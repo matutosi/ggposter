@@ -1,23 +1,14 @@
 Package: ggposter
-Type: Package
 Title: Poster creation tool for conference presentations using ggplot2 in R
 Version: 0.5.0
 Authors@R: person("Toshikazu", "Matsumura", role = c("aut", "cre"), email = "matutosi@gmail.com")
 Description: ggposter makes it easy to create a poster for conference presentations using ggplot2 in R. 
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Imports: 
     knitr,
-    dplyr,
-    plyr,
-    purrr,
-    stringr,
-    tibble,
-    tidyr,
     tidyverse,
-    tidyselect,
-    magrittr,
+    tidyselect
 VignetteBuilder: knitr
 RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)

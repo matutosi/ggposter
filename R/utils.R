@@ -32,5 +32,5 @@ check_numeric <- function(x){
   #' 
   #' @export
 as_names_dots <- function(...){
- as.character(pryr::named_dots(a, b, d))
+ as.character(plyr::named_dots(a, b, d))
 }
