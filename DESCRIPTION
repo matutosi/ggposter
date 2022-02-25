@@ -10,6 +10,7 @@ LazyData: true
 Imports: 
     knitr,
     dplyr,
+    plyr,
     purrr,
     stringr,
     tibble,
