@@ -1,11 +1,24 @@
 Package: ggposter
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Poster creation tool for conference presentations using ggplot2 in R
+Version: 0.5.0
+Authors@R: person("Toshikazu", "Matsumura", role = c("aut", "cre"), email = "matutosi@gmail.com")
+Description: ggposter makes it easy to create a poster for conference presentations using ggplot2 in R. 
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Imports: 
+    knitr,
+    dplyr,
+    purrr,
+    stringr,
+    tibble,
+    tidyr,
+    tidyverse,
+    tidyselect,
+    magrittr,
+VignetteBuilder: knitr
+RoxygenNote: 7.1.2
+Roxygen: list(markdown = TRUE)
+Depends: 
+    R (>= 3.5.0)
