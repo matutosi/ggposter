@@ -1,8 +1,13 @@
+  #' @importFrom rlang .data
+  #' @export
+rlang::`.data`
+
+
   #' Check class of object. 
   #' 
-  #' @param x Object to be coerced or tested.
-  #' @return Returns nothing. When error, only error massage. 
-  #' 
+  #' @param x Object to be tested.
+  #' @return TRUE or FALSE and warning message. 
+  #' @name check_class
   #' @examples
   #' x <- 1
   #' y <- "text"
@@ -13,24 +18,23 @@
   #' 
   #' @export
 check_text <- function(x){
-  if(!is.null(x)) if(!is.character(x)) stop("text MUST be character!")
-}
-check_numeric <- function(x){
-  if(!is.null(x)) if(!is.numeric(x)) stop("x MUST be numeric!")
+  if(!is.null(x)){
+    if(!is.character(x)){
+       warning("text MUST be character!")
+       return(FALSE)
+    }
+  }
+  return(TRUE)
 }
 
-  #' Check class of object. 
-  #' 
-  #' @param ... Any object. 
-  #' @return String of value name. 
-  #' 
-  #' @examples
-  #' x <- 1
-  #' y <- "text"
-  #' z <- NULL
-  #' as_names_dots(x, y, z)
-  #' 
+  #' @rdname check_class
   #' @export
-as_names_dots <- function(...){
- as.character(plyr::named_dots(a, b, d))
+check_numeric <- function(x){
+  if(!is.null(x)){
+    if(!is.numeric(x)){
+       warning("x MUST be numeric!")
+       return(FALSE)
+    }
+  }
+  return(TRUE)
 }
