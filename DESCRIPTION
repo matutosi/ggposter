@@ -6,9 +6,18 @@ Description: ggposter makes it easy to create a poster for conference presentati
 License: MIT + file LICENSE
 Encoding: UTF-8
 Imports: 
+    grid,
     knitr,
-    tidyverse,
-    tidyselect
+    dplyr,
+    ggplot2, 
+    magrittr,
+    purrr,
+    rlang,
+    stringr,
+    tibble,
+    tidyr,
+    tidyselect,
+    utils
 VignetteBuilder: knitr
 RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)
