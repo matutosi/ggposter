@@ -2,42 +2,27 @@
 % Please edit documentation in R/textgrob.R
 \name{as_tg}
 \alias{as_tg}
-\title{Convert text to text grob.}
+\title{Wrapper function for grid::textGrob.}
 \usage{
-as_tg(
-  text,
-  font_size = NULL,
-  base = NULL,
-  name = NULL,
-  use = NULL,
-  silent = TRUE
-)
+as_tg(text, font_size, use, just)
 }
 \arguments{
-\item{text}{A string.}
+\item{text}{A string.
+label in grid::textGrob().}
 
-\item{font_size}{A numeric of font size.}
+\item{font_size}{A numeric of font size.
+fontsize in grid::textGrob().}
 
-\item{base}{A numeric of base font size:
-8, 10, 12, 14, 18, 22, 26, 32, or 38)
-If base=NULL, base=26 will be set in get_font_size().}
+\item{use}{A string.
+name in grid::textGrob().}
 
-\item{name}{A string of font size name.
-"tiny", "scriptsize", "footnotesize", "small",
-"normalsize", "large", "Large", "LARGE",
-"huge", "Huge", or "HUGE"}
-
-\item{use}{A string of font size name for use.
-"tiny", "script", "footnote", "caption",
-"body", "BODY", "item", "ITEM", "thank",
-"author", "affil", "subt", "kw", or "title"
-thank: acknowledgement
-affil: affiliation
-subt: subtitle
-kw: keyword}
-
-\item{silent}{Logical. TRUE: no massage, FALSE: shows massage.}
+\item{just}{A string.
+"left", "right", "centre", "center", "bottom", and "top".
+See grid::textGrob() in detail.}
 }
 \description{
-Convert text to text grob.
+Wrapper function for grid::textGrob.
+}
+\seealso{
+grid::textGrob()
 }
