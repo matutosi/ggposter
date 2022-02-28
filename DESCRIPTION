@@ -5,6 +5,7 @@ Authors@R: person("Toshikazu", "Matsumura", role = c("aut", "cre"), email = "mat
 Description: ggposter makes it easy to create a poster for conference presentations using ggplot2 in R. 
 License: MIT + file LICENSE
 Encoding: UTF-8
+LazyData: true
 Imports: 
     grid,
     knitr,

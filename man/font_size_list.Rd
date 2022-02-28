@@ -22,7 +22,7 @@ List of font size for ggposter.
 }
 \examples{
 # You can check font size by base_size. 
-utils::data(font_size_list)
+data(font_size_list)
 font_size_list \%>\% split(.$base_size)
 # 
 # You can show font size as plot by ggplot visualisation as below. 
@@ -32,7 +32,6 @@ font_size_list \%>\%
     ggplot2::theme_bw()
 # 
 # This data was generated as below. 
-# NOT RUN
 # base  <- c(8, 10, 12, 14, 18, 22, 26, 32, 38)
 # ratio <- round(c(1/(1.2^(4:1)), 1.2^(0:6)), 2)
 # name  <- c(

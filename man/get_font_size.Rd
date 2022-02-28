@@ -9,7 +9,6 @@ get_font_size(base = NULL, name = NULL, use = NULL)
 \arguments{
 \item{base}{A numeric of base font size:
 8, 10, 12, 14, 18, 22, 26, 32, or 38)
-See font_size_list.
 If base=NULL, base=26 will be set in get_font_size().}
 
 \item{name}{A string of font size name.
@@ -27,7 +26,7 @@ subt: subtitle
 kw: keyword}
 }
 \value{
-A numeric of font size
+A numeric of font size.
 }
 \description{
 Get font size from font_size_list with name or use.

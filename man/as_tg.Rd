@@ -13,7 +13,6 @@ as_tg(text, font_size = NULL, base = NULL, name = NULL, use = NULL)
 
 \item{base}{A numeric of base font size:
 8, 10, 12, 14, 18, 22, 26, 32, or 38)
-See font_size_list.
 If base=NULL, base=26 will be set in get_font_size().}
 
 \item{name}{A string of font size name.
