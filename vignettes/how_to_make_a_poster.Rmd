@@ -21,14 +21,124 @@ library(tidyverse)
 library(ggposter)
 ```
 
+# Arrange grobs
+
+## Text grobs
+
+```{r text_grob, warning=FALSE}
+txt_tiny     <- "tiny"
+txt_script   <- "script"
+txt_footnote <- "footnote"
+txt_caption  <- "caption"
+txt_body     <- "body"
+txt_BODY     <- "BODY"
+txt_item     <- "item"
+txt_ITEM     <- "ITEM"
+txt_thank    <- "thank"
+txt_author   <- "author"
+txt_affil    <- "affil"
+txt_subt     <- "subt"
+txt_kw       <- "kw"
+txt_title    <- "title"
+
+tg_layout_1 <- arrange_txt(txt_tiny, txt_script, txt_footnote, txt_caption, txt_body, txt_BODY, txt_item, txt_ITEM)
+tg_layout_2 <- arrange_txt(txt_thank, txt_author, txt_affil, txt_subt, txt_kw, txt_title)
+
+grid::grid.draw(tg_layout_1)
+grid::grid.draw(tg_layout_2)
+```
+
+
+## Combine ggobject and text grob 
+
+You can combine ggplot object and text grob using gridExtra package. 
+
+At first, generate ggplot object as below. 
+
+```{r gg_obj, warning=FALSE}
+gg_obj <- 
+  ggplot2::ggplot(mpg) + 
+  ggplot2::geom_point(aes(x = displ, y = hwy)) +
+  ggplot2::theme_bw()
+gg_obj  # draw ggplot object
+```
+
+Then, generate text grob as below. 
+```{r text_grob2, warning=FALSE}
+txt_body_1 <- "This graphics was generated using ggplot2. "
+txt_body_2 <- "x axis is displ that means engine displacement in litres."
+txt_body_3 <- "y axis is hwy that means highway miles per gallon."
+
+tg_grob <- arrange_txt(txt_body_1, txt_body_2, txt_body_3)
+grid::grid.draw(tg_grob)
+```
+
+Next, combine
+```{r combine_gg_text, warning=FALSE}
+gg_and_text <- gridExtra::grid.arrange(gg_obj, tg_grob, nrow=1, respect=c(TRUE, FALSE), widths=c(1,2))
+grid::grid.draw(gg_and_text)
+```
+
+<!--
+http://www.sthda.com/english/wiki/wiki.php?id_contents=7930
+-->
+
+
+# Generate a poster 
+
+## Title
 
 ```{r title, warning=FALSE}
-txt_title <- "This is a title."
+txt_title_1 <- "This is a title."
 txt_ITEM_1 <- "ITEM text is larger than item text."
 txt_item_2 <- "This is a item text, too."
 txt_BODY_1 <- "BODY text is larger than body text."
 txt_body_2 <- "This is a body text, too."
-arranged_txt <- arrange_txt(txt_title, txt_ITEM_1, txt_item_2, txt_BODY_1, txt_body_2)
+arranged_txt <- arrange_txt(txt_title_1, txt_ITEM_1, txt_item_2, txt_BODY_1, txt_body_2)
 grid::grid.draw(arranged_txt)
-
 ```
+
+
+# Sample
+
+
+```{r sample_two_colmns, warning=FALSE}
+txt_title  <- "wameicheckr"
+  # txt_subt   <- ""
+txt_author <- "Toshikazu Matsumura (Konan Women's univ.)"
+  # txt_affil  <- ""
+  # txt_thank  <- ""
+txt_kw     <- "keywords: analysis，databese, search species names"
+```
+
+```{r warning=FALSE}
+txt_title     <- "title"
+txt_author    <- "author"
+txt_kw        <- "keywords"
+
+txt_header <- txt2tibble(txt_title, txt_author, txt_kw)
+tg_header <- purrr::pmap(txt_header, as_tg)
+layout <- tg2layout(tg_header)
+tg_layout <- tg_arrange(tg=tg_header, layout=layout)
+grid::grid.draw(tg_layout)
+```
+
+# References
+
+- Code in『R graphics』 by Paul Murell
+  - [1st edition](https://www.stat.auckland.ac.nz/~paul/RGraphics/rgraphics.html)
+  - [2nd edition](https://www.stat.auckland.ac.nz/~paul/RG2e/)
+  - [3rd edition](https://www.stat.auckland.ac.nz/~paul/RG3e/)
+
+<!--
+  - https://stat-ata-asu.github.io/R_DS_BD2020/using-ggplot2.html
+  - https://www.christophenicault.com/post/understand_size_dimension_ggplot2/
+
+  - ggplot2, grid, gtable, gridExtra
+    - https://notchained.hatenablog.com/entry/2015/12/17/010904
+    - https://github.com/baptiste/gridextra/wiki/arranging-ggplot
+
+  - gtable
+    - https://cran.r-project.org/web/packages/gridExtra/vignettes/gtable.html
+    - https://github.com/r-lib/gtable
+-->
