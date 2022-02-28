@@ -32,7 +32,6 @@ arrange_txt <- function(...){
   #' @param font_size A numeric of font size.
   #' @param base A numeric of base font size: 
   #'             8, 10, 12, 14, 18, 22, 26, 32, or 38)
-  #'             See font_size_list. 
   #'             If base=NULL, base=26 will be set in get_font_size(). 
   #' @param name A string of font size name. 
   #'             "tiny", "scriptsize", "footnotesize", "small", 
@@ -46,7 +45,6 @@ arrange_txt <- function(...){
   #'               affil: affiliation
   #'               subt: subtitle
   #'               kw: keyword
-  #'
   #' @export
 as_tg <- function(text, font_size=NULL, base=NULL, name=NULL, use=NULL){
     # check input arguments
@@ -87,18 +85,18 @@ as_tg <- function(text, font_size=NULL, base=NULL, name=NULL, use=NULL){
   #' @export
 txt2tibble <- function(...){
   tibble::tibble(...=...) %>%
-    dplyr::mutate(!!"tmp" := 1) %>%
-    tidyr::pivot_longer(!rlang::sym("tmp"), names_to="use", values_to = "text") %>%
-    dplyr::select(-tidyselect::all_of("tmp")) %>%
+    t() %>%
+    as.data.frame() %>%
+    magrittr::set_colnames("text") %>%
+    tibble::rownames_to_column("use") %>%
+    tibble::remove_rownames() %>%
     tidyr::separate(rlang::sym("use"), into=c(NA, "use"), sep="_", extra="drop")
 }
-
 
   #' Get font size from font_size_list with name or use. 
   #' 
   #' @param base A numeric of base font size: 
   #'             8, 10, 12, 14, 18, 22, 26, 32, or 38)
-  #'             See font_size_list. 
   #'             If base=NULL, base=26 will be set in get_font_size(). 
   #' @param name A string of font size name. 
   #'             "tiny", "scriptsize", "footnotesize", "small", 
@@ -112,7 +110,7 @@ txt2tibble <- function(...){
   #'               affil: affiliation
   #'               subt: subtitle
   #'               kw: keyword
-  #' @return A numeric of font size
+  #' @return A numeric of font size.
   #' @seealso font_size_list
   #' @examples
   #' get_font_size(base=NULL, name="large", use=NULL)
@@ -122,7 +120,6 @@ txt2tibble <- function(...){
   #' 
   #' @export
 get_font_size <- function(base=NULL, name=NULL, use=NULL){
-  #   utils::globalVariables(c("font_size_list", "base_size", "font_name", "font_use"))
   if(is.null(base)){
     message("26pt is used for base size.")
     base <- 26
@@ -135,14 +132,10 @@ get_font_size <- function(base=NULL, name=NULL, use=NULL){
     message("'use' is used to set font size. Please input one of name OR use.") 
     name <- NULL
   }
-  utils::data(font_size_list, envir=environment())
-  font <- dplyr::filter(font_size_list, .data[["base_size"]]==base)
+  utils::data("font_size_list")
+  font <- dplyr::filter(eval(rlang::sym("font_size_list")), .data[["base_size"]]==base)
   if(!is.null(name)) font <- dplyr::filter(font, .data[["font_name"]]==name)
   if(!is.null(use))  font <- dplyr::filter(font, stringr::str_detect(.data[["font_use"]], use))
-  #   font <- dplyr::filter(font_size_list, rlang::sym("base_size")==base)        # not work. why?
-  #   font <- dplyr::filter(font_size_list, rlang::.data[["base_size"]]==base)    # not work. why?
-  #   if(!is.null(name)) font <- dplyr::filter(font, rlang::sym("font_name")==name)
-  #   if(!is.null(use))  font <- dplyr::filter(font, stringr::str_detect(rlang::sym("font_use"), use))
   font$size
 }
 
