@@ -24,3 +24,6 @@ RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)
 Depends: 
     R (>= 3.5.0)
+Suggests: 
+    rmarkdown,
+    tidyverse

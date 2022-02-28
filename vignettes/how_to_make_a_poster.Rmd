@@ -1,0 +1,34 @@
+---
+title: "how_to_make_a_poster"
+author: "Toshikazu, Matsumura"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{how_to_make_a_poster}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(tidyverse)
+library(ggposter)
+```
+
+
+```{r title, warning=FALSE}
+txt_title <- "This is a title."
+txt_ITEM_1 <- "ITEM text is larger than item text."
+txt_item_2 <- "This is a item text, too."
+txt_BODY_1 <- "BODY text is larger than body text."
+txt_body_2 <- "This is a body text, too."
+arranged_txt <- arrange_txt(txt_title, txt_ITEM_1, txt_item_2, txt_BODY_1, txt_body_2)
+grid::grid.draw(arranged_txt)
+
+```
