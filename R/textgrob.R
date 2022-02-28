@@ -1,6 +1,9 @@
   #' Wrapper function of converting text into arranged text grob.
   #' 
   #' @inheritParams txt2tibble
+  #' @param just      A string. 
+  #'                  "left", "right", "centre", "center", "bottom", and "top". 
+  #'                  See grid::textGrob() in detail.
   #' @param silent Logical. TRUE: no massage, FALSE: shows massage. 
   #' @return textGrob
   #' @examples
@@ -9,37 +12,26 @@
   #' txt_item_2   <- "This is a item text, too."
   #' txt_BODY_1   <- "BODY text is larger than body text."
   #' txt_body_2   <- "This is a body text, too."
-  #' arranged_txt <- arrange_txt(txt_title, txt_ITEM_1, txt_item_2, txt_BODY_1, txt_body_2)
-  #' grid::grid.draw(arranged_txt)
+  #' arranged_txt_1 <- arrange_txt(txt_title, txt_ITEM_1, txt_item_2)
+  #' grid::grid.draw(arranged_txt_1)
+  #' arranged_txt_2 <- arrange_txt(txt_BODY_1, txt_body_2, just="left")
+  #' grid::grid.draw(arranged_txt_2)
   #' 
   #' @export
-arrange_txt <- function(..., silent=TRUE){
+arrange_txt <- function(..., just="center", silent=TRUE){
+  tbl <- txt2tibble(...)
   tg <- 
-    txt2tibble(...) %>%
+    tbl %>%
+    dplyr::mutate(font_size = purrr::pmap_dbl(tbl, get_font_size)) %>%
+    dplyr::mutate(just=just) %>%
     purrr::pmap(as_tg)
   layout <- tg2layout(tg)
   tg_arrange(tg=tg, layout=layout)
-}
-
-  #' Convert text to text grob.  
-  #' 
-  #' @param text      A string. 
-  #' @param font_size A numeric of font size.
-  #' @inheritParams get_font_size
-  #' @export
-as_tg <- function(text, font_size=NULL, base=NULL, name=NULL, use=NULL, silent=TRUE){
-    # check input arguments
-  if(!check_text(text))         return(NULL)
-  if(!check_text(use))          return(NULL)
-  if(!check_text(name))         return(NULL)
-  if(!check_numeric(font_size)) return(NULL)
-  if(!check_numeric(base))      return(NULL)
-    # font size
-  if(is.null(font_size)){
-    font_size <- get_font_size(base, name, use, silent)
-  }
-    # make grob
-  grid::textGrob(label=text, gp=grid::gpar(fontsize=font_size), name=use)
+  #   tg <- 
+  #     txt2tibble(...) %>%
+  #     purrr::pmap(as_tg)
+  #   layout <- tg2layout(tg)
+  #   tg_arrange(tg=tg, layout=layout)
 }
 
   #' Convert text into tibble. 
@@ -75,6 +67,23 @@ txt2tibble <- function(...){
     tidyr::separate(rlang::sym("use"), into=c(NA, "use"), sep="_", extra="drop", fill="left")
 }
 
+  #' Wrapper function for grid::textGrob. 
+  #' 
+  #' @param text      A string.
+  #'                  label in grid::textGrob(). 
+  #' @param font_size A numeric of font size.
+  #'                  fontsize in grid::textGrob(). 
+  #' @param use       A string.
+  #'                  name in grid::textGrob(). 
+  #' @param just      A string. 
+  #'                  "left", "right", "centre", "center", "bottom", and "top". 
+  #'                  See grid::textGrob() in detail.
+  #' @seealso grid::textGrob()
+  #' @export
+as_tg <- function(text, font_size, use, just){
+  grid::textGrob(label=text, gp=grid::gpar(fontsize=font_size), name=use, just=just)
+}
+
   #' Get font size from font_size_list with name or use. 
   #' 
   #' @param base A numeric of base font size: 
@@ -92,6 +101,7 @@ txt2tibble <- function(...){
   #'               affil: affiliation
   #'               subt: subtitle
   #'               kw: keyword
+  #' @param text   A string, but this argument will be omitted.
   #' @param silent Logical. TRUE: no massage, FALSE: shows massage. 
   #' @return A numeric of font size.
   #' @seealso font_size_list
@@ -102,7 +112,7 @@ txt2tibble <- function(...){
   #' get_font_size(base=22,   name=NULL,    use="kw")
   #' 
   #' @export
-get_font_size <- function(base=NULL, name=NULL, use=NULL, silent=TRUE){
+get_font_size <- function(base=NULL, name=NULL, use=NULL, silent=TRUE, text=""){
   if(is.null(base)){
     if(!silent) message("26pt is used for base size.")
     base <- 26
