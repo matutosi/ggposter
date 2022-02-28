@@ -71,7 +71,8 @@ txt2tibble <- function(...){
     magrittr::set_colnames("text") %>%
     tibble::rownames_to_column("use") %>%
     tibble::remove_rownames() %>%
-    tidyr::separate(rlang::sym("use"), into=c(NA, "use"), sep="_", extra="drop")
+  #     tidyr::separate(rlang::sym("use"), into=c(NA, "use"), sep="_", extra="drop")
+    tidyr::separate(rlang::sym("use"), into=c(NA, "use"), sep="_", extra="drop", fill="left")
 }
 
   #' Get font size from font_size_list with name or use. 
