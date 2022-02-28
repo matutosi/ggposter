@@ -2,7 +2,7 @@
 % Please edit documentation in R/textgrob.R
 \name{tg_arrange}
 \alias{tg_arrange}
-\title{Title.}
+\title{Arrange text grob with layout.}
 \usage{
 tg_arrange(tg, layout, name = NULL)
 }
@@ -10,11 +10,10 @@ tg_arrange(tg, layout, name = NULL)
 \item{tg}{A text grob}
 
 \item{layout}{A Grid layout, or NULL.
-This can be used to initialise the frame with a number of
-rows and columns, with initial widths and heights, etc.}
+This can be used to initialise the frame with a number of rows.}
 
 \item{name}{A character identifier of frame name.}
 }
 \description{
-Title.
+Arrange text grob with layout.
 }

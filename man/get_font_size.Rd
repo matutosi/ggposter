@@ -4,7 +4,7 @@
 \alias{get_font_size}
 \title{Get font size from font_size_list with name or use.}
 \usage{
-get_font_size(base = NULL, name = NULL, use = NULL)
+get_font_size(base = NULL, name = NULL, use = NULL, silent = TRUE)
 }
 \arguments{
 \item{base}{A numeric of base font size:
@@ -24,6 +24,8 @@ thank: acknowledgement
 affil: affiliation
 subt: subtitle
 kw: keyword}
+
+\item{silent}{Logical. TRUE: no massage, FALSE: shows massage.}
 }
 \value{
 A numeric of font size.

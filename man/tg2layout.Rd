@@ -2,22 +2,22 @@
 % Please edit documentation in R/textgrob.R
 \name{tg2layout}
 \alias{tg2layout}
-\title{Layout}
+\title{Create layout to fit height and width with text grob.}
 \usage{
 tg2layout(tg, width = NULL, height = NULL, row_margin = 1.5)
 }
 \arguments{
 \item{tg}{A text grob}
 
-\item{width}{A numeric.}
+\item{width}{A numeric. Default is null to fit text grob.}
 
-\item{height}{A numeric.}
+\item{height}{A numeric. Default is null to fit text grob.}
 
-\item{row_margin}{A numeric.}
+\item{row_margin}{A numeric. Default is 1.5. This makes rows 1.5 heights of text grobs.}
 }
 \value{
 Lauyout grob
 }
 \description{
-Layout
+Create layout to fit height and width with text grob.
 }

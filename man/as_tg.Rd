@@ -4,7 +4,14 @@
 \alias{as_tg}
 \title{Convert text to text grob.}
 \usage{
-as_tg(text, font_size = NULL, base = NULL, name = NULL, use = NULL)
+as_tg(
+  text,
+  font_size = NULL,
+  base = NULL,
+  name = NULL,
+  use = NULL,
+  silent = TRUE
+)
 }
 \arguments{
 \item{text}{A string.}
@@ -28,6 +35,8 @@ thank: acknowledgement
 affil: affiliation
 subt: subtitle
 kw: keyword}
+
+\item{silent}{Logical. TRUE: no massage, FALSE: shows massage.}
 }
 \description{
 Convert text to text grob.

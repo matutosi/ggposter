@@ -28,8 +28,8 @@ txt_title <- "This is a title."
 txt_ITEM_1 <- "ITEM text is larger than item text."
 txt_item_2 <- "This is a item text, too."
 txt_BODY_1 <- "BODY text is larger than body text."
-txt_body_1 <- "This is a body text, too."
-txt2tibble(txt_title, txt_ITEM_1, txt_item_2, txt_BODY_1, txt_body_1)
+txt_body_2 <- "This is a body text, too."
+txt2tibble(txt_title, txt_ITEM_1, txt_item_2, txt_BODY_1, txt_body_2)
 
 }
 \seealso{

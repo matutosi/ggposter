@@ -4,16 +4,18 @@
 \alias{arrange_txt}
 \title{Wrapper function of converting text into arranged text grob.}
 \usage{
-arrange_txt(...)
+arrange_txt(..., silent = TRUE)
 }
 \arguments{
 \item{...}{Text object(s). Multiple object can be input.
-Object name of text: foo_useword or foo_keyword_bar
+Object name of text: foo_keyword or foo_keyword_bar
 examples: txt_title, txt_body_1, proj_ITEM_big
-useword: "tiny", "script", "footnote", "caption",
+keyword: "tiny", "script", "footnote", "caption",
 "body", "BODY", "item", "ITEM",
 "thank", "author", "affil",
-"subt", "kw", or "title"}
+"subt", "kw" or "title"}
+
+\item{silent}{Logical. TRUE: no massage, FALSE: shows massage.}
 }
 \value{
 textGrob
