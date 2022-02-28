@@ -136,9 +136,9 @@ grid::grid.draw(tg_header)
 # References
 
 - Code in『R graphics』 by Paul Murell
-  - [1st edition](https://www.stat.auckland.ac.nz/~paul/RGraphics/rgraphics.html)
-  - [2nd edition](https://www.stat.auckland.ac.nz/~paul/RG2e/)
-  - [3rd edition](https://www.stat.auckland.ac.nz/~paul/RG3e/)
+  - [1st edition]( https://www.stat.auckland.ac.nz/~paul/RGraphics/rgraphics.html )
+  - [2nd edition]( https://www.stat.auckland.ac.nz/~paul/RG2e/ )
+  - [3rd edition]( https://www.stat.auckland.ac.nz/~paul/RG3e/ )
 
 <!--
   - https://stat-ata-asu.github.io/R_DS_BD2020/using-ggplot2.html
