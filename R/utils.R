@@ -2,7 +2,6 @@
   #' @export
 rlang::`.data`
 
-
   #' Check class of object. 
   #' 
   #' @param x Object to be tested.
