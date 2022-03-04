@@ -18,7 +18,39 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(tidyverse)
+library(grid)
 library(ggposter)
+```
+
+
+```{r}
+t_1 <- "This is a sample text. "
+t_2 <- "When longer than viewpeort width, "
+t_3 <- "text will be split and add a break. "
+t_4 <- "This text is separated into 5 objects, "
+t_5 <- "because of R document specification."
+text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
+  # Split text in the context of current grid.gpar()
+splitString(text)
+  # Generate split textGrob on condisions of arguments.
+fontsize <- 20
+stg <- split_text_grob(text, gp=gpar(fontsize=40, font=2))
+grid.draw(stg)
+```
+
+```{r}
+t_1 <- "This is a sample text. "
+t_2 <- "When longer than viewpeort width, "
+t_3 <- "text will be split and add a break. "
+t_4 <- "This text is separated into 5 objects, "
+t_5 <- "because of R document specification."
+text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
+vp <- viewport(gp=gpar(fontsize=20))
+pushViewport(vp)
+st <- splitString(text)
+grid.draw(textGrob(st, x=0, y=1, just=c("left", "top")))
+  # grid.draw(textGrob(st, x=0, y=1, just=c("left", "top"), vp=vp))
+popViewport()
 ```
 
 # Arrange grobs
@@ -111,6 +143,16 @@ arranged_txt <- arrange_txt(txt_title_1, txt_ITEM_1, txt_item_2, txt_BODY_1, txt
 grid::grid.draw(arranged_txt)
 ```
 
+```{r}
+t_1 <- "This is a sample text. "
+t_2 <- "When longer than viewpeort width, "
+t_3 <- "text will be split and add a break. "
+t_4 <- "This text is separated into 5 objects, "
+t_5 <- "because of R document specification."
+text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
+splitText <- split_text_grob(text)
+grid::grid.draw(splitText)
+```
 
 # Sample
 

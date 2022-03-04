@@ -4,7 +4,7 @@
 \alias{arrange_txt}
 \title{Wrapper function of converting text into arranged text grob.}
 \usage{
-arrange_txt(..., just = "center", silent = TRUE)
+arrange_txt(..., just = "center", width = grid::unit(841, "mm"), silent = TRUE)
 }
 \arguments{
 \item{...}{Text object(s). Multiple object can be input.
@@ -18,6 +18,8 @@ keyword: "tiny", "script", "footnote", "caption",
 \item{just}{A string.
 "left", "right", "centre", "center", "bottom", and "top".
 See grid::textGrob() in detail.}
+
+\item{width}{grid::unit}
 
 \item{silent}{Logical. TRUE: no massage, FALSE: shows massage.}
 }

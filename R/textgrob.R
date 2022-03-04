@@ -4,6 +4,7 @@
   #' @param just      A string. 
   #'                  "left", "right", "centre", "center", "bottom", and "top". 
   #'                  See grid::textGrob() in detail.
+  #' @param width grid::unit
   #' @param silent Logical. TRUE: no massage, FALSE: shows massage. 
   #' @return textGrob
   #' @examples
@@ -18,20 +19,15 @@
   #' grid::grid.draw(arranged_txt_2)
   #' 
   #' @export
-arrange_txt <- function(..., just="center", silent=TRUE){
+arrange_txt <- function(..., just="center", width=grid::unit(841, "mm"), silent=TRUE){
   tbl <- txt2tibble(...)
   tg <- 
     tbl %>%
-    dplyr::mutate(font_size = purrr::pmap_dbl(tbl, get_font_size)) %>%
+    dplyr::mutate(font_size = purrr::pmap_dbl(tbl, get_font_size, silent=silent)) %>%
     dplyr::mutate(just=just) %>%
     purrr::pmap(as_tg)
-  layout <- tg2layout(tg)
+  layout <- tg2layout(tg, width=width)
   tg_arrange(tg=tg, layout=layout)
-  #   tg <- 
-  #     txt2tibble(...) %>%
-  #     purrr::pmap(as_tg)
-  #   layout <- tg2layout(tg)
-  #   tg_arrange(tg=tg, layout=layout)
 }
 
   #' Convert text into tibble. 
@@ -135,18 +131,17 @@ get_font_size <- function(base=NULL, name=NULL, use=NULL, silent=TRUE, text=""){
   #' Create layout to fit height and width with text grob. 
   #' 
   #' @param tg A text grob
-  #' @param width A numeric. Default is null to fit text grob. 
+  #' @param width grid::unit
   #' @param height A numeric. Default is null to fit text grob. 
   #' @param row_margin A numeric. Default is 1.5. This makes rows 1.5 heights of text grobs. 
   #' 
   #' @return Lauyout grob
   #' 
   #' @export
-tg2layout <- function(tg, width=NULL, height=NULL, row_margin=1.5  # height = height * row_margin
+tg2layout <- function(tg, width=grid::unit(841, "mm"), height=NULL, row_margin=1.5  # height = height * row_margin
   ){
   nrow <- length(tg)
-  grid::grid.layout(nrow, 1, width=grid::unit(841, "mm"), height=grid::unit(rep(1.5, nrow), "grobheight", tg))
-  # layout <- grid::grid.layout(nrow, 1, width=unit(841, "mm"), height=unit(1, "null"))
+  grid::grid.layout(nrow, 1, width=width, height=grid::unit(rep(1.5, nrow), "grobheight", tg))
 }
 
   #' Arrange text grob with layout.
@@ -158,10 +153,71 @@ tg2layout <- function(tg, width=NULL, height=NULL, row_margin=1.5  # height = he
   #' 
   #' @export
 tg_arrange <- function(tg, layout, name=NULL){
-  # tg <- tg_header
-  # layout <- tg_layout
-  # name <- NULL
   res <- grid::frameGrob(layout=layout, name=name)
   for(i in seq_along(tg)) res <- grid::placeGrob(res, tg[[i]], row=i)
   res
+}
+
+  #' Split text to fit viewpeort width
+  #' 
+  #' This function is a little bit modification of splitString in "R Graphics"
+  #'   Chapter 6: Developing New Graphics Functions and Objects
+  #'   https://www.stat.auckland.ac.nz/~paul/RGraphics/interactgrid-calcdraw.R
+  #' @param text      A string. 
+  #' @param width     grid::unit()
+  #' @param gp        grid::gpar()
+  #' @param name      A string. 
+  #' @return splitString(): split text by "\\n". split_text_grob: textGrob.
+  #' @name split_text_grob
+  #' @examples
+  #' # grid::grid.newpage()
+  #' library(grid)
+  #' t_1 <- "This is a sample text. "
+  #' t_2 <- "When longer than viewpeort width, "
+  #' t_3 <- "text will be split and add a break. "
+  #' t_4 <- "This text is separated into 5 objects, "
+  #' t_5 <- "because of R document specification."
+  #' text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
+  #' # Split text in the context of current grid.gpar()
+  #' splitString(text)
+  #' # Generate split textGrob on condisions of arguments.
+  #' fontsize <- 40
+  #' stg <- split_text_grob(text, gp=gpar(fontsize=40, font=2))
+  #' grid.draw(stg)
+  #' 
+  #' @export
+split_text_grob <- function(text, width=NULL, gp=NULL, name=NULL){
+  if(is.null(width)) width <- grid::unit(1, "npc")
+  if(is.null(gp$lineheight)) <- 1.1
+  if(is.null(gp$fontsize))   <- 12
+  vp <- grid::viewport(width=width, gp=gp)
+  grid::pushViewport(vp=vp)
+  st <- splitString(text)
+  grid::popViewport()
+  grid::textGrob(label=st, x=0, y=1, just=c("left", "top"), name=name, gp=gp)
+}
+
+  #' @rdname split_text_grob
+  #' @export
+splitString <- function(text){
+    # base::split(): stringr::str_split()
+    # base::paste(): stringr::str_c()
+    # "inches" -> "mm"
+  strings    <- stringr::str_split(text, " ")[[1]]
+  newstring  <- strings[1]
+  linewidth  <- grid::stringWidth(newstring)
+  gapwidth   <- grid::stringWidth(" ") 
+  availwidth <- grid::convertWidth(grid::unit(1, "npc"), "mm", valueOnly=TRUE)
+  for(i in 2:length(strings)) {
+    width <- grid::stringWidth(strings[i])
+    if(grid::convertWidth(linewidth + gapwidth + width, "mm", valueOnly=TRUE) < availwidth) {
+      sep <- " "
+      linewidth <- linewidth + gapwidth + width
+    } else {
+      sep <- "\n"
+      linewidth <- width
+    }
+    newstring <- stringr::str_c(newstring, strings[i], sep=sep)
+  }
+  newstring
 }
