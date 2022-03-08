@@ -19,28 +19,63 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(tidyverse)
 library(grid)
+library(gridtext)
 library(ggposter)
 ```
 
-
 ```{r}
+  # plot
+plot <- 
+  ggplot2::ggplot(mpg) + 
+  ggplot2::geom_point(aes(x = displ, y = hwy)) +
+  ggplot2::theme_bw()
+plot  # draw ggplot object
+
+  # text
 t_1 <- "This is a sample text. "
-t_2 <- "When longer than viewpeort width, "
-t_3 <- "text will be split and add a break. "
+t_2 <- "When longer than width, "
+t_3 <- "text will be split and add breaks. "
 t_4 <- "This text is separated into 5 objects, "
 t_5 <- "because of R document specification."
 text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
-  # Split text in the context of current grid.gpar()
-splitString(text)
-  # Generate split textGrob on condisions of arguments.
+  # gp_text
 fontsize <- 20
-stg <- split_text_grob(text, gp=gpar(fontsize=40, font=2))
-grid.draw(stg)
+lineheight <- 1.1
+gp_text <- gpar(fontsize=fontsize, lineheight=lineheight)
+
+  # title
+title <- "THIS IS TITLE WORDS"
+  # gp_text
+fontsize <- 40
+gp_title <- gpar(fontsize=fontsize)
+
+slide <- gen_slide(title, plot, text, gp_title, gp_text)
+grid.draw(slide)
+ggplot2::ggsave("d:/slide.pdf", slide, height=210, width=297, units="mm")
+
 ```
+
+```{r richtext_grob}
+grid::grid.newpage()
+rtg <- gridtext::richtext_grob(text=body, gp=gp, vp=vp)
+grid::grid.draw(rtg)
+  # vp, gpslide
+
+```
+
+
+
+
+
+
+
+# test split_text_grob
+
+
 
 ```{r}
 t_1 <- "This is a sample text. "
-t_2 <- "When longer than viewpeort width, "
+t_2 <- "When longer than viewport width, "
 t_3 <- "text will be split and add a break. "
 t_4 <- "This text is separated into 5 objects, "
 t_5 <- "because of R document specification."
@@ -145,7 +180,7 @@ grid::grid.draw(arranged_txt)
 
 ```{r}
 t_1 <- "This is a sample text. "
-t_2 <- "When longer than viewpeort width, "
+t_2 <- "When longer than viewport width, "
 t_3 <- "text will be split and add a break. "
 t_4 <- "This text is separated into 5 objects, "
 t_5 <- "because of R document specification."
@@ -193,4 +228,23 @@ grid::grid.draw(tg_header)
   - gtable
     - https://cran.r-project.org/web/packages/gridExtra/vignettes/gtable.html
     - https://github.com/r-lib/gtable
+
+
+# slide number function, but no need cf. grid:::grobAutoName
+
+slide_no <- function(){
+  res <- 
+    grid::grid.ls(print=FALSE) %>%
+    .$name
+  if(length(res)==0) return(1)
+  res <- 
+    res %>%
+    stringr::str_subset("slide") %>%
+    stringr::str_split("\\.|_") %>%
+    unlist() %>%
+    stringr::str_subset("\\d")
+  if(length(res)==0) return(1)
+  return( max(as.numeric(res)) + 1)
+}
+
 -->

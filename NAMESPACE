@@ -2,7 +2,9 @@
 
 export("%>%")
 export(.data)
+export(arrange_split_txt)
 export(arrange_txt)
+export(as_stg)
 export(as_tg)
 export(check_numeric)
 export(check_text)
