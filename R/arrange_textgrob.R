@@ -1,9 +1,8 @@
   #' Wrapper function of converting text into arranged text grob.
   #' 
   #' @inheritParams txt2tibble
-  #' @param just      A string. 
-  #'                  "left", "right", "centre", "center", "bottom", and "top". 
-  #'                  See grid::textGrob() in detail.
+  #' @param hjust     A numeric 0-1. 
+  #'                  1: left", 0: "right"
   #' @param width grid::unit
   #' @param silent Logical. TRUE: no massage, FALSE: shows massage. 
   #' @return textGrob
@@ -28,6 +27,40 @@ arrange_txt <- function(..., just="center", width=grid::unit(841, "mm"), silent=
     purrr::pmap(as_tg)
   layout <- tg2layout(tg, width=width)
   tg_arrange(tg=tg, layout=layout)
+}
+
+  #' Wrapper function of converting text into arranged text grob.
+  #' 
+  #' @inheritParams txt2tibble
+  #' @param just      A string. 
+  #'                  "left", "right", "centre", "center", "bottom", and "top". 
+  #'                  See grid::textGrob() in detail.
+  #' @param width grid::unit
+  #' @param silent Logical. TRUE: no massage, FALSE: shows massage. 
+  #' @return textGrob
+  #' @examples
+  #' txt_title    <- "This is a title."
+  #' txt_ITEM_1   <- "ITEM text is larger than item text."
+  #' txt_item_2   <- "This is a item text, too."
+  #' txt_BODY_1   <- "BODY text is larger than body text."
+  #' txt_body_2   <- "This is a body text, too."
+  #' arranged_txt_1 <- arrange_split_txt(txt_title, txt_ITEM_1, txt_item_2)
+  #' grid::grid.draw(arranged_txt_1)
+  #' arranged_txt_2 <- arrange_split_txt(txt_BODY_1, txt_body_2, just="left")
+  #' grid::grid.draw(arranged_txt_2)
+  #' 
+  #' @export
+arrange_split_txt <- function(..., just=c("top", "left"), width=NULL, silent=TRUE){
+  tbl <- txt2tibble(...)
+  stg <- 
+    tbl %>%
+    dplyr::mutate(font_size = purrr::pmap_dbl(tbl, get_font_size, silent=silent)) %>%
+    dplyr::mutate(width = width) %>%
+  #     dplyr::mutate(gp = gp) %>%
+    dplyr::mutate(just = just) %>%
+    purrr::pmap(as_stg)
+  #   layout <- tg2layout(stg, width = width)
+  #   tg_arrange(tg = tg, layout = layout)
 }
 
   #' Create layout to fit height and width with text grob. 
@@ -59,4 +92,3 @@ tg_arrange <- function(tg, layout, name=NULL){
   for(i in seq_along(tg)) res <- grid::placeGrob(res, tg[[i]], row=i)
   res
 }
-

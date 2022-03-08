@@ -27,11 +27,10 @@ txt2tibble <- function(...){
     magrittr::set_colnames("text") %>%
     tibble::rownames_to_column("use") %>%
     tibble::remove_rownames() %>%
-  #     tidyr::separate(rlang::sym("use"), into=c(NA, "use"), sep="_", extra="drop")
     tidyr::separate(rlang::sym("use"), into=c(NA, "use"), sep="_", extra="drop", fill="left")
 }
 
-  #' Wrapper function for grid::textGrob. 
+  #' Wrapper function to generate textGrob for grid::textGrob. 
   #' 
   #' @param text      A string.
   #'                  label in grid::textGrob(). 
@@ -44,9 +43,28 @@ txt2tibble <- function(...){
   #'                  See grid::textGrob() in detail.
   #' @seealso grid::textGrob()
   #' @export
-as_tg <- function(text, font_size, use, just){
+as_tg <- function(text, font_size, use, just, ...){
   grid::textGrob(label=text, gp=grid::gpar(fontsize=font_size), name=use, just=just)
 }
+
+
+  #' Wrapper function to generate split textGrob for grid::textGrob. 
+  #' 
+  #' @param text      A string.
+  #'                  label in grid::textGrob(). 
+  #' @param font_size A numeric of font size.
+  #'                  fontsize in grid::textGrob(). 
+  #' @param use       A string.
+  #'                  name in grid::textGrob(). 
+  #' @param just      A string. 
+  #'                  "left", "right", "centre", "center", "bottom", and "top". 
+  #'                  See grid::textGrob() in detail.
+  #' @seealso grid::textGrob()
+  #' @export
+as_stg <- function(text, width=NULL, font_size, use=NULL, ...){
+  split_text_grob(text=text, width=width, gp=grid::gpar(fontsize=font_size), name=use, ...)
+}
+
 
   #' Get font size from font_size_list with name or use. 
   #' 
@@ -125,9 +143,9 @@ get_font_size <- function(base=NULL, name=NULL, use=NULL, silent=TRUE, text=""){
   #' 
   #' @export
 split_text_grob <- function(text, width=NULL, gp=NULL, name=NULL){
-  if(is.null(width)) width <- grid::unit(1, "npc")
-  if(is.null(gp$lineheight)) <- 1.1
-  if(is.null(gp$fontsize))   <- 12
+  if(is.null(width))         width         <- grid::unit(1, "npc")
+  if(is.null(gp$lineheight)) gp$lineheight <- 1.1
+  if(is.null(gp$fontsize))   gp$fontsize   <- 12
   vp <- grid::viewport(width=width, gp=gp)
   grid::pushViewport(vp=vp)
   st <- splitString(text)
