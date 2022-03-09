@@ -32,7 +32,8 @@
 appose_grob <- function(x, y){
     # layout
   widths <- grid::unit(rep(1, 2), rep("grobwidth", 2), list(x, y))
-  layout <- grid::grid.layout(nrow=1, ncol=2, widths=widths)
+  heights <- max(grid::unit(rep(1, 2), rep("grobheight", 2), list(x, y)))
+  layout <- grid::grid.layout(nrow=1, ncol=2, widths=widths, heights=heights)
     # frame and place
   x_y <- grid::frameGrob(layout=layout)
   x_y <- grid::placeGrob(x_y, x, col=1)
@@ -44,8 +45,9 @@ appose_grob <- function(x, y){
   #' @export
 stack_grob <- function(x, y){
     # layout
+  widths <- max(grid::unit(rep(1, 2), rep("grobwidth", 2), list(x, y)))
   heights <- grid::unit(rep(1, 2), rep("grobheight", 2), list(x, y))
-  layout <- grid::grid.layout(nrow=2, ncol=1, heights=heights)
+  layout <- grid::grid.layout(nrow=2, ncol=1, widths=widths, heights=heights)
     # frame and place
   x_y <- grid::frameGrob(layout=layout)
   x_y <- grid::placeGrob(x_y, x, row=1)
@@ -60,7 +62,8 @@ appose_grobs <- function(...){
   n <- length(dots)
     # layout
   widths <- grid::unit(rep(1, n), rep("grobwidth", n), dots)
-  layout <- grid::grid.layout(nrow=1, ncol=n, widths=widths)
+  heights <- max(grid::unit(rep(1, n), rep("grobheight", n), dots))
+  layout <- grid::grid.layout(nrow=1, ncol=n, widths=widths, heights=heights)
     # frame and place
   grobs <- grid::frameGrob(layout=layout)
   for(i in  seq_along(dots)){
@@ -75,8 +78,9 @@ stack_grobs <- function(...){
   dots <- list(...)
   n <- length(dots)
     # layout
+  widths <- max(grid::unit(rep(1, n), rep("grobwidth", n), dots))
   heights <- grid::unit(rep(1, n), rep("grobheight", n), dots)
-  layout <- grid::grid.layout(nrow=n, ncol=1, heights=heights)
+  layout <- grid::grid.layout(nrow=n, ncol=1, widths=widths, heights=heights)
     # frame and place
   grobs <- grid::frameGrob(layout=layout)
   for(i in  seq_along(dots)){
