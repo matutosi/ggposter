@@ -4,14 +4,14 @@
 \alias{tg2layout}
 \title{Create layout to fit height and width with text grob.}
 \usage{
-tg2layout(tg, width = grid::unit(841, "mm"), height = NULL, row_margin = 1.5)
+tg2layout(tg, widths = grid::unit(841, "mm"), heights = NULL, row_margin = 1.5)
 }
 \arguments{
 \item{tg}{A text grob}
 
-\item{width}{grid::unit}
+\item{widths}{grid::unit}
 
-\item{height}{A numeric. Default is null to fit text grob.}
+\item{heights}{A numeric. Default is null to fit text grob.}
 
 \item{row_margin}{A numeric. Default is 1.5. This makes rows 1.5 heights of text grobs.}
 }

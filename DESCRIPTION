@@ -7,10 +7,12 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    grid,
-    knitr,
+    cowplot,
     dplyr,
     ggplot2, 
+    grid,
+    gridtext,
+    knitr,
     magrittr,
     purrr,
     rlang,

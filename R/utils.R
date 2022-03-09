@@ -2,6 +2,10 @@
   #' @export
 rlang::`.data`
 
+  #' @importFrom grid grobName
+  #' @export
+grid:::grobName
+
   #' Check class of object. 
   #' 
   #' @param x Object to be tested.

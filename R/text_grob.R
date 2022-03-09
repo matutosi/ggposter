@@ -38,33 +38,13 @@ txt2tibble <- function(...){
   #'                  fontsize in grid::textGrob(). 
   #' @param use       A string.
   #'                  name in grid::textGrob(). 
-  #' @param just      A string. 
-  #'                  "left", "right", "centre", "center", "bottom", and "top". 
-  #'                  See grid::textGrob() in detail.
+  #' @param hjust     A numeric 0-1. 1: left", 0: "right"
+  #' @param ...       Some more arguments
   #' @seealso grid::textGrob()
   #' @export
-as_tg <- function(text, font_size, use, just, ...){
-  grid::textGrob(label=text, gp=grid::gpar(fontsize=font_size), name=use, just=just)
+as_tg <- function(text, font_size, use, hjust, ...){
+  grid::textGrob(label=text, gp=grid::gpar(fontsize=font_size), name=use, hjust=hjust)
 }
-
-
-  #' Wrapper function to generate split textGrob for grid::textGrob. 
-  #' 
-  #' @param text      A string.
-  #'                  label in grid::textGrob(). 
-  #' @param font_size A numeric of font size.
-  #'                  fontsize in grid::textGrob(). 
-  #' @param use       A string.
-  #'                  name in grid::textGrob(). 
-  #' @param just      A string. 
-  #'                  "left", "right", "centre", "center", "bottom", and "top". 
-  #'                  See grid::textGrob() in detail.
-  #' @seealso grid::textGrob()
-  #' @export
-as_stg <- function(text, width=NULL, font_size, use=NULL, ...){
-  split_text_grob(text=text, width=width, gp=grid::gpar(fontsize=font_size), name=use, ...)
-}
-
 
   #' Get font size from font_size_list with name or use. 
   #' 

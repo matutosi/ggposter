@@ -4,7 +4,7 @@
 \alias{arrange_txt}
 \title{Wrapper function of converting text into arranged text grob.}
 \usage{
-arrange_txt(..., just = "center", width = grid::unit(841, "mm"), silent = TRUE)
+arrange_txt(..., hjust = 1, widths = grid::unit(841, "mm"), silent = TRUE)
 }
 \arguments{
 \item{...}{Text object(s). Multiple object can be input.
@@ -15,16 +15,15 @@ keyword: "tiny", "script", "footnote", "caption",
 "thank", "author", "affil",
 "subt", "kw" or "title"}
 
-\item{just}{A string.
-"left", "right", "centre", "center", "bottom", and "top".
-See grid::textGrob() in detail.}
+\item{hjust}{A numeric 0-1. 1: left", 0: "right"}
 
-\item{width}{grid::unit}
+\item{widths}{grid::unit}
 
 \item{silent}{Logical. TRUE: no massage, FALSE: shows massage.}
 }
 \value{
-textGrob
+\preformatted{   textGrob
+}
 }
 \description{
 Wrapper function of converting text into arranged text grob.
@@ -37,7 +36,7 @@ txt_BODY_1   <- "BODY text is larger than body text."
 txt_body_2   <- "This is a body text, too."
 arranged_txt_1 <- arrange_txt(txt_title, txt_ITEM_1, txt_item_2)
 grid::grid.draw(arranged_txt_1)
-arranged_txt_2 <- arrange_txt(txt_BODY_1, txt_body_2, just="left")
+arranged_txt_2 <- arrange_txt(txt_BODY_1, txt_body_2, hjust=1)
 grid::grid.draw(arranged_txt_2)
 
 }

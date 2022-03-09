@@ -24,6 +24,27 @@ library(ggposter)
 ```
 
 ```{r}
+dots <- function(...){
+  ab <- list(...)
+  ab[1]
+}
+a <- textGrob("aaa")
+b <- textGrob("b")
+dots(a, b)
+
+
+
+
+```
+
+
+
+
+
+
+
+
+```{r}
   # plot
 plot <- 
   ggplot2::ggplot(mpg) + 
@@ -51,19 +72,18 @@ gp_title <- gpar(fontsize=fontsize)
 
 slide <- gen_slide(title, plot, text, gp_title, gp_text)
 grid.draw(slide)
-ggplot2::ggsave("d:/slide.pdf", slide, height=210, width=297, units="mm")
+  # ggplot2::ggsave("d:/slide.pdf", slide, height=210, width=297, units="mm")
 
 ```
 
 ```{r richtext_grob}
 grid::grid.newpage()
-rtg <- gridtext::richtext_grob(text=body, gp=gp, vp=vp)
+gp <- gpar(fontsize=20)
+rtg <- gridtext::richtext_grob(text=text, gp=gp)
 grid::grid.draw(rtg)
   # vp, gpslide
 
 ```
-
-
 
 
 
@@ -179,14 +199,14 @@ grid::grid.draw(arranged_txt)
 ```
 
 ```{r}
-t_1 <- "This is a sample text. "
-t_2 <- "When longer than viewport width, "
-t_3 <- "text will be split and add a break. "
-t_4 <- "This text is separated into 5 objects, "
-t_5 <- "because of R document specification."
-text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
-splitText <- split_text_grob(text)
-grid::grid.draw(splitText)
+  # t_1 <- "This is a sample text. "
+  # t_2 <- "When longer than viewport width, "
+  # t_3 <- "text will be split and add a break. "
+  # t_4 <- "This text is separated into 5 objects, "
+  # t_5 <- "because of R document specification."
+  # text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
+  # splitText <- split_text_grob(text)
+  # grid::grid.draw(splitText)
 ```
 
 # Sample

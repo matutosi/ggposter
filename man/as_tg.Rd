@@ -4,7 +4,7 @@
 \alias{as_tg}
 \title{Wrapper function to generate textGrob for grid::textGrob.}
 \usage{
-as_tg(text, font_size, use, just, ...)
+as_tg(text, font_size, use, hjust, ...)
 }
 \arguments{
 \item{text}{A string.
@@ -16,9 +16,9 @@ fontsize in grid::textGrob().}
 \item{use}{A string.
 name in grid::textGrob().}
 
-\item{just}{A string.
-"left", "right", "centre", "center", "bottom", and "top".
-See grid::textGrob() in detail.}
+\item{hjust}{A numeric 0-1. 1: left", 0: "right"}
+
+\item{...}{Some more arguments}
 }
 \description{
 Wrapper function to generate textGrob for grid::textGrob.
