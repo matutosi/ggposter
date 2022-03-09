@@ -3,14 +3,20 @@
 \name{appose_grobs}
 \alias{appose_grobs}
 \alias{stack_grobs}
+\alias{\%oo\%}
+\alias{\%8\%}
 \alias{combine_grobs}
 \alias{appose_grob}
 \alias{stack_grob}
-\title{Appose or stack two grobs in a line.}
+\title{Appose or stack two grobs or more in a line (row or col).}
 \usage{
 appose_grobs(...)
 
 stack_grobs(...)
+
+x \%oo\% y
+
+x \%8\% y
 
 appose_grob(x, y)
 
@@ -23,7 +29,7 @@ stack_grob(x, y)
 apposed or stack grob in a line
 }
 \description{
-Appose or stack two grobs in a line.
+Appose or stack two grobs or more in a line (row or col).
 }
 \examples{
 x <- grid::textGrob("foo_bar")
@@ -40,5 +46,9 @@ grid::grid.newpage()
 grid::grid.draw(ags)
 grid::grid.newpage()
 grid::grid.draw(sgs)
+grid::grid.newpage()
+grid::grid.draw(y \%oo\% z)
+grid::grid.newpage()
+grid::grid.draw(y \%8\% z)
 
 }

@@ -30,7 +30,15 @@ stack_grobs <- function(...){
   grobs
 }
 
-  #' Appose or stack two grobs in a line.
+  #' @rdname combine_grobs
+  #' @export
+"%oo%" <- function(x, y) appose_grob(x, y)
+
+  #' @rdname combine_grobs
+  #' @export
+"%8%" <- function(x, y) stack_grob(x, y)
+
+  #' Appose or stack two grobs or more in a line (row or col).
   #' 
   #' @name combine_grobs
   #' @param x,y,... grob
@@ -50,6 +58,10 @@ stack_grobs <- function(...){
   #' grid::grid.draw(ags)
   #' grid::grid.newpage()
   #' grid::grid.draw(sgs)
+  #' grid::grid.newpage()
+  #' grid::grid.draw(y %oo% z)
+  #' grid::grid.newpage()
+  #' grid::grid.draw(y %8% z)
   #' 
   #' @export
 appose_grob <- function(x, y){
