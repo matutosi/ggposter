@@ -13,37 +13,21 @@
   #' @seealso get_font_size(), arrange_txt(), 
   #' @examples
   #' txt_title <- "This is a title."
-  #' txt_ITEM_1 <- "ITEM text is larger than item text."
-  #' txt_item_2 <- "This is a item text, too."
-  #' txt_BODY_1 <- "BODY text is larger than body text."
-  #' txt_body_2 <- "This is a body text, too."
+  #' txt_ITEM_1 <- "ITEM is larger than item."
+  #' txt_item_2 <- "This is a item."
+  #' txt_BODY_1 <- "BODY is larger than body."
+  #' txt_body_2 <- "This is a body text."
   #' txt2tibble(txt_title, txt_ITEM_1, txt_item_2, txt_BODY_1, txt_body_2)
   #' 
   #' @export
 txt2tibble <- function(...){
-  tibble::tibble(...=...) %>%
+  data.frame(...) %>%
     t() %>%
     as.data.frame() %>%
     magrittr::set_colnames("text") %>%
     tibble::rownames_to_column("use") %>%
     tibble::remove_rownames() %>%
     tidyr::separate(rlang::sym("use"), into=c(NA, "use"), sep="_", extra="drop", fill="left")
-}
-
-  #' Wrapper function to generate textGrob for grid::textGrob. 
-  #' 
-  #' @param text      A string.
-  #'                  label in grid::textGrob(). 
-  #' @param font_size A numeric of font size.
-  #'                  fontsize in grid::textGrob(). 
-  #' @param use       A string.
-  #'                  name in grid::textGrob(). 
-  #' @param hjust     A numeric 0-1. 1: left", 0: "right"
-  #' @param ...       Some more arguments
-  #' @seealso grid::textGrob()
-  #' @export
-as_tg <- function(text, font_size, use, hjust, ...){
-  grid::textGrob(label=text, gp=grid::gpar(fontsize=font_size), name=use, hjust=hjust)
 }
 
   #' Get font size from font_size_list with name or use. 
@@ -92,6 +76,23 @@ get_font_size <- function(base=NULL, name=NULL, use=NULL, silent=TRUE, text=""){
   if(!is.null(name)) font <- dplyr::filter(font, .data[["font_name"]]==name)
   if(!is.null(use))  font <- dplyr::filter(font, stringr::str_detect(.data[["font_use"]], use))
   font$size
+}
+
+  #' Wrapper function to generate textGrob for grid::textGrob. 
+  #' 
+  #' @param text      A string.
+  #'                  label in grid::textGrob(). 
+  #' @param x,y       A numeric. Specify x- or y-value.
+  #' @param hjust     A numeric 0-1. 0: left, 1: right.
+  #' @param font_size A numeric of font size.
+  #'                  fontsize in grid::textGrob(). 
+  #' @param use       A string.
+  #'                  name in grid::textGrob(). 
+  #' @param ...       Some more arguments
+  #' @seealso grid::textGrob()
+  #' @export
+as_tg <- function(text, x, y, hjust, font_size, use, ...){
+  grid::textGrob(label=text, x=x, y=y, hjust=hjust, gp=grid::gpar(fontsize=font_size), name=use, ...)
 }
 
   #' Split text to fit viewpeort width

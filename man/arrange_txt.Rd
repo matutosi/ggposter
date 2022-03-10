@@ -4,7 +4,14 @@
 \alias{arrange_txt}
 \title{Wrapper function of converting text into arranged text grob.}
 \usage{
-arrange_txt(..., hjust = 1, widths = grid::unit(841, "mm"), silent = TRUE)
+arrange_txt(
+  ...,
+  x = 0,
+  y = 1,
+  hjust = 0,
+  widths = grid::unit(841, "mm"),
+  silent = TRUE
+)
 }
 \arguments{
 \item{...}{Text object(s). Multiple object can be input.
@@ -14,6 +21,8 @@ keyword: "tiny", "script", "footnote", "caption",
 "body", "BODY", "item", "ITEM",
 "thank", "author", "affil",
 "subt", "kw" or "title"}
+
+\item{x, y}{A numeric. Specify x- or y-value.}
 
 \item{hjust}{A numeric 0-1. 1: left", 0: "right"}
 

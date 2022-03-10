@@ -16,30 +16,131 @@ knitr::opts_chunk$set(
 )
 ```
 
+# setup
+
 ```{r setup}
 library(tidyverse)
+library(cowplot)
 library(grid)
 library(gridtext)
 library(ggposter)
 ```
 
-```{r}
-dots <- function(...){
-  ab <- list(...)
-  ab[1]
-}
-a <- textGrob("aaa")
-b <- textGrob("b")
-dots(a, b)
+# Example: ggposter
+
+## Title
+
+```{r title}
+txt_title  <- "How to Make a Poster with ggposter Package in R"
+txt_subt   <- "For comfotable and tidy work"
+txt_kw     <- "Key words: ggplot2, grid, gridtext, R"
+txt_author <- "Toshikazu Matsumura (Konan Women's Univ., Japan), matutosi@gmail.com"
+
+title <- arrange_txt(
+    txt_title, txt_subt, txt_kw, txt_author, 
+    x=0.5, y=0.5, hjust=c(rep(0.5, 3), 0), widths=grid::unit(841, "mm"))
+  # grid::grid.draw(title)
+```
+
+## Objectives
+
+```{r objectives}
+txt_ITEM_10  <- "OBJECTIVES"
+txt_BODY_11   <- "- Want to use R throughout making a poster."
+txt_BODY_12   <- "- To use grid and ggplot2 system."
+txt_BODY_13   <- "- To reuse parts of past work."
+txt_ITEM_20  <- "BACKGROUND"
+txt_BODY_21   <- "- No R packages or tools for making a poster."
+txt_BODY_22  <- "- PowerPoint needs many manual procedures to uniform a style."
+txt_BODY_23  <- "- If we can use R for making poster, no need to save and load plot files."
+
+objectives <- arrange_txt(
+  txt_ITEM_10, txt_BODY_11, txt_BODY_12, txt_BODY_13, 
+  txt_ITEM_20, txt_BODY_21, txt_BODY_22, txt_BODY_23, 
+  widths=grid::unit(420, "mm"))
+  # grid::grid.draw(objectives)
+  # objectives <- 
+  #   "
+  #   OBJECTIVES
+  #   "
+```
+
+## Conclusions
+
+```{r conclusions}
+txt_ITEM_10  <- "CONCLUSIONS"
+txt_BODY_11   <- "- Please install from CRAN or GitHub."
+txt_BODY_12   <- "- ggposter package can might be a alternative tool for making a poster and slides."
+txt_BODY_13   <- "- Colaboration with ggplot2, cowplot, gridtext or other package may produce more effects."
+txt_BODY_14   <- "- Still in the development stage and can have bugs."
+txt_BODY_15   <- "- Welcome your requests."
+txt_BODY_16   <- "- ENJOY!"
+
+conclusions <- arrange_txt(
+  txt_ITEM_10, txt_BODY_11, txt_BODY_12, txt_BODY_13, txt_BODY_14, txt_BODY_15, txt_BODY_16, 
+  widths=grid::unit(420, "mm"))
+```
 
 
+## Colaboration with ggplot2 and cowplot
 
+
+```{r ggplot2}
+fig <- 
+  ggplot(mpg, aes(x=displ, y=hwy)) + 
+  geom_point() +
+  theme_bw()
+fig <- cowplot::as_grob(fig)
+
+
+  # text
+t_1 <- "This is a sample text. "
+t_2 <- "When longer than width, "
+t_3 <- "text will be split and add breaks. "
+t_4 <- "This text is separated into 5 objects, "
+t_5 <- "because of R document specification."
+text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
+  # gp_text
+fontsize <- 20
+lineheight <- 1.1
+gp_text <- gpar(fontsize=fontsize, lineheight=lineheight)
+
+  # title
+title_1 <- "THIS IS TITLE WORDS"
+  # gp_text
+fontsize <- 40
+gp_title <- gpar(fontsize=fontsize)
+
+slide <- gen_slide(title_1, fig, text, gp_title, gp_text)
+grid.draw(slide)
+  # ggplot2::ggsave("d:/slide.pdf", slide, height=210, width=297, units="mm")
 
 ```
 
 
 
 
+
+## Colaboration with gridtext
+
+
+```{r gridtext}
+
+```
+
+## Rendering
+
+```{r rendering}
+grid.newpage()
+grid.draw(title %8% (objectives %oo% conclusions))
+
+poster <- title %8% (objectives %oo% conclusions)
+ggplot2::ggsave("d:/tmp.pdf", poster)
+ggplot2::ggsave("d:/tmp.png", poster)
+```
+
+
+# 
 
 
 
@@ -188,7 +289,7 @@ http://www.sthda.com/english/wiki/wiki.php?id_contents=7930
 
 ## Title
 
-```{r title, warning=FALSE}
+```{r title_example, warning=FALSE}
 txt_title_1 <- "This is a title."
 txt_ITEM_1 <- "ITEM text is larger than item text."
 txt_item_2 <- "This is a item text, too."

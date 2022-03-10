@@ -1,15 +1,15 @@
   #' Generate slide.
   #' 
   #' @param title A text.
-  #' @param plot ggplot object.
-  #' @param text A body text
+  #' @param fig      ggplot object.
+  #' @param text     A body text
   #' @param gp_title gpar of title
-  #' @param gp_text gpar of text
-  #' @param paper Slide size. default: "a4".
-  #' @param width Slide width.
-  #' @param height Slide height.
-  #' @param layout Layout of slide.
-  #' @param name A name of grob.
+  #' @param gp_text  gpar of text
+  #' @param paper    Slide size. default: "a4".
+  #' @param width    Slide width.
+  #' @param height   Slide height.
+  #' @param layout   Layout of slide.
+  #' @param name     A name of grob.
   #' 
   #' @return Grob
   #' 
@@ -19,13 +19,13 @@
   #'   # gp_title
   #' fontsize <- 40
   #' gp_title <- grid::gpar(fontsize=fontsize)
-  #'   # plot
+  #'   # figure
   #' data("mpg", package="ggplot2")
-  #' plot <- 
+  #' fig <- 
   #'   ggplot2::ggplot(mpg) + 
   #'   ggplot2::geom_point(ggplot2::aes(x = .data[["displ"]], y = .data[["hwy"]])) +
   #'   ggplot2::theme_bw()
-  #' plot  # draw ggplot object
+  #' fig  # draw ggplot object
   #'   # text
   #' t_1 <- "This is a sample text. "
   #' t_2 <- "When longer than width, "
@@ -38,11 +38,11 @@
   #' lineheight <- 1.1
   #' gp_text <- grid::gpar(fontsize=fontsize, lineheight=lineheight)
   #'   # generate slide and draw
-  #' slide <- gen_slide(title, plot, text, gp_title, gp_text)
+  #' slide <- gen_slide(title, fig, text, gp_title, gp_text)
   #' grid::grid.draw(slide)
   #' 
   #' @export
-gen_slide <- function(title, plot, text, gp_title, gp_text, paper="a4", width=NULL, height=NULL, layout=NULL, name=NULL){
+gen_slide <- function(title, fig, text, gp_title, gp_text, paper="a4", width=NULL, height=NULL, layout=NULL, name=NULL){
     # set paper size
   if(paper=="a4"){
     width  <- grid::unit(297, "mm")
@@ -60,12 +60,12 @@ gen_slide <- function(title, plot, text, gp_title, gp_text, paper="a4", width=NU
     layout <- grid::grid.layout(2, 2, heights=layout_height, respect=respect)
   }
     #  ggplot -> grid
-  plot <- cowplot::as_grob(plot)
+  fig <- cowplot::as_grob(fig)
     # frame and place
   if(is.null(name)) name <- grobName(prefix="slide")
   slide <- grid::frameGrob(layout=layout, name=name, vp=vp)
   slide <- grid::placeGrob(slide, tbg_title, row=1)
-  slide <- grid::placeGrob(slide, plot,      row=2, col=1)
+  slide <- grid::placeGrob(slide, fig,       row=2, col=1)
   slide <- grid::placeGrob(slide, tbg_text,  row=2, col=2)
   slide
 }

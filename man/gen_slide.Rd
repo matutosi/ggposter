@@ -6,7 +6,7 @@
 \usage{
 gen_slide(
   title,
-  plot,
+  fig,
   text,
   gp_title,
   gp_text,
@@ -20,7 +20,7 @@ gen_slide(
 \arguments{
 \item{title}{A text.}
 
-\item{plot}{ggplot object.}
+\item{fig}{ggplot object.}
 
 \item{text}{A body text}
 
@@ -50,13 +50,13 @@ title <- "THIS IS TITLE WORDS"
   # gp_title
 fontsize <- 40
 gp_title <- grid::gpar(fontsize=fontsize)
-  # plot
+  # figure
 data("mpg", package="ggplot2")
-plot <- 
+fig <- 
   ggplot2::ggplot(mpg) + 
   ggplot2::geom_point(ggplot2::aes(x = .data[["displ"]], y = .data[["hwy"]])) +
   ggplot2::theme_bw()
-plot  # draw ggplot object
+fig  # draw ggplot object
   # text
 t_1 <- "This is a sample text. "
 t_2 <- "When longer than width, "
@@ -69,7 +69,7 @@ fontsize <- 20
 lineheight <- 1.1
 gp_text <- grid::gpar(fontsize=fontsize, lineheight=lineheight)
   # generate slide and draw
-slide <- gen_slide(title, plot, text, gp_title, gp_text)
+slide <- gen_slide(title, fig, text, gp_title, gp_text)
 grid::grid.draw(slide)
 
 }

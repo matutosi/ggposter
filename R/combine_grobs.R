@@ -4,14 +4,24 @@
   #' while appose_grobs() and stack_grobs() can conbine more. 
   #' `%oo%` and `%8%` are shortcuts of appose_grob() and tack_grob(). 
   #' 
-  #' @name combine_grobs
-  #' @param x,y,... grob
-  #' @return apposed or stack grob in a line
+  #' @name          combine_grobs
+  #' @param x,y,... grob.
+  #' @param name    A string. grob name
+  #' @param space   A grid unit. Space among grobs. 
+  #'                Space will be insert all of gorbs, 
+  #'                so unit(1, "mm") make space of 2mm among grobs.
+  #' @return        combined (apposed or stacked) grob in a line.
   #' @examples
-  #' x <- grid::textGrob("foo_bar")
-  #' y <- grid::textGrob("xxx_yyy")
-  #' z <- grid::textGrob("hogehoge")
-  #' ag <- appose_grob(x, y)
+  #' library(grid)
+  #' x <- grid::textGrob("foo_bar", hjust=1, vjust=0)
+  #' x2 <- grid::textGrob("foo_bar", x=0, y=1, hjust=1, vjust=1)
+  #' y <- gridtext::textbox_grob(
+  #'      "textbox_grob generate wrapped text in a box.", 
+  #'      width=grid::unit(30, "mm"), box_gp=grid::gpar(col="black"))
+  #' z <- gridtext::richtext_grob(
+  #'      "richtext_grob can NOT wrap text", 
+  #'      box_gp=grid::gpar(col="black"))
+  #' ag <- appose_grob(x, y, name="apppsed_grob")
   #' sg <- stack_grob(x, y)
   #' ags <- appose_grobs(x, y, z)
   #' sgs <- stack_grobs(x, y, z)
@@ -27,15 +37,31 @@
   #' grid::grid.newpage()
   #' grid::grid.draw(y %8% z)
   #' grid::grid.newpage()
+  #' grid::grid.draw(x %oo% y %8% z)
+  #' grid::grid.newpage()
+  #' grid::grid.draw(x %oo% (y %8% z))
+  #' grid::grid.newpage()
+  #' grid::grid.draw(x2 %oo% (y %8% z))
+  #' 
+  #' # NOTE: do no work in gridtext package when use "npc" in grid::unit
+  #' # library(gridtext)
+  #' # a <- gridtext::textbox_grob(
+  #' #      "textbox_grob generate wrapped text in a box.", 
+  #' #       width=grid::unit(0.5, "npc"), box_gp=grid::gpar(col="black"))
+  #' # b <- gridtext::richtext_grob(
+  #' #      "richtext_grob can NOT wrap text", 
+  #' #      box_gp=grid::gpar(col="black"))
+  #' # grid::grid.draw(a %oo% b)
+  #' # grid::grid.draw(a %8% b)
   #' 
   #' @export
-appose_grob <- function(x, y){
+appose_grob <- function(x, y, space=grid::unit(0, "mm"), name=NULL){
     # layout
-  widths <- grid::unit(rep(1, 2), rep("grobwidth", 2), list(x, y))
+  widths <- grid::unit(rep(1, 2), rep("grobwidth", 2), list(x, y)) + space
   heights <- max(grid::unit(rep(1, 2), rep("grobheight", 2), list(x, y)))
   layout <- grid::grid.layout(nrow=1, ncol=2, widths=widths, heights=heights)
     # frame and place
-  x_y <- grid::frameGrob(layout=layout)
+  x_y <- grid::frameGrob(layout=layout, name=name)
   x_y <- grid::placeGrob(x_y, x, col=1)
   x_y <- grid::placeGrob(x_y, y, col=2)
   x_y
@@ -43,13 +69,13 @@ appose_grob <- function(x, y){
 
   #' @rdname combine_grobs
   #' @export
-stack_grob <- function(x, y){
+stack_grob <- function(x, y, space=grid::unit(0, "mm"), name=NULL){
     # layout
   widths <- max(grid::unit(rep(1, 2), rep("grobwidth", 2), list(x, y)))
-  heights <- grid::unit(rep(1, 2), rep("grobheight", 2), list(x, y))
+  heights <- grid::unit(rep(1, 2), rep("grobheight", 2), list(x, y)) + space
   layout <- grid::grid.layout(nrow=2, ncol=1, widths=widths, heights=heights)
     # frame and place
-  x_y <- grid::frameGrob(layout=layout)
+  x_y <- grid::frameGrob(layout=layout, name=name)
   x_y <- grid::placeGrob(x_y, x, row=1)
   x_y <- grid::placeGrob(x_y, y, row=2)
   x_y
@@ -57,15 +83,15 @@ stack_grob <- function(x, y){
 
   #' @rdname combine_grobs
   #' @export
-appose_grobs <- function(...){
+appose_grobs <- function(..., space=grid::unit(0, "mm"), name=NULL){
   dots <- list(...)
   n <- length(dots)
     # layout
-  widths <- grid::unit(rep(1, n), rep("grobwidth", n), dots)
+  widths <- grid::unit(rep(1, n), rep("grobwidth", n), dots) + space
   heights <- max(grid::unit(rep(1, n), rep("grobheight", n), dots))
   layout <- grid::grid.layout(nrow=1, ncol=n, widths=widths, heights=heights)
     # frame and place
-  grobs <- grid::frameGrob(layout=layout)
+  grobs <- grid::frameGrob(layout=layout, name=name)
   for(i in  seq_along(dots)){
     grobs <- grid::placeGrob(grobs, dots[[i]], col=i)
   }
@@ -74,15 +100,15 @@ appose_grobs <- function(...){
 
   #' @rdname combine_grobs
   #' @export
-stack_grobs <- function(...){
+stack_grobs <- function(..., space=grid::unit(0, "mm"), name=NULL){
   dots <- list(...)
   n <- length(dots)
     # layout
   widths <- max(grid::unit(rep(1, n), rep("grobwidth", n), dots))
-  heights <- grid::unit(rep(1, n), rep("grobheight", n), dots)
+  heights <- grid::unit(rep(1, n), rep("grobheight", n), dots) + space
   layout <- grid::grid.layout(nrow=n, ncol=1, widths=widths, heights=heights)
     # frame and place
-  grobs <- grid::frameGrob(layout=layout)
+  grobs <- grid::frameGrob(layout=layout, name=name)
   for(i in  seq_along(dots)){
     grobs <- grid::placeGrob(grobs, dots[[i]], row=i)
   }

@@ -10,23 +10,30 @@
 \alias{\%8\%}
 \title{Appose or stack two grobs or more in a line (row or col).}
 \usage{
-appose_grob(x, y)
+appose_grob(x, y, space = grid::unit(0, "mm"), name = NULL)
 
-stack_grob(x, y)
+stack_grob(x, y, space = grid::unit(0, "mm"), name = NULL)
 
-appose_grobs(...)
+appose_grobs(..., space = grid::unit(0, "mm"), name = NULL)
 
-stack_grobs(...)
+stack_grobs(..., space = grid::unit(0, "mm"), name = NULL)
 
 x \%oo\% y
 
 x \%8\% y
 }
 \arguments{
-\item{x, y, ...}{grob}
+\item{x, y, ...}{grob.}
+
+\item{space}{A grid unit. Space among grobs.
+Space will be insert all of gorbs,
+so unit(1, "mm") make space of 2mm among grobs.}
+
+\item{name}{A string. grob name}
 }
 \value{
-apposed or stack grob in a line
+\preformatted{   combined (apposed or stacked) grob in a line.
+}
 }
 \description{
 appose_grob() and tack_grob() conbine two grobs,
@@ -34,10 +41,16 @@ while appose_grobs() and stack_grobs() can conbine more.
 \verb{\%oo\%} and \verb{\%8\%} are shortcuts of appose_grob() and tack_grob().
 }
 \examples{
-x <- grid::textGrob("foo_bar")
-y <- grid::textGrob("xxx_yyy")
-z <- grid::textGrob("hogehoge")
-ag <- appose_grob(x, y)
+library(grid)
+x <- grid::textGrob("foo_bar", hjust=1, vjust=0)
+x2 <- grid::textGrob("foo_bar", x=0, y=1, hjust=1, vjust=1)
+y <- gridtext::textbox_grob(
+     "textbox_grob generate wrapped text in a box.", 
+     width=grid::unit(30, "mm"), box_gp=grid::gpar(col="black"))
+z <- gridtext::richtext_grob(
+     "richtext_grob can NOT wrap text", 
+     box_gp=grid::gpar(col="black"))
+ag <- appose_grob(x, y, name="apppsed_grob")
 sg <- stack_grob(x, y)
 ags <- appose_grobs(x, y, z)
 sgs <- stack_grobs(x, y, z)
@@ -53,5 +66,21 @@ grid::grid.draw(y \%oo\% z)
 grid::grid.newpage()
 grid::grid.draw(y \%8\% z)
 grid::grid.newpage()
+grid::grid.draw(x \%oo\% y \%8\% z)
+grid::grid.newpage()
+grid::grid.draw(x \%oo\% (y \%8\% z))
+grid::grid.newpage()
+grid::grid.draw(x2 \%oo\% (y \%8\% z))
+
+# NOTE: do no work in gridtext package when use "npc" in grid::unit
+# library(gridtext)
+# a <- gridtext::textbox_grob(
+#      "textbox_grob generate wrapped text in a box.", 
+#       width=grid::unit(0.5, "npc"), box_gp=grid::gpar(col="black"))
+# b <- gridtext::richtext_grob(
+#      "richtext_grob can NOT wrap text", 
+#      box_gp=grid::gpar(col="black"))
+# grid::grid.draw(a \%oo\% b)
+# grid::grid.draw(a \%8\% b)
 
 }
