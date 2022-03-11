@@ -117,10 +117,52 @@ grid.draw(slide)
 
 ```
 
-## Colaboration with ggplot2 (and cowplot)
+## Combine images
 
 
 ```{r images}
+library(grid)
+small <- rectGrob(width=unit(1, "cm"), height=unit(1, "cm"), gp=gpar(fill="black"))
+tall  <- rectGrob(width=unit(1, "cm"), height=unit(2, "cm"), gp=gpar(fill="red"))
+wide  <- rectGrob(width=unit(2, "cm"), height=unit(1, "cm"), gp=gpar(fill="blue"))
+large <- rectGrob(width=unit(2, "cm"), height=unit(2, "cm"), gp=gpar(fill="white"))
+
+grid.newpage()
+grid.draw(
+  (small %oo% tall %oo% wide %oo% large) %8%
+  appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"), unify="as_is")
+  )
+
+grid.newpage()
+grid.draw(
+  (small %oo% tall %oo% wide %oo% large) %8%
+  appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"), unify="height")
+  )
+
+grid.newpage()
+grid.draw(
+  (small %oo% tall %oo% wide %oo% large) %8%
+  appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"), unify="width")
+  )
+
+
+original        <- small %oo% tall %oo% wide %oo% large
+combined_as_is  <- appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"), unify="as_is")
+combined_height <- appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"), unify="height")
+combined_width  <- appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"), unify="width")
+  # convertUnit(grobHeight(original       ), "mm")
+  # convertUnit(grobHeight(combined_as_is ), "mm")
+  # convertUnit(grobHeight(combined_height), "mm")
+  # convertUnit(grobHeight(combined_width ), "mm")
+
+grid.newpage()
+grid.draw(
+  original        %8% # original
+  combined_as_is  %8%
+  combined_height %8%
+  combined_width 
+)
+
 rlogo <- 
   system.file("extdata", "Rlogo.png", package = "gridtext") %>%
   png::readPNG() %>%
@@ -130,7 +172,17 @@ grid::grid.draw(rlogo %oo% rlogo %oo% rlogo)
 rlogo$width <- grid::unit(20, "mm")
 grid::grid.draw(rlogo %oo% rlogo %oo% rlogo)
 
-```{r}
+```
+
+
+
+## Colaboration with ggplot2 (and cowplot)
+
+
+```{r ggplot2}
+
+
+```
 
 
 ## Colaboration with gridtext

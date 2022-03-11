@@ -8,7 +8,7 @@ appose_image_grobs(
   ...,
   width = NULL,
   height = NULL,
-  unify = NULL,
+  unify = "height",
   space = grid::unit(0, "mm"),
   name = NULL
 )
