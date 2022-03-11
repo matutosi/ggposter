@@ -86,39 +86,89 @@ stack_grob <- function(gx, gy, space=grid::unit(0, "mm"), name=NULL){
 "%oo%" <- function(gx, gy) appose_grob(gx, gy)
 
   #' @rdname combine_grobs
-  #' @egxport
+  #' @export
 "%8%" <- function(gx, gy) stack_grob(gx, gy)
 
   #' @rdname combine_grobs
   #' @export
 appose_grobs <- function(..., space=grid::unit(0, "mm"), name=NULL){
-  dots <- list(...)
-  n <- length(dots)
+  grobs <- list(...)
+  n <- length(grobs)
     # layout
-  widths <- grid::unit(rep(1, n), rep("grobwidth", n), dots) + space
-  heights <- max(grid::unit(rep(1, n), rep("grobheight", n), dots))
+  widths <- grid::unit(rep(1, n), rep("grobwidth", n), grobs) + space
+  heights <- max(grid::unit(rep(1, n), rep("grobheight", n), grobs))
   layout <- grid::grid.layout(nrow=1, ncol=n, widths=widths, heights=heights)
     # frame and place
-  grobs <- grid::frameGrob(layout=layout, name=name)
-  for(i in  seq_along(dots)){
-    grobs <- grid::placeGrob(grobs, dots[[i]], col=i)
+  combined_grobs <- grid::frameGrob(layout=layout, name=name)
+  for(i in  seq_along(grobs)){
+    combined_grobs <- grid::placeGrob(combined_grobs, grobs[[i]], col=i)
   }
-  grobs
+  combined_grobs
 }
 
   #' @rdname combine_grobs
   #' @export
 stack_grobs <- function(..., space=grid::unit(0, "mm"), name=NULL){
-  dots <- list(...)
-  n <- length(dots)
+  grobs <- list(...)
+  n <- length(grobs)
     # layout
-  widths <- max(grid::unit(rep(1, n), rep("grobwidth", n), dots))
-  heights <- grid::unit(rep(1, n), rep("grobheight", n), dots) + space
+  widths <- max(grid::unit(rep(1, n), rep("grobwidth", n), grobs))
+  heights <- grid::unit(rep(1, n), rep("grobheight", n), grobs) + space
   layout <- grid::grid.layout(nrow=n, ncol=1, widths=widths, heights=heights)
     # frame and place
-  grobs <- grid::frameGrob(layout=layout, name=name)
-  for(i in  seq_along(dots)){
-    grobs <- grid::placeGrob(grobs, dots[[i]], row=i)
+  combined_grobs <- grid::frameGrob(layout=layout, name=name)
+  for(i in  seq_along(grobs)){
+    combined_grobs <- grid::placeGrob(combined_grobs, grobs[[i]], row=i)
   }
-  grobs
+  combined_grobs
+}
+
+  #' Appose or stack two grobs or more in a line (row or col).
+  #' 
+  #' @param ...       grob.
+  #' @param width     A grid unit,
+  #' @param height    A grid unit.
+  #' @param unify     A string. 
+  #' @param name      A string. grob name
+  #' @param space     A grid unit. Space among grobs. 
+  #'                  Space will be insert all of gorbs, 
+  #'                  so unit(1, "mm") make space of 2mm among grobs.
+  #' @return          combined (apposed or stacked) grob in a line.
+  #' @examples
+  #' library(grid)
+  #' small <- rectGrob(width=unit(1, "cm"), height=unit(1, "cm"), gp=gpar(fill="black"))
+  #' tall  <- rectGrob(width=unit(1, "cm"), height=unit(2, "cm"), gp=gpar(fill="red"))
+  #' wide  <- rectGrob(width=unit(2, "cm"), height=unit(1, "cm"), gp=gpar(fill="blue"))
+  #' large <- rectGrob(width=unit(2, "cm"), height=unit(2, "cm"), gp=gpar(fill="white"))
+  #' combined_grobs <- 
+  #'   (small %oo% tall %oo% wide %oo% large) %8% # original
+  #'   appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"))
+  #' grid.draw(combined_grobs)
+  #' 
+  #' @export
+appose_image_grobs <- function(..., width=NULL, height=NULL, unify=NULL, space=grid::unit(0, "mm"), name=NULL){
+  grobs <- list(...)
+  n <- length(grobs)
+    # layout
+  widths  <- grid::unit(rep(1, n), rep("grobwidth", n),  grobs)
+  heights <- grid::unit(rep(1, n), rep("grobheight", n), grobs)
+  max_height <- max(heights)
+  ratio <- 
+    grid::convertUnit(max_height, "mm", valueOnly=TRUE) / 
+    grid::convertUnit(heights, "mm", valueOnly=TRUE)
+  widths  <- widths * ratio
+  layout <- grid::grid.layout(nrow=1, ncol=n, widths=widths + space, heights=max_height)
+    #   # debug
+    # convertUnit(widths, "mm")
+    # convertUnit(heights, "mm")
+    # convertUnit(max_height, "mm")
+    # ratio
+    # frame and place
+  combined_grobs <- grid::frameGrob(layout=layout, name=name)
+  for(i in  seq_along(grobs)){
+    grobs[[i]]$width <- widths[[i]]
+    grobs[[i]]$height <- max_height
+    combined_grobs <- grid::placeGrob(combined_grobs, grobs[[i]], col=i)
+  }
+  combined_grobs
 }

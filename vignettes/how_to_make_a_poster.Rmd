@@ -82,7 +82,7 @@ conclusions <- arrange_txt(
 ```
 
 
-## Colaboration with ggplot2 and cowplot
+## Colaboration with ggplot2 (and cowplot)
 
 
 ```{r ggplot2}
@@ -117,8 +117,20 @@ grid.draw(slide)
 
 ```
 
+## Colaboration with ggplot2 (and cowplot)
 
 
+```{r images}
+rlogo <- 
+  system.file("extdata", "Rlogo.png", package = "gridtext") %>%
+  png::readPNG() %>%
+  grid::rasterGrob()
+grid::grid.draw(rlogo %oo% rlogo %oo% rlogo)
+
+rlogo$width <- grid::unit(20, "mm")
+grid::grid.draw(rlogo %oo% rlogo %oo% rlogo)
+
+```{r}
 
 
 ## Colaboration with gridtext

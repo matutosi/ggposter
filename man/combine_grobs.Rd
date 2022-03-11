@@ -4,26 +4,26 @@
 \alias{combine_grobs}
 \alias{appose_grob}
 \alias{stack_grob}
-\alias{appose_grobs}
-\alias{stack_grobs}
 \alias{\%oo\%}
 \alias{\%8\%}
+\alias{appose_grobs}
+\alias{stack_grobs}
 \title{Appose or stack two grobs or more in a line (row or col).}
 \usage{
-appose_grob(x, y, space = grid::unit(0, "mm"), name = NULL)
+appose_grob(gx, gy, space = grid::unit(0, "mm"), name = NULL)
 
-stack_grob(x, y, space = grid::unit(0, "mm"), name = NULL)
+stack_grob(gx, gy, space = grid::unit(0, "mm"), name = NULL)
+
+gx \%oo\% gy
+
+gx \%8\% gy
 
 appose_grobs(..., space = grid::unit(0, "mm"), name = NULL)
 
 stack_grobs(..., space = grid::unit(0, "mm"), name = NULL)
-
-x \%oo\% y
-
-x \%8\% y
 }
 \arguments{
-\item{x, y, ...}{grob.}
+\item{gx, gy, ...}{grob.}
 
 \item{space}{A grid unit. Space among grobs.
 Space will be insert all of gorbs,
@@ -32,7 +32,7 @@ so unit(1, "mm") make space of 2mm among grobs.}
 \item{name}{A string. grob name}
 }
 \value{
-\preformatted{   combined (apposed or stacked) grob in a line.
+\preformatted{     combined (apposed or stacked) grob in a line.
 }
 }
 \description{
