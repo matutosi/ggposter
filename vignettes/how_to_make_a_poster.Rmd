@@ -162,6 +162,12 @@ grid.draw(
   combined_height %8%
   combined_width 
 )
+tmp <- original     %8% # original
+    combined_as_is  %8%
+    combined_height %8%
+    combined_width 
+ggplot2::ggsave("d:/tmp.png", tmp)
+ggplot2::ggsave("d:/tmp.pdf", tmp)
 
 rlogo <- 
   system.file("extdata", "Rlogo.png", package = "gridtext") %>%
