@@ -60,7 +60,8 @@ gen_slide <- function(title, fig, text, gp_title, gp_text, paper="a4", width=NUL
     layout <- grid::grid.layout(2, 2, heights=layout_height, respect=respect)
   }
     #  ggplot -> grid
-  fig <- cowplot::as_grob(fig)
+  fig <- ggplot2::ggplotGrob(fig)
+  #   fig <- cowplot::as_grob(fig)
     # frame and place
   if(is.null(name)) name <- grobName(prefix="slide")
   slide <- grid::frameGrob(layout=layout, name=name, vp=vp)
