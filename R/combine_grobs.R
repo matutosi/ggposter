@@ -152,8 +152,8 @@ appose_image_grobs <- function(..., width=NULL, height=NULL, unify="height", spa
     # layout
   widths  <- grid::unit(rep(1, n), rep("grobwidth",  n), grobs)
   heights <- grid::unit(rep(1, n), rep("grobheight", n), grobs)
-  widths  <- grid::convertUnit(widths,  "mm")
-  heights <- grid::convertUnit(heights, "mm")
+  #   widths  <- grid::convertUnit(widths,  "mm")
+  #   heights <- grid::convertUnit(heights, "mm")
   max_height <- max(heights)
 
   if(unify=="height") {
