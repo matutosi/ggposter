@@ -15,6 +15,8 @@ frame_place_grobs(grobs, layout, widths, heights, space, name = NULL)
 
 \item{heights}{grid unit.}
 
+\item{space}{A grid unit. Space among grobs.}
+
 \item{name}{A string. Name of combined grob.}
 }
 \value{

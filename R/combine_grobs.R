@@ -174,28 +174,33 @@ appose_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="h
     # layout
   layout <- grid::grid.layout(nrow=1, ncol=n, widths=widths + space, heights=max(heights))
     # frame and place
-  combined_grobs <- frame_place_grobs(grobs, layout, widths, heights, space, name)
+  combined_grobs <- frame_place_grobs(grobs, layout, widths, heights, space, by_row=TRUE, name)
   combined_grobs
 }
 
-  #' Frame and place grobs
+  #' Frame and place grobs in line (row or col)
   #' 
   #' This function is used in appose_image_grobs() and stack_image_grobs(). 
   #' @param grobs      grobs to be combined
   #' @param widths     grid unit. 
   #' @param heights    grid unit. 
   #' @param layout     grid layout.
+  #' @param space      A grid unit. Space among grobs. 
+  #' @param by_row     A logical. TRUE: line in a row. FALSE: line in a col.
   #' @param name       A string. Name of combined grob.
   #' @return           combined grobs by layout.
   #' 
   #' @export
-frame_place_grobs <- function(grobs, layout, widths, heights, space, name=NULL){
+frame_place_grobs <- function(grobs, layout, widths, heights, space, by_row=TRUE, name=NULL){
   # frame_place_grobs <- function(grobs, layout, space, name=NULL){
   combined_grobs <- grid::frameGrob(layout=layout, name=name)
+  col <- 1
+  row <- 1
   for(i in  seq_along(grobs)){
     grobs[[i]]$width  <- widths[[i]]
     grobs[[i]]$height <- heights[[i]]
-    combined_grobs <- grid::placeGrob(combined_grobs, grobs[[i]], col=i)
+    if(by_row) col <- i else row <- i
+    combined_grobs <- grid::placeGrob(combined_grobs, grobs[[i]], col=col, row=row)
   }
   combined_grobs
 }

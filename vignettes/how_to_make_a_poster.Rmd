@@ -119,78 +119,13 @@ grid.draw(slide)
 
 ## Combine images
 
-```{r}
-grobs[[1]]$width <- unit(0.5, "npc")
-grobs[[1]]$height <- unit(0.5, "npc")
-grobs[[1]]$width <- unit(5, "cm")
-grobs[[1]]$height <- unit(5, "cm")
-grid.draw(grobs[[1]])
-
-
-library(grid)
-library(tidyverse)
-space <- grid::unit(1, "mm")
-width  <- unit(100, "mm")
-width <- grid::convertUnit(width, "mm", valueOnly=TRUE)
-  # height <- unit(50, "mm")
-
-  # grobs <- list(small, tall, wide, large)
-
-jpg_grobs <- 
-  stringr::str_c("original_", c("small", "tall", "wide", "large"), ".jpg") %>%
-  system.file("extdata", ., package="ggposter") %>%
-  purrr::map(jpeg::readJPEG) %>%
-  purrr::map(grid::rasterGrob)
-grobs <- list(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]])
-unify <- "height"
-
-
-  #   grobs <- list(...)
-  n <- length(grobs)
-    # widths and heights
-  widths  <- grid::unit(rep(1, n), rep("grobwidth",  n), grobs)
-  heights <- grid::unit(rep(1, n), rep("grobheight", n), grobs)
-    # reverse ratio
-  if(unify=="height") rev_ratio <- reverse_ratio(heights) else 
-  if(unify=="width")  rev_ratio <- reverse_ratio(widths)  else
-  if(unify=="as_is")  rev_ratio <- 1                      else { # do nothing
-                      rev_ratio <- 1
-                      message('no match argument, unify="as_is" was set')
-  }
-
-
-  width_sum <- sum(grid::convertUnit(widths,        "mm", valueOnly=TRUE),
-                   grid::convertUnit(space * (n-1), "mm", valueOnly=TRUE))
-expantion <- width / width_sum
-
-    # output widths and heights
-  widths  <- widths  * rev_ratio * expantion
-  heights <- heights * rev_ratio * expantion
-    # layout
-  layout <- grid::grid.layout(nrow=1, ncol=n, widths=widths + space, heights=max(heights))
-    # frame and place
-  combined_grobs <- frame_place_grobs(grobs, widths, heights, layout, name=NULL)
-
-  combined_grobs
-
-grid.show.layout(layout)
-grid.draw(combined_grobs)
-
-ggplot2::ggsave("d:/tmp.pdf", combined_grobs)
-
-grid::convertUnit(widths,  "mm")
-grid::convertUnit(heights, "mm")
-
-grid::convertUnit(layout$widths,  "mm")
-grid::convertUnit(layout$heights, "mm")
-
-```
-
 ```{r jpgs}
 library(tidyverse)
 library(grid)
 
 jpg_grobs <- 
+  #   "D:/matu/work/ToDo/ggposter/inst/extdata/" %>%
+  #    stringr::str_c(., "original_", c("small", "tall", "wide", "large"), ".jpg") %>%
   stringr::str_c("original_", c("small", "tall", "wide", "large"), ".jpg") %>%
   system.file("extdata", ., package="ggposter") %>%
   purrr::map(jpeg::readJPEG) %>%
@@ -217,7 +152,7 @@ sum(combined$frame$layout$widths)
 ```
 
 
-```{r jpgs}
+```{r image}
 small <- rectGrob(width=unit(1, "cm"), height=unit(1, "cm"), gp=gpar(fill="black"))
 tall  <- rectGrob(width=unit(1, "cm"), height=unit(2, "cm"), gp=gpar(fill="red"))
 wide  <- rectGrob(width=unit(2, "cm"), height=unit(1, "cm"), gp=gpar(fill="blue"))
