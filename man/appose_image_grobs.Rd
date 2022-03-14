@@ -17,22 +17,18 @@ appose_image_grobs(
 \arguments{
 \item{...}{grob.}
 
-\item{width}{A grid unit,}
-
-\item{height}{A grid unit.}
+\item{width, height}{A grid unit. When both are set, use width and omit height.}
 
 \item{grow}{Logical. TRUE: images will be grown to fill the width or height.}
 
 \item{unify}{A string.}
 
-\item{space}{A grid unit. Space among grobs.
-Space will be insert all of gorbs,
-so unit(1, "mm") make space of 2mm among grobs.}
+\item{space}{A grid unit. Space among grobs.}
 
 \item{name}{A string. grob name}
 }
 \value{
-\preformatted{     combined (apposed or stacked) grob in a line.
+\preformatted{        combined (apposed or stacked) grob in a line.
 }
 }
 \description{
