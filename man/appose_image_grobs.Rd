@@ -8,6 +8,7 @@ appose_image_grobs(
   ...,
   width = NULL,
   height = NULL,
+  grow = TRUE,
   unify = "height",
   space = grid::unit(0, "mm"),
   name = NULL
@@ -19,6 +20,8 @@ appose_image_grobs(
 \item{width}{A grid unit,}
 
 \item{height}{A grid unit.}
+
+\item{grow}{Logical. TRUE: images will be grown to fill the width or height.}
 
 \item{unify}{A string.}
 

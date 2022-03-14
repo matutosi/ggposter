@@ -4,16 +4,16 @@
 \alias{frame_place_grobs}
 \title{Frame and place grobs}
 \usage{
-frame_place_grobs(grobs, widths, heights, layout, name = NULL)
+frame_place_grobs(grobs, layout, widths, heights, space, name = NULL)
 }
 \arguments{
 \item{grobs}{grobs to be combined}
 
+\item{layout}{grid layout.}
+
 \item{widths}{grid unit.}
 
 \item{heights}{grid unit.}
-
-\item{layout}{grid layout.}
 
 \item{name}{A string. Name of combined grob.}
 }
@@ -23,8 +23,4 @@ frame_place_grobs(grobs, widths, heights, layout, name = NULL)
 }
 \description{
 This function is used in appose_image_grobs() and stack_image_grobs().
-}
-\examples{
-system.file("extdata", "tall.jpg", package="ggposter")
-
 }

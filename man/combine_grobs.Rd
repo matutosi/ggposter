@@ -25,9 +25,7 @@ stack_grobs(..., space = grid::unit(0, "mm"), name = NULL)
 \arguments{
 \item{gx, gy, ...}{grob.}
 
-\item{space}{A grid unit. Space among grobs.
-Space will be insert all of gorbs,
-so unit(1, "mm") make space of 2mm among grobs.}
+\item{space}{A grid unit. Space among grobs.}
 
 \item{name}{A string. grob name}
 }

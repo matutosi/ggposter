@@ -196,27 +196,40 @@ jpg_grobs <-
   purrr::map(jpeg::readJPEG) %>%
   purrr::map(grid::rasterGrob)
 
-combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], width=grid::unit(200, "mm"), space=unit(5, "mm"))
+grid.newpage()
+combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], 
+  width=grid::unit(150, "mm"), space=unit(10, "mm"))
 grid::grid.show.layout(combined$frame$layout)
 grid::grid.draw(combined)
+sum(combined$frame$layout$widths)
 
-combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], width=grid::unit(200, "mm"), unify="as_is", space=unit(5, "mm"))
+grid.newpage()
+combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], width=grid::unit(100, "mm"), unify="as_is", space=unit(5, "mm"))
 grid::grid.show.layout(combined$frame$layout)
 grid::grid.draw(combined)
+sum(combined$frame$layout$widths)
+
+grid.newpage()
+combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], width=grid::unit(100, "mm"), unify="width", space=unit(1, "mm"))
+grid::grid.show.layout(combined$frame$layout)
+grid::grid.draw(combined)
+sum(combined$frame$layout$widths)
+```
 
 
-library(tidyverse)
-library(grid)
+```{r jpgs}
 small <- rectGrob(width=unit(1, "cm"), height=unit(1, "cm"), gp=gpar(fill="black"))
 tall  <- rectGrob(width=unit(1, "cm"), height=unit(2, "cm"), gp=gpar(fill="red"))
 wide  <- rectGrob(width=unit(2, "cm"), height=unit(1, "cm"), gp=gpar(fill="blue"))
 large <- rectGrob(width=unit(2, "cm"), height=unit(2, "cm"), gp=gpar(fill="white"))
-combined <- appose_image_grobs(small, tall, wide, large, width=grid::unit(200, "mm"), space=unit(5, "mm"))
+combined <- appose_image_grobs(small, tall, wide, large, width=grid::unit(200, "mm"), space=unit(10, "mm"))
 grid::grid.show.layout(combined$frame$layout)
 grid::grid.draw(combined)
 
-
-
+grid.newpage()
+combined <- appose_image_grobs(small, tall, wide, large, width=grid::unit(150, "mm"), space=unit(2, "mm"))
+grid::grid.show.layout(combined$frame$layout)
+grid::grid.draw(combined)
 ```
 
 ```{r images}

@@ -160,22 +160,21 @@ appose_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="h
                       rev_ratio <- 1
                       message('no match argument, unify="as_is" was set')
   }
+    # output widths and heights
+  widths  <- widths  * rev_ratio
+  heights <- heights * rev_ratio
 
     # expantion rate: output length / (sum length of grobs + space)
-  width_sum <- sum(grid::convertUnit(widths,        "mm", valueOnly=TRUE),
-                   grid::convertUnit(space * (n-1), "mm", valueOnly=TRUE))
-  expantion <- width / width_sum
-
-
-    # output widths and heights
-  widths  <- widths  * rev_ratio * expantion
-  heights <- heights * rev_ratio * expantion
-
+  expantion <- 
+    sum(width - grid::convertUnit(space * n, "mm", valueOnly=TRUE)) / 
+    sum(        grid::convertUnit(widths,    "mm", valueOnly=TRUE))
+  widths  <- widths  * expantion
+  heights <- heights * expantion
 
     # layout
   layout <- grid::grid.layout(nrow=1, ncol=n, widths=widths + space, heights=max(heights))
     # frame and place
-  combined_grobs <- frame_place_grobs(grobs, layout, space, name)
+  combined_grobs <- frame_place_grobs(grobs, layout, widths, heights, space, name)
   combined_grobs
 }
 
@@ -190,12 +189,12 @@ appose_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="h
   #' @return           combined grobs by layout.
   #' 
   #' @export
-frame_place_grobs <- function(grobs, layout, space, name=NULL){
-  # frame_place_grobs <- function(grobs, widths, heights, layout, name=NULL){
+frame_place_grobs <- function(grobs, layout, widths, heights, space, name=NULL){
+  # frame_place_grobs <- function(grobs, layout, space, name=NULL){
   combined_grobs <- grid::frameGrob(layout=layout, name=name)
   for(i in  seq_along(grobs)){
-    grobs[[i]]$width  <- layout$widths[[i]] - space
-    grobs[[i]]$height <- layout$heights
+    grobs[[i]]$width  <- widths[[i]]
+    grobs[[i]]$height <- heights[[i]]
     combined_grobs <- grid::placeGrob(combined_grobs, grobs[[i]], col=i)
   }
   combined_grobs
