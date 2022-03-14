@@ -90,7 +90,7 @@ fig <-
   ggplot(mpg, aes(x=displ, y=hwy)) + 
   geom_point() +
   theme_bw()
-fig <- cowplot::as_grob(fig)
+  # fig <- ggplot2::ggplotGrob(fig)
 
 
   # text
@@ -119,6 +119,105 @@ grid.draw(slide)
 
 ## Combine images
 
+```{r}
+grobs[[1]]$width <- unit(0.5, "npc")
+grobs[[1]]$height <- unit(0.5, "npc")
+grobs[[1]]$width <- unit(5, "cm")
+grobs[[1]]$height <- unit(5, "cm")
+grid.draw(grobs[[1]])
+
+
+library(grid)
+library(tidyverse)
+space <- grid::unit(1, "mm")
+width  <- unit(100, "mm")
+width <- grid::convertUnit(width, "mm", valueOnly=TRUE)
+  # height <- unit(50, "mm")
+
+  # grobs <- list(small, tall, wide, large)
+
+jpg_grobs <- 
+  stringr::str_c("original_", c("small", "tall", "wide", "large"), ".jpg") %>%
+  system.file("extdata", ., package="ggposter") %>%
+  purrr::map(jpeg::readJPEG) %>%
+  purrr::map(grid::rasterGrob)
+grobs <- list(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]])
+unify <- "height"
+
+
+  #   grobs <- list(...)
+  n <- length(grobs)
+    # widths and heights
+  widths  <- grid::unit(rep(1, n), rep("grobwidth",  n), grobs)
+  heights <- grid::unit(rep(1, n), rep("grobheight", n), grobs)
+    # reverse ratio
+  if(unify=="height") rev_ratio <- reverse_ratio(heights) else 
+  if(unify=="width")  rev_ratio <- reverse_ratio(widths)  else
+  if(unify=="as_is")  rev_ratio <- 1                      else { # do nothing
+                      rev_ratio <- 1
+                      message('no match argument, unify="as_is" was set')
+  }
+
+
+  width_sum <- sum(grid::convertUnit(widths,        "mm", valueOnly=TRUE),
+                   grid::convertUnit(space * (n-1), "mm", valueOnly=TRUE))
+expantion <- width / width_sum
+
+    # output widths and heights
+  widths  <- widths  * rev_ratio * expantion
+  heights <- heights * rev_ratio * expantion
+    # layout
+  layout <- grid::grid.layout(nrow=1, ncol=n, widths=widths + space, heights=max(heights))
+    # frame and place
+  combined_grobs <- frame_place_grobs(grobs, widths, heights, layout, name=NULL)
+
+  combined_grobs
+
+grid.show.layout(layout)
+grid.draw(combined_grobs)
+
+ggplot2::ggsave("d:/tmp.pdf", combined_grobs)
+
+grid::convertUnit(widths,  "mm")
+grid::convertUnit(heights, "mm")
+
+grid::convertUnit(layout$widths,  "mm")
+grid::convertUnit(layout$heights, "mm")
+
+```
+
+```{r jpgs}
+library(tidyverse)
+library(grid)
+
+jpg_grobs <- 
+  stringr::str_c("original_", c("small", "tall", "wide", "large"), ".jpg") %>%
+  system.file("extdata", ., package="ggposter") %>%
+  purrr::map(jpeg::readJPEG) %>%
+  purrr::map(grid::rasterGrob)
+
+combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], width=grid::unit(200, "mm"), space=unit(5, "mm"))
+grid::grid.show.layout(combined$frame$layout)
+grid::grid.draw(combined)
+
+combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], width=grid::unit(200, "mm"), unify="as_is", space=unit(5, "mm"))
+grid::grid.show.layout(combined$frame$layout)
+grid::grid.draw(combined)
+
+
+library(tidyverse)
+library(grid)
+small <- rectGrob(width=unit(1, "cm"), height=unit(1, "cm"), gp=gpar(fill="black"))
+tall  <- rectGrob(width=unit(1, "cm"), height=unit(2, "cm"), gp=gpar(fill="red"))
+wide  <- rectGrob(width=unit(2, "cm"), height=unit(1, "cm"), gp=gpar(fill="blue"))
+large <- rectGrob(width=unit(2, "cm"), height=unit(2, "cm"), gp=gpar(fill="white"))
+combined <- appose_image_grobs(small, tall, wide, large, width=grid::unit(200, "mm"), space=unit(5, "mm"))
+grid::grid.show.layout(combined$frame$layout)
+grid::grid.draw(combined)
+
+
+
+```
 
 ```{r images}
   # setwd("d:/matu/work/todo/ggposter")
@@ -130,26 +229,27 @@ tall  <- rectGrob(width=unit(1, "cm"), height=unit(2, "cm"), gp=gpar(fill="red")
 wide  <- rectGrob(width=unit(2, "cm"), height=unit(1, "cm"), gp=gpar(fill="blue"))
 large <- rectGrob(width=unit(2, "cm"), height=unit(2, "cm"), gp=gpar(fill="white"))
 
-grid.newpage()
-grid.draw(
-  (small %oo% tall %oo% wide %oo% large) %8%
-  appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"), unify="as_is")
-  )
 
 grid.newpage()
 grid.draw(
-  (small %oo% tall %oo% wide %oo% large) %8%
+  appose_image_grobs(small, tall, wide, large, space=grid::unit(0, "mm"), unify="height") %8%
   appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"), unify="height")
   )
 
 grid.newpage()
 grid.draw(
-  (small %oo% tall %oo% wide %oo% large) %8%
+  appose_image_grobs(small, tall, wide, large, space=grid::unit(0, "mm"), unify="as_is") %8%
+  appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"), unify="height")
+  )
+
+grid.newpage()
+grid.draw(
+  appose_image_grobs(small, tall, wide, large, space=grid::unit(0, "mm"), unify="as_is") %8%
   appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"), unify="width")
   )
 
 
-original        <- small %oo% tall %oo% wide %oo% large
+original        <- appose_image_grobs(small, tall, wide, large, space=grid::unit(0, "mm"), unify="as_is")
 combined_as_is  <- appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"), unify="as_is")
 combined_height <- appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"), unify="height")
 combined_width  <- appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"), unify="width")
@@ -161,8 +261,8 @@ combined_width  <- appose_image_grobs(small, tall, wide, large, space=grid::unit
 
 combined <- stack_grobs(original, combined_as_is, combined_height, combined_width)
 system.time(grid.draw(combined))
-ggplot2::ggsave("d:/tmp.pdf", combined)
-ggplot2::ggsave("d:/tmp.png", combined)
+  # ggplot2::ggsave("d:/tmp.pdf", combined)
+  # ggplot2::ggsave("d:/tmp.png", combined)
 
   original        %8% # original
   combined_as_is  %8%
@@ -180,17 +280,18 @@ tmp <- original     %8% # original
     combined_as_is  %8%
     combined_height %8%
     combined_width 
-ggplot2::ggsave("d:/tmp.png", tmp)
-ggplot2::ggsave("d:/tmp.pdf", tmp)
+  # ggplot2::ggsave("d:/tmp.png", tmp)
+  # ggplot2::ggsave("d:/tmp.pdf", tmp)
 
 rlogo <- 
   system.file("extdata", "Rlogo.png", package = "gridtext") %>%
   png::readPNG() %>%
   grid::rasterGrob()
-grid::grid.draw(rlogo %oo% rlogo %oo% rlogo)
+grid::grid.draw(appose_image_grobs(rlogo, rlogo, rlogo, space=grid::unit(1, "mm"), unify="as_is"))
+
 
 rlogo$width <- grid::unit(20, "mm")
-grid::grid.draw(rlogo %oo% rlogo %oo% rlogo)
+grid::grid.draw(appose_image_grobs(rlogo, rlogo, rlogo, space=grid::unit(1, "mm"), unify="as_is"))
 
 ```
 
@@ -199,7 +300,7 @@ grid::grid.draw(rlogo %oo% rlogo %oo% rlogo)
 ## Colaboration with ggplot2 (and cowplot)
 
 
-```{r ggplot2}
+```{r}
 
 
 ```
@@ -219,8 +320,10 @@ grid.newpage()
 grid.draw(title %8% (objectives %oo% conclusions))
 
 poster <- title %8% (objectives %oo% conclusions)
-ggplot2::ggsave("d:/tmp.pdf", poster)
-ggplot2::ggsave("d:/tmp.png", poster)
+
+grid.draw(poster)
+  # ggplot2::ggsave("d:/tmp.pdf", poster)
+  # ggplot2::ggsave("d:/tmp.png", poster)
 ```
 
 

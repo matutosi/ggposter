@@ -36,8 +36,8 @@ so unit(1, "mm") make space of 2mm among grobs.}
 }
 }
 \description{
-appose_grob() and tack_grob() conbine two grobs,
-while appose_grobs() and stack_grobs() can conbine more.
+appose_grob() and tack_grob() combine two grobs,
+while appose_grobs() and stack_grobs() can combine more.
 \verb{\%oo\%} and \verb{\%8\%} are shortcuts of appose_grob() and tack_grob().
 }
 \examples{
