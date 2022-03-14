@@ -2,9 +2,17 @@
 % Please edit documentation in R/combine_grobs.R
 \name{frame_place_grobs}
 \alias{frame_place_grobs}
-\title{Frame and place grobs}
+\title{Frame and place grobs in line (row or col)}
 \usage{
-frame_place_grobs(grobs, layout, widths, heights, space, name = NULL)
+frame_place_grobs(
+  grobs,
+  layout,
+  widths,
+  heights,
+  space,
+  by_row = TRUE,
+  name = NULL
+)
 }
 \arguments{
 \item{grobs}{grobs to be combined}
@@ -16,6 +24,8 @@ frame_place_grobs(grobs, layout, widths, heights, space, name = NULL)
 \item{heights}{grid unit.}
 
 \item{space}{A grid unit. Space among grobs.}
+
+\item{by_row}{A logical. TRUE: line in a row. FALSE: line in a col.}
 
 \item{name}{A string. Name of combined grob.}
 }

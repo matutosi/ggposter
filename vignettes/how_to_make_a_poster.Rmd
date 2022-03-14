@@ -149,6 +149,29 @@ combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], j
 grid::grid.show.layout(combined$frame$layout)
 grid::grid.draw(combined)
 sum(combined$frame$layout$widths)
+
+
+grid.newpage()
+combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], 
+  height=grid::unit(30, "mm"), space=unit(10, "mm"))
+grid::grid.show.layout(combined$frame$layout)
+grid::grid.draw(combined)
+sum(combined$frame$layout$widths)
+
+grid.newpage()
+combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], 
+  height=grid::unit(30, "mm"), unify="as_is", space=unit(5, "mm"))
+grid::grid.show.layout(combined$frame$layout)
+grid::grid.draw(combined)
+sum(combined$frame$layout$widths)
+
+grid.newpage()
+combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], 
+  height=grid::unit(25, "mm"), unify="width", space=unit(1, "mm"))
+grid::grid.show.layout(combined$frame$layout)
+grid::grid.draw(combined)
+sum(combined$frame$layout$widths)
+
 ```
 
 
