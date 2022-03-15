@@ -10,11 +10,12 @@ gen_slide(
   text,
   gp_title,
   gp_text,
-  paper = "a4",
-  width = NULL,
-  height = NULL,
+  paper = "",
+  width = unit(1, "npc"),
+  height = unit(1, "npc"),
   layout = NULL,
-  name = NULL
+  name = NULL,
+  ...
 )
 }
 \arguments{

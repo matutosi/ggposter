@@ -4,7 +4,7 @@
 \alias{as_tg}
 \title{Wrapper function to generate textGrob for grid::textGrob.}
 \usage{
-as_tg(text, x, y, hjust, font_size, use, ...)
+as_tg(text, x, y, hjust, vjust, font_size, use, ...)
 }
 \arguments{
 \item{text}{A string.

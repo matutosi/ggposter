@@ -91,8 +91,8 @@ get_font_size <- function(base=NULL, name=NULL, use=NULL, silent=TRUE, text=""){
   #' @param ...       Some more arguments
   #' @seealso grid::textGrob()
   #' @export
-as_tg <- function(text, x, y, hjust, font_size, use, ...){
-  grid::textGrob(label=text, x=x, y=y, hjust=hjust, gp=grid::gpar(fontsize=font_size), name=use, ...)
+as_tg <- function(text, x, y, hjust, vjust, font_size, use, ...){
+  grid::textGrob(label=text, x=x, y=y, hjust=hjust, vjust=vjust, gp=grid::gpar(fontsize=font_size), name=use, ...)
 }
 
   #' Split text to fit viewpeort width

@@ -18,7 +18,7 @@
   #' grid::grid.draw(arranged_txt_2)
   #'
   #' @export
-arrange_txt <- function(..., x=0, y=1, hjust=0, widths=grid::unit(841, "mm"), silent=TRUE){
+arrange_txt <- function(..., x=0, y=0.5, hjust=0, vjust=0.5, widths=grid::unit(841, "mm"), silent=TRUE){
   tbl <- txt2tibble(...)
   tg <-
     tbl %>%
@@ -26,6 +26,7 @@ arrange_txt <- function(..., x=0, y=1, hjust=0, widths=grid::unit(841, "mm"), si
     dplyr::mutate(x=x) %>%
     dplyr::mutate(y=y) %>%
     dplyr::mutate(hjust=hjust) %>%
+    dplyr::mutate(vjust=vjust) %>%
     purrr::pmap(as_tg)
   layout <- tg2layout(tg, widths=widths)
   tg_arrange(tg=tg, layout=layout)

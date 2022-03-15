@@ -7,8 +7,9 @@
 arrange_txt(
   ...,
   x = 0,
-  y = 1,
+  y = 0.5,
   hjust = 0,
+  vjust = 0.5,
   widths = grid::unit(841, "mm"),
   silent = TRUE
 )

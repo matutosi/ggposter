@@ -42,7 +42,7 @@
   #' grid::grid.draw(slide)
   #' 
   #' @export
-gen_slide <- function(title, fig, text, gp_title, gp_text, paper="a4", width=NULL, height=NULL, layout=NULL, name=NULL){
+gen_slide <- function(title, fig, text, gp_title, gp_text, paper="", width=unit(1, "npc"), height=unit(1, "npc"), layout=NULL, name=NULL, ...){
     # set paper size
   if(paper=="a4"){
     width  <- grid::unit(297, "mm")
@@ -51,8 +51,8 @@ gen_slide <- function(title, fig, text, gp_title, gp_text, paper="a4", width=NUL
     # viewport
   vp <- grid::viewport(width=width, height=height)
     # textbox_grob
-  tbg_title <- gridtext::textbox_grob(text=title, halign=0.5, gp=gp_title, name="title")
-  tbg_text  <- gridtext::textbox_grob(text=text,              gp=gp_text,  name="text")
+  tbg_title <- gridtext::textbox_grob(text=title, halign=0.5, gp=gp_title, name="title", ...)
+  tbg_text  <- gridtext::textbox_grob(text=text,              gp=gp_text,  name="text", ...)
     # layout
   if(is.null(layout)){
     respect <- rbind(c(0,0), c(1,0))
