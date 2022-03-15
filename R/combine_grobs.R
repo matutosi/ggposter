@@ -147,6 +147,7 @@ stack_grobs <- function(..., space=grid::unit(0, "mm"), name=NULL){
 appose_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="height", space=grid::unit(0, "mm"), name=NULL){
   grobs <- list(...)
   n <- length(grobs)
+
     # convert width and height
   if(!is.null(width))  width  <- grid::convertUnit(width,  "mm", valueOnly=TRUE)
   if(!is.null(height)) height <- grid::convertUnit(height, "mm", valueOnly=TRUE)
@@ -159,8 +160,8 @@ appose_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="h
     # reverse ratio
   if(unify=="height") rev_ratio <- reverse_ratio(heights) else 
   if(unify=="width")  rev_ratio <- reverse_ratio(widths)  else
-  if(unify=="as_is")  rev_ratio <- 1                      else   # do nothing
-  #   if(unify=="grow" )  rev_ratio <- 1                      else { # do nothing
+  if(unify=="as_is")  rev_ratio <- 1                      else {  # do nothing
+  #   if(unify=="grow" )  rev_ratio <- 1                      else  # do nothing
                       rev_ratio <- 1
                       message('no match argument, unify="as_is" was set')
   }

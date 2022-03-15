@@ -17,11 +17,11 @@ appose_image_grobs(
 \arguments{
 \item{...}{grob.}
 
-\item{width, height}{A grid unit. When both are set, use width and omit height.}
+\item{width, height}{A grid unit.}
 
-\item{grow}{Logical. TRUE: images will be grown to fill the width or height.
-Work when (!is.null(width)  & unify=="height") or
-when (!is.null(height) & unify=="width").}
+\item{grow}{A string. "height", "width", or "none"
+Images will be grown to fill the width or height.
+Work ONLY when both of width and height are set.}
 
 \item{unify}{A string.}
 
