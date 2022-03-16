@@ -16,19 +16,33 @@ knitr::opts_chunk$set(
 )
 ```
 
-# setup
+# Setup
+
+Atatch essential packages for setup. 
+Please install them if not yet. 
 
 ```{r setup}
 library(tidyverse)
-library(ggplot2)
 library(grid)
-library(gridtext)
 library(ggposter)
 ```
 
+
 # Example: ggposter
 
-## poster size
+As an example, this vignette shows how to make a poster. 
+
+
+## Poster size
+
+Most of posters in academic conferences can be based on A0 size paper. 
+When we prepare it, however, A4 size is comfotable and printable. 
+Argument `shrink` in ggposter decide how much it will be shrunk. 
+`shrink`=0.25 make poster just size for A4 paper. 
+
+You can use `full` and `half` for paper width as grid unit, which are defined by `grid::unit()`. 
+In addition, space defined by `grid::unit()` among grob are set here. 
+You can change it as you want. 
 
 ```{r poster_size}
 size <- "A0"
@@ -116,6 +130,8 @@ grid.draw(part_1)
 ## Combine images
 
 ```{r jpgs}
+library(gridtext)
+
 jpg_grobs <- 
   stringr::str_c("original_", c("small", "tall", "wide", "large"), ".jpg") %>%
   system.file("extdata", ., package="ggposter") %>%
