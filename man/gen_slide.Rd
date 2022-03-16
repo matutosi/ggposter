@@ -11,8 +11,8 @@ gen_slide(
   gp_title,
   gp_text,
   paper = "",
-  width = unit(1, "npc"),
-  height = unit(1, "npc"),
+  width = grid::unit(1, "npc"),
+  height = grid::unit(1, "npc"),
   layout = NULL,
   name = NULL,
   ...
@@ -38,6 +38,8 @@ gen_slide(
 \item{layout}{Layout of slide.}
 
 \item{name}{A name of grob.}
+
+\item{...}{Others.}
 }
 \value{
 Grob

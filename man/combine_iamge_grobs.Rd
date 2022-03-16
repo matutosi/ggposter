@@ -13,7 +13,7 @@ appose_image_grobs(
   grow = TRUE,
   unify = "height",
   space = grid::unit(0, "mm"),
-  gp = gpar(),
+  gp = grid::gpar(),
   name = NULL
 )
 
@@ -24,7 +24,7 @@ stack_image_grobs(
   grow = TRUE,
   unify = "width",
   space = grid::unit(0, "mm"),
-  gp = gpar(),
+  gp = grid::gpar(),
   name = NULL
 )
 }

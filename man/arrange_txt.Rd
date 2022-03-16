@@ -11,6 +11,7 @@ arrange_txt(
   hjust = 0,
   vjust = 0.5,
   widths = grid::unit(841, "mm"),
+  convert = FALSE,
   silent = TRUE
 )
 }
@@ -25,14 +26,17 @@ keyword: "tiny", "script", "footnote", "caption",
 
 \item{x, y}{A numeric. Specify x- or y-value.}
 
-\item{hjust}{A numeric 0-1. 1: left", 0: "right"}
+\item{hjust, vjust}{A numeric 0-1. 1: left", 0: "right"}
 
 \item{widths}{grid::unit}
+
+\item{convert}{Logical. TRUE: convert unit to simple unit ("mm")
+to improve performance.}
 
 \item{silent}{Logical. TRUE: no massage, FALSE: shows massage.}
 }
 \value{
-\preformatted{   textGrob
+\preformatted{         textGrob
 }
 }
 \description{

@@ -10,6 +10,7 @@
 #' @param height   Slide height.
 #' @param layout   Layout of slide.
 #' @param name     A name of grob.
+#' @param ...      Others. 
 #' 
 #' @return Grob
 #' 
@@ -42,7 +43,7 @@
 #' grid::grid.draw(slide)
 #' 
 #' @export
-gen_slide <- function(title, fig, text, gp_title, gp_text, paper="", width=unit(1, "npc"), height=unit(1, "npc"), layout=NULL, name=NULL, ...){
+gen_slide <- function(title, fig, text, gp_title, gp_text, paper="", width=grid::unit(1, "npc"), height=grid::unit(1, "npc"), layout=NULL, name=NULL, ...){
     # set paper size
   if(paper=="a4"){
     width  <- grid::unit(297, "mm")

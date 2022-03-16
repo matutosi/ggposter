@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(tidyverse)
-  # library(cowplot)
+library(ggplot2)
 library(grid)
 library(gridtext)
 library(ggposter)
@@ -28,7 +28,7 @@ library(ggposter)
 
 # Example: ggposter
 
-## Title
+## poster size
 
 ```{r poster_size}
 size <- "A0"
@@ -330,21 +330,13 @@ grid.newpage()
 pushViewport(vp=viewport(width=full, gp=gpar(cex=cex)))
 
 
-
-gen_slide <- function(title, fig, text, gp_title, gp_text, paper="a4", width=NULL, height=NULL, layout=NULL, name=NULL){
-
-
-
 description_1 <- 
   arrange_txt(
-    txt_body_31, txt_body_32, txt_body_33, txt_body_34, 
+    txt_body_31, txt_body_32, 
     widths=half)
 
 grid.newpage()
-grid.draw(appose_image_grobs(fig, description_1, unify="width", width=half))
-
-
-grid.draw(colab_ggplot <- appose_grobs(fig, description_1))
+grid.draw(appose_image_grobs(ggplot2::ggplotGrob(fig), description_1, unify="width"))
 
 
 ```
@@ -370,13 +362,10 @@ grid.draw(colab_ggplot <- appose_grobs(fig, description_1))
 
 ## Rendering
 
-```{r rendering}
+```{r rendering_and_save}
 grid.newpage()
-grid.draw(title %8% (objectives %oo% conclusions))
 
-poster <- title %8% (objectives %oo% conclusions)
 
-grid.draw(poster)
   # ggplot2::ggsave("d:/tmp.pdf", poster)
   # ggplot2::ggsave("d:/tmp.png", poster)
 ```

@@ -12,13 +12,12 @@ label in grid::textGrob().}
 
 \item{x, y}{A numeric. Specify x- or y-value.}
 
-\item{hjust}{A numeric 0-1. 0: left, 1: right.}
+\item{hjust, vjust}{A numeric 0-1. 0: left, 1: right.}
 
 \item{font_size}{A numeric of font size.
 fontsize in grid::textGrob().}
 
-\item{use}{A string.
-name in grid::textGrob().}
+\item{use}{A string. Name in grid::textGrob().}
 
 \item{...}{Some more arguments}
 }

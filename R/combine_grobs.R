@@ -6,8 +6,9 @@
 #' 
 #' @name            combine_grobs
 #' @param gx,gy,... grob.
-#' @param name      A string. grob name
+#' @param gp        gpar(). 
 #' @param space     A grid unit. Space among grobs. 
+#' @param name      A string. grob name
 #' @return          combined (apposed or stacked) grob in a line.
 #' @examples
 #' library(grid)
@@ -235,6 +236,7 @@ appose_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="h
 #' @param layout     grid layout.
 #' @param space      A grid unit. Space among grobs. 
 #' @param by_row     A logical. TRUE: line in a row. FALSE: line in a col.
+#' @param gp        gpar(). 
 #' @param name       A string. Name of combined grob.
 #' @return           combined grobs by layout.
 #' 

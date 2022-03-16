@@ -1,13 +1,13 @@
 #' Wrapper function of converting text into arranged text grob.
 #' 
 #' @inheritParams txt2tibble
-#' @param x,y     A numeric. Specify x- or y-value.
-#' @param hjust   A numeric 0-1. 1: left", 0: "right"
-#' @param widths  grid::unit
-#' @param convert Logical. TRUE: convert unit to simple unit ("mm") 
-#'                to improve performance. 
-#' @param silent  Logical. TRUE: no massage, FALSE: shows massage.
-#' @return        textGrob
+#' @param x,y           A numeric. Specify x- or y-value.
+#' @param hjust,vjust   A numeric 0-1. 1: left", 0: "right"
+#' @param widths        grid::unit
+#' @param convert       Logical. TRUE: convert unit to simple unit ("mm") 
+#'                      to improve performance. 
+#' @param silent        Logical. TRUE: no massage, FALSE: shows massage.
+#' @return              textGrob
 #' @examples
 #' txt_title    <- "This is a title."
 #' txt_ITEM_1   <- "ITEM text is larger than item text."

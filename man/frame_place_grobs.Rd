@@ -11,7 +11,7 @@ frame_place_grobs(
   heights,
   space,
   by_row = TRUE,
-  gp = gpar(),
+  gp = grid::gpar(),
   name = NULL
 )
 }
@@ -27,6 +27,8 @@ frame_place_grobs(
 \item{space}{A grid unit. Space among grobs.}
 
 \item{by_row}{A logical. TRUE: line in a row. FALSE: line in a col.}
+
+\item{gp}{gpar().}
 
 \item{name}{A string. Name of combined grob.}
 }
