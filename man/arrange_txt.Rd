@@ -7,9 +7,12 @@
 arrange_txt(
   ...,
   x = 0,
-  y = 1,
+  y = 0.5,
   hjust = 0,
+  vjust = 0.5,
   widths = grid::unit(841, "mm"),
+  convert = FALSE,
+  shrink = 1,
   silent = TRUE
 )
 }
@@ -24,14 +27,22 @@ keyword: "tiny", "script", "footnote", "caption",
 
 \item{x, y}{A numeric. Specify x- or y-value.}
 
-\item{hjust}{A numeric 0-1. 1: left", 0: "right"}
+\item{hjust, vjust}{A numeric 0-1. 1: left", 0: "right"}
 
 \item{widths}{grid::unit}
+
+\item{convert}{Logical. TRUE: convert unit to simple unit ("mm")
+to improve performance.
+Not implemented yet.}
+
+\item{shrink}{A numeric. Shrink rate of font size.
+In preperation, 0.25 is recomended.
+This make the paper size from A0 (810mm * 1189) to A4 (210 * 297).}
 
 \item{silent}{Logical. TRUE: no massage, FALSE: shows massage.}
 }
 \value{
-\preformatted{   textGrob
+\preformatted{         textGrob
 }
 }
 \description{

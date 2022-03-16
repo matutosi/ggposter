@@ -10,11 +10,12 @@ gen_slide(
   text,
   gp_title,
   gp_text,
-  paper = "a4",
-  width = NULL,
-  height = NULL,
+  paper = "",
+  width = grid::unit(1, "npc"),
+  height = grid::unit(1, "npc"),
   layout = NULL,
-  name = NULL
+  name = NULL,
+  ...
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ gen_slide(
 \item{layout}{Layout of slide.}
 
 \item{name}{A name of grob.}
+
+\item{...}{Others.}
 }
 \value{
 Grob

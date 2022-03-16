@@ -16,31 +16,63 @@ knitr::opts_chunk$set(
 )
 ```
 
-# setup
+# Setup
+
+Atatch essential packages for setup. 
+Please install them if not yet. 
 
 ```{r setup}
 library(tidyverse)
-  # library(cowplot)
 library(grid)
-library(gridtext)
 library(ggposter)
 ```
 
+
 # Example: ggposter
+
+As an example, this vignette shows how to make a poster. 
+
+
+## Poster size
+
+Most of posters in academic conferences can be based on A0 size paper. 
+When we prepare it, however, A4 size is comfotable and printable. 
+Argument `shrink` in ggposter decide how much it will be shrunk. 
+`shrink`=0.25 make poster just size for A4 paper. 
+
+You can use `full` and `half` for paper width as grid unit, which are defined by `grid::unit()`. 
+In addition, space defined by `grid::unit()` among grob are set here. 
+You can change it as you want. 
+
+```{r poster_size}
+size <- "A0"
+size <- "A4" # for preparation
+if(size=="A0") i <- 1 else 
+if(size=="A4") i <- 2
+
+full <- grid::unit(c(841, 210), "mm")[i]
+half <- grid::unit(c(420, 105), "mm")[i]
+shrink <- c(1, 0.25)[i]
+space <- grid::unit(2, "mm")
+```
 
 ## Title
 
-```{r title}
+```{r title, fig.width=8.3, out.width="100%"}
 txt_title  <- "How to Make a Poster with ggposter Package in R"
 txt_subt   <- "For comfotable and tidy work"
 txt_kw     <- "Key words: ggplot2, grid, gridtext, R"
-txt_author <- "Toshikazu Matsumura (Konan Women's Univ., Japan), matutosi@gmail.com"
+txt_author <- "Toshikazu Matsumura, matutosi@gmail.com"
+txt_affil <- "Konan Women's Univ., Japan"
 
 title <- arrange_txt(
-    txt_title, txt_subt, txt_kw, txt_author, 
-    x=0.5, y=0.5, hjust=c(rep(0.5, 3), 0), widths=grid::unit(841, "mm"))
-  # grid::grid.draw(title)
+    txt_title, txt_subt, txt_kw, txt_author, txt_affil,
+    x=0.5, y=0.5, hjust=c(rep(0.5, 3), rep(0, 2)), widths=full, shrink=0.25)
+pushViewport(vp=viewport(width=full))
+grid::grid.draw(title)
 ```
+
+
 
 ## Objectives
 
@@ -48,106 +80,136 @@ title <- arrange_txt(
 txt_ITEM_10  <- "OBJECTIVES"
 txt_BODY_11   <- "- Want to use R throughout making a poster."
 txt_BODY_12   <- "- To use grid and ggplot2 system."
-txt_BODY_13   <- "- To reuse parts of past work."
-txt_ITEM_20  <- "BACKGROUND"
+txt_BODY_13   <- "- Not to make similar poster from scratch."
+
+txt_ITEM_20  <- "BACKGROUNDS"
 txt_BODY_21   <- "- No R packages or tools for making a poster."
 txt_BODY_22  <- "- PowerPoint needs many manual procedures to uniform a style."
-txt_BODY_23  <- "- If we can use R for making poster, no need to save and load plot files."
+txt_BODY_23  <- "- If we can make a poster with R, no need to save and load plots."
 
 objectives <- arrange_txt(
-  txt_ITEM_10, txt_BODY_11, txt_BODY_12, txt_BODY_13, 
-  txt_ITEM_20, txt_BODY_21, txt_BODY_22, txt_BODY_23, 
-  widths=grid::unit(420, "mm"))
-  # grid::grid.draw(objectives)
-  # objectives <- 
-  #   "
-  #   OBJECTIVES
-  #   "
+  txt_ITEM_10, 
+  txt_BODY_11, txt_BODY_12, txt_BODY_13, 
+  widths=half, shrink=0.25)
+
+backgrounds <- arrange_txt(
+  txt_ITEM_20, 
+  txt_BODY_21, txt_BODY_22, txt_BODY_23, 
+  widths=half, shrink=0.25)
 ```
 
 ## Conclusions
 
 ```{r conclusions}
-txt_ITEM_10  <- "CONCLUSIONS"
-txt_BODY_11   <- "- Please install from CRAN or GitHub."
-txt_BODY_12   <- "- ggposter package can might be a alternative tool for making a poster and slides."
-txt_BODY_13   <- "- Colaboration with ggplot2, cowplot, gridtext or other package may produce more effects."
-txt_BODY_14   <- "- Still in the development stage and can have bugs."
-txt_BODY_15   <- "- Welcome your requests."
-txt_BODY_16   <- "- ENJOY!"
+txt_ITEM_30  <- "CONCLUSIONS"
+txt_BODY_31   <- "- Please install from CRAN or GitHub."
+txt_BODY_32   <- "- ggposter package can might be a alternative tool for making a poster and slides."
+txt_BODY_33   <- "- Colaboration with ggplot2, gridtext or other package may produce more effects."
+txt_BODY_34   <- "- Still in the development stage and can have bugs."
+txt_BODY_35   <- "- Welcome your requests."
+txt_BODY_36   <- "- ENJOY!"
 
 conclusions <- arrange_txt(
-  txt_ITEM_10, txt_BODY_11, txt_BODY_12, txt_BODY_13, txt_BODY_14, txt_BODY_15, txt_BODY_16, 
-  widths=grid::unit(420, "mm"))
+  txt_ITEM_30, 
+  txt_BODY_31, txt_BODY_32, txt_BODY_33, txt_BODY_34, txt_BODY_35, txt_BODY_36, 
+  widths=half, shrink=0.25)
 ```
 
+## Combine
 
-## Colaboration with ggplot2 (and cowplot)
-
-
-```{r ggplot2}
-fig <- 
-  ggplot(mpg, aes(x=displ, y=hwy)) + 
-  geom_point() +
-  theme_bw()
-  # fig <- ggplot2::ggplotGrob(fig)
-
-
-  # text
-t_1 <- "This is a sample text. "
-t_2 <- "When longer than width, "
-t_3 <- "text will be split and add breaks. "
-t_4 <- "This text is separated into 5 objects, "
-t_5 <- "because of R document specification."
-text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
-  # gp_text
-fontsize <- 20
-lineheight <- 1.1
-gp_text <- gpar(fontsize=fontsize, lineheight=lineheight)
-
-  # title
-title_1 <- "THIS IS TITLE WORDS"
-  # gp_text
-fontsize <- 40
-gp_title <- gpar(fontsize=fontsize)
-
-slide <- gen_slide(title_1, fig, text, gp_title, gp_text)
-grid.draw(slide)
-  # ggplot2::ggsave("d:/slide.pdf", slide, height=210, width=297, units="mm")
-
+```{r combine_part_1, fig.width=8.3, out.width="100%"}
+part_1 <- 
+  stack_grobs_conv(title, 
+    appose_grobs_conv(
+      stack_grob(objectives, backgrounds, space=space),
+      conclusions), space=space)
+grid.newpage()
+grid.draw(part_1)
 ```
 
 ## Combine images
 
 ```{r jpgs}
-library(tidyverse)
-library(grid)
+library(gridtext)
 
 jpg_grobs <- 
-  #   "D:/matu/work/ToDo/ggposter/inst/extdata/" %>%
-  #    stringr::str_c(., "original_", c("small", "tall", "wide", "large"), ".jpg") %>%
   stringr::str_c("original_", c("small", "tall", "wide", "large"), ".jpg") %>%
   system.file("extdata", ., package="ggposter") %>%
   purrr::map(jpeg::readJPEG) %>%
   purrr::map(grid::rasterGrob)
 
+  # fix hole width
+fix_width_as_is <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], width=half, 
+   unify="as_is", space=space)  # same to unify=="width"
+fix_width_height <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], width=half, 
+   unify="height", space=space)
+
+image_combined <- stack_image_grobs(fix_width_as_is, fix_width_height, width=half, unify="width", space=space)
+  # grid::grid.show.layout(combined_images$frame$layout)
+  # grid::grid.draw(combined_images)
+
+  # description
+txt_ITEM_40  <- "COMBINE IMAGES<br>"
+txt_BODY_41   <- "- appose_image_grobs() and stack_image_grobs().<br>"
+txt_BODY_42   <- "- Import images and arrange them in a line (row or col).<br>"
+txt_BODY_43   <- "- Can unify height or width of each image (argument: unify).<br>"
+txt_BODY_44   <- "- Can fix hole width and height of combined grob (argument: width, height). <br>"
+
+txt <- str_c(txt_ITEM_40, txt_BODY_41, txt_BODY_42, txt_BODY_43, txt_BODY_44)
+grid.draw(gridtext::textbox_grob(txt, use_markdown=FALSE))
+
+image_description <- arrange_txt(
+  txt_ITEM_40, 
+  txt_BODY_41, txt_BODY_42, txt_BODY_43, txt_BODY_44, 
+  vjust=0.5, widths=half)
+
+grid.newpage()
+
+image_and_description <- stack_grobs_conv(image_description, image_combined)
+  # convertUnit(grobWidth(image_and_description), "mm")
+  # convertUnit(grobHeight(image_and_description), "mm")
+grid.newpage()
+grid.draw(image_and_description)
+
+
+image_and_description <- stack_grobs(image_description, image_description)
+grid::grid.show.layout(image_and_description$frame$layout)
+grid.draw(image_and_description)
+convertUnit(grobHeight(image_and_description), "mm")
+convertUnit(grobWidth(image_and_description),  "mm")
+
+image_and_description <- stack_grobs(image_description, image_description)
+grid::grid.show.layout(image_and_description$frame$layout)
+grid.draw(image_and_description)
+convertUnit(grobHeight(image_and_description), "mm")
+convertUnit(grobWidth(image_and_description),  "mm")
+
+
+
+```
+
+
+
+
+```{r image_fix_hole_height}
 grid.newpage()
 combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], 
-  width=grid::unit(150, "mm"), space=unit(10, "mm"))
+  height=grid::unit(30, "mm"), unify="height", space=space)
 grid::grid.show.layout(combined$frame$layout)
 grid::grid.draw(combined)
-sum(combined$frame$layout$widths)
 
 grid.newpage()
-combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], width=grid::unit(100, "mm"), unify="as_is", space=unit(5, "mm"))
+combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], 
+  height=grid::unit(30, "mm"), unify="as_is", space=space)
 grid::grid.show.layout(combined$frame$layout)
 grid::grid.draw(combined)
-sum(combined$frame$layout$widths)
 
 grid.newpage()
-combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], width=grid::unit(100, "mm"), unify="width", space=unit(1, "mm"))
+combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], 
+  height=grid::unit(25, "mm"), unify="width", space=space)
 grid::grid.show.layout(combined$frame$layout)
 grid::grid.draw(combined)
+<<<<<<< HEAD
 sum(combined$frame$layout$widths)
 
 
@@ -284,17 +346,44 @@ grid::grid.draw(appose_image_grobs(rlogo, rlogo, rlogo, space=grid::unit(1, "mm"
 
 ```
 
+
 ## Rendering
 
-```{r rendering}
+```{r rendering_and_save}
 grid.newpage()
-grid.draw(title %8% (objectives %oo% conclusions))
 
-poster <- title %8% (objectives %oo% conclusions)
 
-grid.draw(poster)
   # ggplot2::ggsave("d:/tmp.pdf", poster)
   # ggplot2::ggsave("d:/tmp.png", poster)
+```
+
+# Slide
+
+
+```{r slide}
+library(grid)
+  # text
+t_1 <- "This is a sample text. "
+t_2 <- "When longer than width, "
+t_3 <- "text will be split and add breaks. "
+t_4 <- "This text is separated into 5 objects, "
+t_5 <- "because of R document specification."
+text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
+  # gp_text
+fontsize <- 20
+lineheight <- 1.1
+gp_text <- gpar(fontsize=fontsize, lineheight=lineheight)
+
+  # title
+title_1 <- "THIS IS TITLE WORDS"
+  # gp_text
+fontsize <- 40
+gp_title <- gpar(fontsize=fontsize)
+
+slide <- gen_slide(title_1, fig, text, gp_title, gp_text)
+grid.draw(slide)
+  # ggplot2::ggsave("d:/slide.pdf", slide, height=210, width=297, units="mm")
+
 ```
 
 
@@ -495,6 +584,7 @@ grid::grid.draw(tg_header)
   - [1st edition]( https://www.stat.auckland.ac.nz/~paul/RGraphics/rgraphics.html )
   - [2nd edition]( https://www.stat.auckland.ac.nz/~paul/RG2e/ )
   - [3rd edition]( https://www.stat.auckland.ac.nz/~paul/RG3e/ )
+
 
 <!--
   - https://stat-ata-asu.github.io/R_DS_BD2020/using-ggplot2.html

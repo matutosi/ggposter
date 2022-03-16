@@ -8,24 +8,48 @@
 \alias{\%8\%}
 \alias{appose_grobs}
 \alias{stack_grobs}
+\alias{appose_grobs_conv}
+\alias{stack_grobs_conv}
 \title{Appose or stack two grobs or more in a line (row or col).}
 \usage{
-appose_grob(gx, gy, space = grid::unit(0, "mm"), name = NULL)
+appose_grob(
+  gx,
+  gy,
+  space = grid::unit(0, "mm"),
+  gp = grid::gpar(),
+  name = NULL
+)
 
-stack_grob(gx, gy, space = grid::unit(0, "mm"), name = NULL)
+stack_grob(gx, gy, space = grid::unit(0, "mm"), gp = grid::gpar(), name = NULL)
 
 gx \%oo\% gy
 
 gx \%8\% gy
 
-appose_grobs(..., space = grid::unit(0, "mm"), name = NULL)
+appose_grobs(..., space = grid::unit(0, "mm"), gp = grid::gpar(), name = NULL)
 
-stack_grobs(..., space = grid::unit(0, "mm"), name = NULL)
+stack_grobs(..., space = grid::unit(0, "mm"), gp = grid::gpar(), name = NULL)
+
+appose_grobs_conv(
+  ...,
+  space = grid::unit(0, "mm"),
+  gp = grid::gpar(),
+  name = NULL
+)
+
+stack_grobs_conv(
+  ...,
+  space = grid::unit(0, "mm"),
+  gp = grid::gpar(),
+  name = NULL
+)
 }
 \arguments{
 \item{gx, gy, ...}{grob.}
 
 \item{space}{A grid unit. Space among grobs.}
+
+\item{gp}{gpar().}
 
 \item{name}{A string. grob name}
 }

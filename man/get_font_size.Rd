@@ -4,7 +4,14 @@
 \alias{get_font_size}
 \title{Get font size from font_size_list with name or use.}
 \usage{
-get_font_size(base = NULL, name = NULL, use = NULL, silent = TRUE, text = "")
+get_font_size(
+  base = NULL,
+  name = NULL,
+  use = NULL,
+  shrink = 1,
+  silent = 1,
+  text = ""
+)
 }
 \arguments{
 \item{base}{A numeric of base font size:
@@ -24,6 +31,10 @@ thank: acknowledgement
 affil: affiliation
 subt: subtitle
 kw: keyword}
+
+\item{shrink}{A numeric. Shrink rate of font size.
+In preperation, 0.25 is recomended.
+This make the paper size from A0 (810mm * 1189) to A4 (210 * 297).}
 
 \item{silent}{Logical. TRUE: no massage, FALSE: shows massage.}
 
