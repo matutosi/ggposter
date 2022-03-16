@@ -133,7 +133,7 @@ drawDetails.splitText <- function(x, recording) {
 }
 
 
-#' add "splitText" class to grob
+#' add "splitText" class to split text grob
 #' 
 #' Called when drawDetails are run. 
 #' @rdname split_text
@@ -142,7 +142,7 @@ splitTextGrob <- function(text, ...) {
   grid::grob(text=text, cl="splitText", ...)
 }
 
-#' add "splitText" class to grob
+#' add "splitText" class to split text grob
 #' 
 #' Called when drawDetails are run. 
 #' @rdname split_text

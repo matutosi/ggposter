@@ -6,6 +6,10 @@
 #' @param widths        grid::unit
 #' @param convert       Logical. TRUE: convert unit to simple unit ("mm") 
 #'                      to improve performance. 
+#'                      Not implemented yet.
+#' @param shrink        A numeric. Shrink rate of font size. 
+#'                      In preperation, 0.25 is recomended. 
+#'                      This make the paper size from A0 (810mm * 1189) to A4 (210 * 297).
 #' @param silent        Logical. TRUE: no massage, FALSE: shows massage.
 #' @return              textGrob
 #' @examples
@@ -20,11 +24,11 @@
 #' grid::grid.draw(arranged_txt_2)
 #'
 #' @export
-arrange_txt <- function(..., x=0, y=0.5, hjust=0, vjust=0.5, widths=grid::unit(841, "mm"), convert=FALSE, silent=TRUE){
+arrange_txt <- function(..., x=0, y=0.5, hjust=0, vjust=0.5, widths=grid::unit(841, "mm"), convert=FALSE, shrink=1, silent=TRUE){
   tbl <- txt2tibble(...)
   tg <-
     tbl %>%
-    dplyr::mutate(font_size = purrr::pmap_dbl(tbl, get_font_size, silent=silent)) %>%
+    dplyr::mutate(font_size = purrr::pmap_dbl(tbl, get_font_size, shrink=shrink, silent=silent)) %>%
     dplyr::mutate(x=x) %>%
     dplyr::mutate(y=y) %>%
     dplyr::mutate(hjust=hjust) %>%

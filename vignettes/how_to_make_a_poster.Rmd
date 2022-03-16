@@ -38,13 +38,13 @@ if(size=="A4") i <- 2
 
 full <- grid::unit(c(841, 210), "mm")[i]
 half <- grid::unit(c(420, 105), "mm")[i]
+shrink <- c(1, 0.25)[i]
 space <- grid::unit(2, "mm")
-cex <- c(1, 0.25)[i]
 ```
 
 ## Title
 
-```{r title}
+```{r title, fig.width=8.3, out.width="100%"}
 txt_title  <- "How to Make a Poster with ggposter Package in R"
 txt_subt   <- "For comfotable and tidy work"
 txt_kw     <- "Key words: ggplot2, grid, gridtext, R"
@@ -53,9 +53,12 @@ txt_affil <- "Konan Women's Univ., Japan"
 
 title <- arrange_txt(
     txt_title, txt_subt, txt_kw, txt_author, txt_affil,
-    x=0.5, y=0.5, hjust=c(rep(0.5, 3), rep(0, 2)), widths=full)
-  # grid::grid.draw(title)
+    x=0.5, y=0.5, hjust=c(rep(0.5, 3), rep(0, 2)), widths=full, shrink=0.25)
+pushViewport(vp=viewport(width=full))
+grid::grid.draw(title)
 ```
+
+
 
 ## Objectives
 
@@ -73,18 +76,12 @@ txt_BODY_23  <- "- If we can make a poster with R, no need to save and load plot
 objectives <- arrange_txt(
   txt_ITEM_10, 
   txt_BODY_11, txt_BODY_12, txt_BODY_13, 
-  widths=half)
+  widths=half, shrink=0.25)
 
 backgrounds <- arrange_txt(
   txt_ITEM_20, 
   txt_BODY_21, txt_BODY_22, txt_BODY_23, 
-  widths=half)
-
-  # grid::grid.draw(objectives)
-  # objectives <- 
-  #   "
-  #   OBJECTIVES
-  #   "
+  widths=half, shrink=0.25)
 ```
 
 ## Conclusions
@@ -93,7 +90,7 @@ backgrounds <- arrange_txt(
 txt_ITEM_30  <- "CONCLUSIONS"
 txt_BODY_31   <- "- Please install from CRAN or GitHub."
 txt_BODY_32   <- "- ggposter package can might be a alternative tool for making a poster and slides."
-txt_BODY_33   <- "- Colaboration with ggplot2, cowplot, gridtext or other package may produce more effects."
+txt_BODY_33   <- "- Colaboration with ggplot2, gridtext or other package may produce more effects."
 txt_BODY_34   <- "- Still in the development stage and can have bugs."
 txt_BODY_35   <- "- Welcome your requests."
 txt_BODY_36   <- "- ENJOY!"
@@ -101,21 +98,19 @@ txt_BODY_36   <- "- ENJOY!"
 conclusions <- arrange_txt(
   txt_ITEM_30, 
   txt_BODY_31, txt_BODY_32, txt_BODY_33, txt_BODY_34, txt_BODY_35, txt_BODY_36, 
-  widths=half)
+  widths=half, shrink=0.25)
 ```
 
 ## Combine
 
-```{r combine_part_1}
-grid.newpage()
-pushViewport(vp=viewport(width=full, gp=gpar(cex=cex)))
+```{r combine_part_1, fig.width=8.3, out.width="100%"}
 part_1 <- 
   stack_grobs_conv(title, 
     appose_grobs_conv(
       stack_grob(objectives, backgrounds, space=space),
       conclusions), space=space)
+grid.newpage()
 grid.draw(part_1)
-
 ```
 
 ## Combine images
@@ -154,14 +149,14 @@ image_description <- arrange_txt(
 
 grid.newpage()
 
-image_and_description <- stack_grobs_conv(image_description, image_combined, gp=gpar(cex=cex))
+image_and_description <- stack_grobs_conv(image_description, image_combined)
   # convertUnit(grobWidth(image_and_description), "mm")
   # convertUnit(grobHeight(image_and_description), "mm")
 grid.newpage()
 grid.draw(image_and_description)
 
 
-image_and_description <- stack_grobs(image_description, image_description, gp=gpar(cex=cex))
+image_and_description <- stack_grobs(image_description, image_description)
 grid::grid.show.layout(image_and_description$frame$layout)
 grid.draw(image_and_description)
 convertUnit(grobHeight(image_and_description), "mm")
@@ -327,7 +322,7 @@ grid::grid.draw(slide)
 
 
 grid.newpage()
-pushViewport(vp=viewport(width=full, gp=gpar(cex=cex)))
+pushViewport(vp=viewport(width=full))
 
 
 description_1 <- 
@@ -374,6 +369,7 @@ grid.newpage()
 
 
 ```{r slide}
+library(grid)
   # text
 t_1 <- "This is a sample text. "
 t_2 <- "When longer than width, "
@@ -462,9 +458,9 @@ t_5 <- "because of R document specification."
 text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
 vp <- viewport(gp=gpar(fontsize=20))
 pushViewport(vp)
-st <- splitString(text)
-grid.draw(textGrob(st, x=0, y=1, just=c("left", "top")))
-  # grid.draw(textGrob(st, x=0, y=1, just=c("left", "top"), vp=vp))
+st <- splitTextGrob(text)
+grid.draw(st)
+
 popViewport()
 ```
 
@@ -596,6 +592,7 @@ grid::grid.draw(tg_header)
   - [1st edition]( https://www.stat.auckland.ac.nz/~paul/RGraphics/rgraphics.html )
   - [2nd edition]( https://www.stat.auckland.ac.nz/~paul/RG2e/ )
   - [3rd edition]( https://www.stat.auckland.ac.nz/~paul/RG3e/ )
+
 
 <!--
   - https://stat-ata-asu.github.io/R_DS_BD2020/using-ggplot2.html

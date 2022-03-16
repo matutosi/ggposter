@@ -47,6 +47,9 @@ txt2tibble <- function(...){
 #'               affil: affiliation
 #'               subt: subtitle
 #'               kw: keyword
+#' @param shrink A numeric. Shrink rate of font size. 
+#'               In preperation, 0.25 is recomended. 
+#'               This make the paper size from A0 (810mm * 1189) to A4 (210 * 297).
 #' @param text   A string, but this argument will be omitted.
 #' @param silent Logical. TRUE: no massage, FALSE: shows massage. 
 #' @return A numeric of font size.
@@ -58,7 +61,7 @@ txt2tibble <- function(...){
 #' get_font_size(base=22,   name=NULL,    use="kw")
 #' 
 #' @export
-get_font_size <- function(base=NULL, name=NULL, use=NULL, silent=TRUE, text=""){
+get_font_size <- function(base=NULL, name=NULL, use=NULL, shrink=1, silent=1, text=""){
   if(is.null(base)){
     if(!silent) message("26pt is used for base size.")
     base <- 26
@@ -75,7 +78,7 @@ get_font_size <- function(base=NULL, name=NULL, use=NULL, silent=TRUE, text=""){
   font <- dplyr::filter(eval(rlang::sym("font_size_list")), .data[["base_size"]]==base)
   if(!is.null(name)) font <- dplyr::filter(font, .data[["font_name"]]==name)
   if(!is.null(use))  font <- dplyr::filter(font, stringr::str_detect(.data[["font_use"]], use))
-  font$size
+  font$size * shrink
 }
 
 #' Wrapper function to generate textGrob for grid::textGrob. 
