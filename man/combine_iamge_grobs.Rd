@@ -13,6 +13,7 @@ appose_image_grobs(
   grow = TRUE,
   unify = "height",
   space = grid::unit(0, "mm"),
+  gp = gpar(),
   name = NULL
 )
 
@@ -23,6 +24,7 @@ stack_image_grobs(
   grow = TRUE,
   unify = "width",
   space = grid::unit(0, "mm"),
+  gp = gpar(),
   name = NULL
 )
 }
@@ -39,6 +41,8 @@ Work ONLY when both of width and height are set.}
 \item{unify}{A string.}
 
 \item{space}{A grid unit. Space among grobs.}
+
+\item{gp}{gpar() object.}
 
 \item{name}{A string. grob name}
 }

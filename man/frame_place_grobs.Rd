@@ -11,6 +11,7 @@ frame_place_grobs(
   heights,
   space,
   by_row = TRUE,
+  gp = gpar(),
   name = NULL
 )
 }

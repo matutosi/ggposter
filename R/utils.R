@@ -1,25 +1,25 @@
-  #' @importFrom rlang .data
-  #' @export
+#' @importFrom rlang .data
+#' @export
 rlang::`.data`
 
-  #' @importFrom grid grobName
-  #' @export
+#' @importFrom grid grobName
+#' @export
 grid:::grobName
 
-  #' Check class of object. 
-  #' 
-  #' @param x Object to be tested.
-  #' @return TRUE or FALSE and warning message. 
-  #' @name check_class
-  #' @examples
-  #' x <- 1
-  #' y <- "text"
-  #' check_text(x)
-  #' check_text(y)
-  #' check_numeric(x)
-  #' check_numeric(y)
-  #' 
-  #' @export
+#' Check class of object. 
+#' 
+#' @param x Object to be tested.
+#' @return TRUE or FALSE and warning message. 
+#' @name check_class
+#' @examples
+#' x <- 1
+#' y <- "text"
+#' check_text(x)
+#' check_text(y)
+#' check_numeric(x)
+#' check_numeric(y)
+#' 
+#' @export
 check_text <- function(x){
   if(!is.null(x)){
     if(!is.character(x)){
@@ -30,8 +30,8 @@ check_text <- function(x){
   return(TRUE)
 }
 
-  #' @rdname check_class
-  #' @export
+#' @rdname check_class
+#' @export
 check_numeric <- function(x){
   if(!is.null(x)){
     if(!is.numeric(x)){
