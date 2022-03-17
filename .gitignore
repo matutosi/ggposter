@@ -2,7 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
-/tools
-/man
+/tools/
+/man/
 /R/inprogress.R
 /inst/doc
