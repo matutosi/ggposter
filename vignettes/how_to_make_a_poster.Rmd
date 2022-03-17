@@ -241,32 +241,8 @@ combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], j
   height=grid::unit(25, "mm"), unify="width", space=space)
 grid::grid.show.layout(combined$frame$layout)
 grid::grid.draw(combined)
-
-sum(combined$frame$layout$widths)
-
-
-grid.newpage()
-combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], 
-  height=grid::unit(30, "mm"), space=unit(10, "mm"))
-grid::grid.show.layout(combined$frame$layout)
-grid::grid.draw(combined)
-sum(combined$frame$layout$widths)
-
-grid.newpage()
-combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], 
-  height=grid::unit(30, "mm"), unify="as_is", space=unit(5, "mm"))
-grid::grid.show.layout(combined$frame$layout)
-grid::grid.draw(combined)
-sum(combined$frame$layout$widths)
-
-grid.newpage()
-combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], jpg_grobs[[4]], 
-  height=grid::unit(25, "mm"), unify="width", space=unit(1, "mm"))
-grid::grid.show.layout(combined$frame$layout)
-grid::grid.draw(combined)
-sum(combined$frame$layout$widths)
-
 ```
+
 
 
 ```{r image}
@@ -365,6 +341,54 @@ grid::grid.draw(appose_image_grobs(rlogo, rlogo, rlogo, space=grid::unit(1, "mm"
 ## Colaboration with ggplot2 (and cowplot)
 
 
+```{r ggplot2}
+ # fig
+fig <- 
+  ggplot(mpg, aes(x=displ, y=hwy)) + 
+  geom_point() +
+  theme_bw()
+
+   # title
+title <- "Colab with ggplot2 and gridtext"
+fontsize <- 60
+gp_title <- grid::gpar(fontsize=fontsize)
+
+txt_body_31 <- "As shown in this example, we can use ggplot object in ggposter. "
+txt_body_32 <- "We can write description aroud it."
+description <- stringr::str_c(txt_body_31, txt_body_32)
+
+ # text
+fontsize <- 30
+lineheight <- 1.1
+gp_text <- grid::gpar(fontsize=fontsize, lineheight=lineheight)
+
+ # generate slide and draw
+slide <- gen_slide(title, fig, description, gp_title, gp_text, width=half)
+
+grid.newpage()
+grid::grid.draw(slide)
+
+
+grid.newpage()
+pushViewport(vp=viewport(width=full))
+
+
+description_1 <- 
+  arrange_txt(
+    txt_body_31, txt_body_32, 
+    widths=half)
+
+grid.newpage()
+grid.draw(appose_image_grobs(ggplot2::ggplotGrob(fig), description_1, unify="width"))
+
+
+```
+
+
+
+## Colaboration with ggplot2 (and cowplot)
+
+
 ```{r}
 
 
@@ -394,12 +418,6 @@ grid.newpage()
 
 ```{r slide}
 library(grid)
-
-plot <- 
-  ggplot2::ggplot(mpg) + 
-  ggplot2::geom_point(aes(x = displ, y = hwy)) +
-  ggplot2::theme_bw()
-plot  # draw ggplot object
   # text
 t_1 <- "This is a sample text. "
 t_2 <- "When longer than width, "
@@ -418,7 +436,7 @@ title_1 <- "THIS IS TITLE WORDS"
 fontsize <- 40
 gp_title <- gpar(fontsize=fontsize)
 
-slide <- gen_slide(title_1, plot, text, gp_title, gp_text)
+slide <- gen_slide(title_1, fig, text, gp_title, gp_text)
 grid.draw(slide)
   # ggplot2::ggsave("d:/slide.pdf", slide, height=210, width=297, units="mm")
 
@@ -488,9 +506,9 @@ t_5 <- "because of R document specification."
 text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
 vp <- viewport(gp=gpar(fontsize=20))
 pushViewport(vp)
-st <- splitString(text)
-grid.draw(textGrob(st, x=0, y=1, just=c("left", "top")))
-  # grid.draw(textGrob(st, x=0, y=1, just=c("left", "top"), vp=vp))
+st <- splitTextGrob(text)
+grid.draw(st)
+
 popViewport()
 ```
 
@@ -604,7 +622,7 @@ txt_title  <- "wameicheckr"
 txt_author <- "Toshikazu Matsumura (Konan Women's univ.)"
   # txt_affil  <- ""
   # txt_thank  <- ""
-txt_kw     <- "keywords: analysis・慧atabese, search species names"
+txt_kw     <- "keywords: analysis，databese, search species names"
 ```
 
 ```{r warning=FALSE}
@@ -618,7 +636,7 @@ grid::grid.draw(tg_header)
 
 # References
 
-- Code in R graphics by Paul Murell
+- Code in『R graphics』 by Paul Murell
   - [1st edition]( https://www.stat.auckland.ac.nz/~paul/RGraphics/rgraphics.html )
   - [2nd edition]( https://www.stat.auckland.ac.nz/~paul/RG2e/ )
   - [3rd edition]( https://www.stat.auckland.ac.nz/~paul/RG3e/ )
