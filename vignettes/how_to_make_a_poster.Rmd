@@ -208,6 +208,21 @@ convertUnit(grobHeight(image_and_description), "in")
 
 To make table
 
+# Comparison with other packages
+
+Some R packages related to grid and ggplot2 can arrange the plots and grobs. 
+gridExtra, patchwork, and cowplot are well designed packages for arrangement. 
+These packages, however, are not desined for arrangement of strings, 
+thus I think few people make a poster and slides by these packages. 
+
+In gridExtra, you should decide the layout of parts in a poster before making. 
+In most cases, the layout of a poster will be decided and changed while making, at least for me. 
+In ggposter you do not need to decide the layout before making, 
+because the layout in ggposter will be adjusted with the size (width and height) of grobs. 
+
+In patchwork and cowplot also do not need to decided the layout. 
+The size of plot will be resized to fit the hole width and/or height of viewport, which is an advantage for making document. 
+It is desirable for making a poster to unify the size of plot, figure, and font size of body text in the point of appearance.
 
 
 ## Colaboration with ggplot2 (and cowplot)
