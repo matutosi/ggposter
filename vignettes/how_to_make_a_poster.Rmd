@@ -209,7 +209,7 @@ combined <- appose_image_grobs(jpg_grobs[[1]], jpg_grobs[[2]], jpg_grobs[[3]], j
   height=grid::unit(25, "mm"), unify="width", space=space)
 grid::grid.show.layout(combined$frame$layout)
 grid::grid.draw(combined)
-<<<<<<< HEAD
+
 sum(combined$frame$layout$widths)
 
 
@@ -362,6 +362,12 @@ grid.newpage()
 
 ```{r slide}
 library(grid)
+
+plot <- 
+  ggplot2::ggplot(mpg) + 
+  ggplot2::geom_point(aes(x = displ, y = hwy)) +
+  ggplot2::theme_bw()
+plot  # draw ggplot object
   # text
 t_1 <- "This is a sample text. "
 t_2 <- "When longer than width, "
@@ -380,7 +386,7 @@ title_1 <- "THIS IS TITLE WORDS"
 fontsize <- 40
 gp_title <- gpar(fontsize=fontsize)
 
-slide <- gen_slide(title_1, fig, text, gp_title, gp_text)
+slide <- gen_slide(title_1, plot, text, gp_title, gp_text)
 grid.draw(slide)
   # ggplot2::ggsave("d:/slide.pdf", slide, height=210, width=297, units="mm")
 
@@ -566,7 +572,7 @@ txt_title  <- "wameicheckr"
 txt_author <- "Toshikazu Matsumura (Konan Women's univ.)"
   # txt_affil  <- ""
   # txt_thank  <- ""
-txt_kw     <- "keywords: analysis，databese, search species names"
+txt_kw     <- "keywords: analysis・慧atabese, search species names"
 ```
 
 ```{r warning=FALSE}
@@ -580,7 +586,7 @@ grid::grid.draw(tg_header)
 
 # References
 
-- Code in『R graphics』 by Paul Murell
+- Code in R graphics by Paul Murell
   - [1st edition]( https://www.stat.auckland.ac.nz/~paul/RGraphics/rgraphics.html )
   - [2nd edition]( https://www.stat.auckland.ac.nz/~paul/RG2e/ )
   - [3rd edition]( https://www.stat.auckland.ac.nz/~paul/RG3e/ )

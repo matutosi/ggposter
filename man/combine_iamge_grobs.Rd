@@ -31,27 +31,18 @@ stack_image_grobs(
 \arguments{
 \item{...}{grob.}
 
-<<<<<<< HEAD:man/appose_image_grobs.Rd
-\item{width, height}{A grid unit. When both are set, use width and omit height.}
-
-\item{grow}{Logical. TRUE: images will be grown to fill the width or height.}
-=======
 \item{width, height}{A grid unit.}
 
 \item{grow}{Do not work yet!
 A string. "height", "width", or "none"
 Images will be grown to fill the width or height.
 Work ONLY when both of width and height are set.}
->>>>>>> develop:man/combine_iamge_grobs.Rd
 
 \item{unify}{A string.}
 
 \item{space}{A grid unit. Space among grobs.}
-<<<<<<< HEAD:man/appose_image_grobs.Rd
-=======
 
 \item{gp}{gpar() object.}
->>>>>>> develop:man/combine_iamge_grobs.Rd
 
 \item{name}{A string. grob name}
 }
@@ -68,7 +59,7 @@ small <- rectGrob(width=unit(1, "cm"), height=unit(1, "cm"), gp=gpar(fill="black
 tall  <- rectGrob(width=unit(1, "cm"), height=unit(2, "cm"), gp=gpar(fill="red"))
 wide  <- rectGrob(width=unit(2, "cm"), height=unit(1, "cm"), gp=gpar(fill="blue"))
 large <- rectGrob(width=unit(2, "cm"), height=unit(2, "cm"), gp=gpar(fill="white"))
-combined_grobs <- 
+combined_grobs <-
   (small \%oo\% tall \%oo\% wide \%oo\% large) \%8\% # original
   appose_image_grobs(small, tall, wide, large, space=grid::unit(1, "mm"))
 grid.draw(combined_grobs)

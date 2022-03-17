@@ -67,10 +67,10 @@ library(grid)
 x <- grid::textGrob("foo_bar", hjust=1, vjust=0)
 x2 <- grid::textGrob("foo_bar", x=0, y=1, hjust=1, vjust=1)
 y <- gridtext::textbox_grob(
-     "textbox_grob generate wrapped text in a box.", 
+     "textbox_grob generate wrapped text in a box.",
      width=grid::unit(30, "mm"), box_gp=grid::gpar(col="black"))
 z <- gridtext::richtext_grob(
-     "richtext_grob can NOT wrap text", 
+     "richtext_grob can NOT wrap text",
      box_gp=grid::gpar(col="black"))
 ag <- appose_grob(x, y, name="apppsed_grob")
 sg <- stack_grob(x, y)
@@ -97,10 +97,10 @@ grid::grid.draw(x2 \%oo\% (y \%8\% z))
 # NOTE: do no work in gridtext package when use "npc" in grid::unit
 # library(gridtext)
 # a <- gridtext::textbox_grob(
-#      "textbox_grob generate wrapped text in a box.", 
+#      "textbox_grob generate wrapped text in a box.",
 #       width=grid::unit(0.5, "npc"), box_gp=grid::gpar(col="black"))
 # b <- gridtext::richtext_grob(
-#      "richtext_grob can NOT wrap text", 
+#      "richtext_grob can NOT wrap text",
 #      box_gp=grid::gpar(col="black"))
 # grid::grid.draw(a \%oo\% b)
 # grid::grid.draw(a \%8\% b)

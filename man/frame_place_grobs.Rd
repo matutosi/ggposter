@@ -11,10 +11,7 @@ frame_place_grobs(
   heights,
   space,
   by_row = TRUE,
-<<<<<<< HEAD
-=======
   gp = grid::gpar(),
->>>>>>> develop
   name = NULL
 )
 }
@@ -31,11 +28,8 @@ frame_place_grobs(
 
 \item{by_row}{A logical. TRUE: line in a row. FALSE: line in a col.}
 
-<<<<<<< HEAD
-=======
 \item{gp}{gpar().}
 
->>>>>>> develop
 \item{name}{A string. Name of combined grob.}
 }
 \value{
