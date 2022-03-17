@@ -208,6 +208,30 @@ convertUnit(grobHeight(image_and_description), "in")
 
 To make table
 
+```{r font_size}
+data(font_size_list)
+head(font_size_list, 5)
+dplyr::filter(font_size_list, base_size==26)
+dplyr::filter(font_size_list, ratio==1)
+kable
+
+library(gridExtra)
+font_size_list %>%
+  dplyr::filter(base_size==26) %>%
+  gridExtra::grid.table(rows=NULL, theme=ttheme_minimal())
+
+  gridExtra::tableGrob(rows=NULL)
+
+grid.ftable(head(iris, 4), gp=gpar(fill="white"))
+
+```
+
+<!--
+  - https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html   
+  - https://gedevan-aleksizde.github.io/rmarkdown-cookbook/kableextra.html   
+  - https://cran.r-project.org/web/packages/gridExtra/vignettes/tableGrob.html   
+-->
+
 # Comparison with other packages
 
 Some R packages related to grid and ggplot2 can arrange the plots and grobs. 
@@ -223,6 +247,7 @@ because the layout in ggposter will be adjusted with the size (width and height)
 In patchwork and cowplot also do not need to decided the layout. 
 The size of plot will be resized to fit the hole width and/or height of viewport, which is an advantage for making document. 
 It is desirable for making a poster to unify the size of plot, figure, and font size of body text in the point of appearance.
+
 
 
 ## Colaboration with ggplot2 (and cowplot)
