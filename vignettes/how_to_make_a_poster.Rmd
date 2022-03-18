@@ -337,7 +337,6 @@ head(iris) %>%
 ```
 
 
-
 <!--
   - https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html   
   - https://gedevan-aleksizde.github.io/rmarkdown-cookbook/kableextra.html   
