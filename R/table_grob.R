@@ -29,6 +29,15 @@ fix_table_unit <- function(tg){
 }
 
 #' Generate booktab table grob 
+#' 
+#' @param tg             A table grob. 
+#' @param df             A data frame. 
+#' @param lwd_out,lwd_in A numeric. Line width. 
+#' @param title,caption  A string. 
+#' @param space          grid unit. Space between grobs. 
+#' @return tableGrob
+#' 
+#' @name table_grob
 #' @export
 booktab_table_grob <- function(df, lwd_out=2, lwd_in=1, title=NULL, caption=NULL){
   df %>%
@@ -38,6 +47,8 @@ booktab_table_grob <- function(df, lwd_out=2, lwd_in=1, title=NULL, caption=NULL
 }
 
 #' Add book tab to table grob
+#' 
+#' @rdname table_grob
 #' @export
 add_booktab <- function(tg, lwd_out=2, lwd_in=1){
   tg %>%
@@ -47,6 +58,8 @@ add_booktab <- function(tg, lwd_out=2, lwd_in=1){
 }
 
 #' Add line between colnames and values to table grob
+#' 
+#' @rdname table_grob
 #' @export
 add_btw_line <- function(tg, lwd_in=1){
   gtable::gtable_add_grob(tg, 
@@ -57,16 +70,21 @@ add_btw_line <- function(tg, lwd_in=1){
 }
 
 #' Add top and bottom line to table grob
+#' 
+#' @rdname table_grob
 #' @export
-add_tb_line <- function(tg, lwd_out=2, height=grid::unit(0.1, "mm"), space=grid::unit(0.1, "mm")){
+add_tb_line <- function(tg, lwd_out=2, space=grid::unit(0.1, "mm")){
+  rect_height <- grid::unit(0.1, "mm")
   rg <- 
     grid::rectGrob(width=sum(tg$widths), 
-             height=height,
+             height=rect_height,
              gp=grid::gpar(lwd=lwd_out))
   sg <- stack_grobs(rg, tg, rg, space=space)
 }
 
 #' Add annotation to table grob
+#' 
+#' @rdname table_grob
 #' @export
 add_annotation <- function(tg, title=NULL, caption=NULL, space=grid::unit(3, "mm")){
   if(is.null(title) & is.null(caption)){
