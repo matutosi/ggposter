@@ -3,15 +3,15 @@
 \name{split_text}
 \alias{split_text}
 \alias{split_string}
-\alias{splitTextGrob}
 \alias{split_text_grob}
+\alias{splitTextGrob}
 \title{Split text to fit viewport width}
 \usage{
 split_string(text, width = grid::unit(1, "npc"))
 
-splitTextGrob(text, ...)
+split_text_grob(text, width = NULL)
 
-split_text_grob(text, width = NULL, gp = NULL, name = NULL, ...)
+splitTextGrob(text, ...)
 }
 \arguments{
 \item{text}{A string.}
@@ -30,9 +30,7 @@ textGrob
 \description{
 This function is a little bit modified version of splitString in "R Graphics"
 Chapter 6: Developing New Graphics Functions and Objects
-https://www.stat.Auckland.ac.nz/~paul/RGraphics/integrated-calcdraw.R
-
-Called when drawDetails are run.
+https://www.stat.auckland.ac.nz/~paul/RGraphics/interactgrid-calcdraw.R
 
 Called when drawDetails are run.
 }

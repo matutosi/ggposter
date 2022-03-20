@@ -43,31 +43,6 @@ arrange_split_txt <- function(..., width=NULL, silent=TRUE){
   #   tg_arrange(tg = tg, layout = layout)
 }
 
-
-#' split string
-#' 
-#' @param text   A string.
-#' @export
-splitString <- function(text) {
-  strings   <- strsplit(text, " ")[[1]]
-  newstring <- strings[1]
-  linewidth <- grid::stringWidth(newstring)
-  gapwidth  <- grid::stringWidth(" ")
-  availwidth <- grid::convertWidth(grid::unit(1, "npc"), "inches", valueOnly=TRUE) 
-  for (i in 2:length(strings)) {
-    width <- grid::stringWidth(strings[i])
-    if (grid::convertWidth(linewidth + gapwidth + width, "inches", valueOnly=TRUE) < availwidth) {
-      sep <- " "
-      linewidth <- linewidth + gapwidth + width
-    } else {
-      sep <- "\n"
-      linewidth <- width
-    }
-    newstring <- paste(newstring, strings[i], sep=sep)
-  }
-  newstring
-}
-
 #' Split text to fit viewport width
 #' 
 #' This function is a little bit modified version of splitString in "R Graphics"
@@ -120,6 +95,39 @@ split_string <- function(text, width=grid::unit(1, "npc")){
   newstring
 }
 
+#' Generate split text grob
+#' 
+#' @rdname split_text
+#' @export
+split_text_grob <- function(text, width=NULL){
+  split_string <- split_string(text, width)
+  grid::textGrob(split_string, x=0, y=1, just=c("left", "top"))
+}
+
+#' split string
+#' 
+#' @param text   A string.
+#' @export
+splitString <- function(text) {
+  strings   <- strsplit(text, " ")[[1]]
+  newstring <- strings[1]
+  linewidth <- grid::stringWidth(newstring)
+  gapwidth  <- grid::stringWidth(" ")
+  availwidth <- grid::convertWidth(grid::unit(1, "npc"), "inches", valueOnly=TRUE) 
+  for (i in 2:length(strings)) {
+    width <- grid::stringWidth(strings[i])
+    if (grid::convertWidth(linewidth + gapwidth + width, "inches", valueOnly=TRUE) < availwidth) {
+      sep <- " "
+      linewidth <- linewidth + gapwidth + width
+    } else {
+      sep <- "\n"
+      linewidth <- width
+    }
+    newstring <- paste(newstring, strings[i], sep=sep)
+  }
+  newstring
+}
+
 #' split string draw
 #' 
 #' @importFrom grid drawDetails
@@ -133,27 +141,11 @@ drawDetails.splitText <- function(x, recording) {
 }
 
 
-#' add "splitText" class to split text grob
+#' Add "splitText" class to split text grob
 #' 
 #' Called when drawDetails are run. 
 #' @rdname split_text
 #' @export
 splitTextGrob <- function(text, ...) {
   grid::grob(text=text, cl="splitText", ...)
-}
-
-#' add "splitText" class to split text grob
-#' 
-#' Called when drawDetails are run. 
-#' @rdname split_text
-#' @export
-split_text_grob <- function(text, width=NULL, gp=NULL, name=NULL, ...){
-  if(is.null(width))         width         <- grid::unit(1, "npc")
-  if(is.null(gp$lineheight)) gp$lineheight <- 1.1
-  if(is.null(gp$fontsize))   gp$fontsize   <- 12
-  vp <- grid::viewport(width=width, gp=gp)
-  grid::pushViewport(vp=vp)
-  st <- splitString(text)
-  grid::popViewport()
-  grid::grob(label=st, x=0, y=0.5, name=name, gp=gp, cl="splitText", ...)
 }
