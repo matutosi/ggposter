@@ -321,7 +321,37 @@ head(iris) %>%
 
 
 
-## Colaboration with ggplot2 (and cowplot)
+## split_text_grob
+
+
+```{r richtext_grob}
+  # grid::grid.newpage()
+  # gp <- gpar(fontsize=20)
+  # rtg <- gridtext::richtext_grob(text=text, gp=gp)
+  # grid::grid.draw(rtg)
+  # vp, gpslide
+
+```
+
+
+```{r}
+t_1 <- "This is a sample text. "
+t_2 <- "When longer than viewport width, "
+t_3 <- "text will be split and add a break. "
+t_4 <- "This text is separated into 5 objects, "
+t_5 <- "because of R document specification."
+text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
+vp <- viewport(gp=gpar(fontsize=20))
+pushViewport(vp)
+st <- splitTextGrob(text)
+grid.draw(st)
+
+popViewport()
+```
+
+
+## With ggplot2 
+  # (and cowplot)
 
 
 ```{r ggplot2}
@@ -368,91 +398,12 @@ grid.draw(appose_image_grobs(ggplot2::ggplotGrob(fig), description_1, unify="wid
 ```
 
 
-
-## Colaboration with gridtext
+## With gridtext
 
 
 ```{r gridtext}
 
 ```
-
-
-## test split_text_grob
-
-
-```{r richtext_grob}
-  # grid::grid.newpage()
-  # gp <- gpar(fontsize=20)
-  # rtg <- gridtext::richtext_grob(text=text, gp=gp)
-  # grid::grid.draw(rtg)
-  # vp, gpslide
-
-```
-
-
-```{r}
-t_1 <- "This is a sample text. "
-t_2 <- "When longer than viewport width, "
-t_3 <- "text will be split and add a break. "
-t_4 <- "This text is separated into 5 objects, "
-t_5 <- "because of R document specification."
-text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
-vp <- viewport(gp=gpar(fontsize=20))
-pushViewport(vp)
-st <- splitTextGrob(text)
-grid.draw(st)
-
-popViewport()
-```
-
-
-## Combine ggobject and text grob 
-
-You can combine ggplot object and text grob using gridExtra package. 
-
-At first, generate ggplot object as below. 
-
-```{r gg_obj, warning=FALSE}
-gg_obj <- 
-  ggplot2::ggplot(mpg) + 
-  ggplot2::geom_point(aes(x = displ, y = hwy)) +
-  ggplot2::theme_bw()
-gg_obj  # draw ggplot object
-```
-
-
-```{r text}
-
-  # tb <- txt2tibble(txt_body_1, txt_body_2, txt_body_3)
-  # tb <- 
-  # dplyr::mutate(font_size = purrr::pmap_dbl(tb, get_font_size)) %>%
-  # dplyr::mutate(just="left") %>%
-  # purrr::pmap(as_tg)
-  # layout <- tg2layout(tg)
-  # ar_tg <- tg_arrange(tg=tg, layout=layout)
-```
-
-Then, generate text grob as below. 
-```{r text_grob2, warning=FALSE}
-txt_body_1 <- "This graphics was generated using ggplot2. "
-txt_body_2 <- "x axis is displ that means engine displacement in litres."
-txt_body_3 <- "y axis is hwy that means highway miles per gallon."
-
-tg_grob <- arrange_txt(txt_body_1, txt_body_2, txt_body_3)
-grid::grid.draw(tg_grob)
-grid::grid.newpage
-```
-
-Next, combine
-```{r combine_gg_text, warning=FALSE}
-gg_and_text <- gridExtra::grid.arrange(gg_obj, tg_grob, nrow=1, respect=c(TRUE, FALSE), widths=c(1,2))
-grid::grid.draw(gg_and_text)
-```
-
-<!--
-http://www.sthda.com/english/wiki/wiki.php?id_contents=7930
--->
-
 
 
 
@@ -554,7 +505,7 @@ grid.draw(part_1)
 
 
 
-## Rendering
+## Rendering a poster
 
 ```{r rendering_and_save}
 grid.newpage()
@@ -599,6 +550,56 @@ grid.draw(slide)
 
 ggposter is designed for making a poster and rendering speed is slow, 
 bacause the 
+
+## Combine ggobject and text grob 
+
+You can combine ggplot object and text grob using gridExtra package. 
+
+At first, generate ggplot object as below. 
+
+```{r gg_obj, warning=FALSE}
+gg_obj <- 
+  ggplot2::ggplot(mpg) + 
+  ggplot2::geom_point(aes(x = displ, y = hwy)) +
+  ggplot2::theme_bw()
+gg_obj  # draw ggplot object
+```
+
+
+```{r text}
+
+  # tb <- txt2tibble(txt_body_1, txt_body_2, txt_body_3)
+  # tb <- 
+  # dplyr::mutate(font_size = purrr::pmap_dbl(tb, get_font_size)) %>%
+  # dplyr::mutate(just="left") %>%
+  # purrr::pmap(as_tg)
+  # layout <- tg2layout(tg)
+  # ar_tg <- tg_arrange(tg=tg, layout=layout)
+```
+
+Then, generate text grob as below. 
+```{r text_grob2, warning=FALSE}
+txt_body_1 <- "This graphics was generated using ggplot2. "
+txt_body_2 <- "x axis is displ that means engine displacement in litres."
+txt_body_3 <- "y axis is hwy that means highway miles per gallon."
+
+tg_grob <- arrange_txt(txt_body_1, txt_body_2, txt_body_3)
+grid::grid.draw(tg_grob)
+grid::grid.newpage
+```
+
+Next, combine
+```{r combine_gg_text, warning=FALSE}
+gg_and_text <- gridExtra::grid.arrange(gg_obj, tg_grob, nrow=1, respect=c(TRUE, FALSE), widths=c(1,2))
+grid::grid.draw(gg_and_text)
+```
+
+<!--
+http://www.sthda.com/english/wiki/wiki.php?id_contents=7930
+-->
+
+
+
 
 # References
 
