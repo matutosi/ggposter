@@ -68,11 +68,11 @@ splitString <- function(text) {
   newstring
 }
 
-#' Split text to fit viewpeort width
+#' Split text to fit viewport width
 #' 
-#' This function is a little bit modificated vertion of splitString in "R Graphics"
+#' This function is a little bit modified version of splitString in "R Graphics"
 #'   Chapter 6: Developing New Graphics Functions and Objects
-#'   https://www.stat.auckland.ac.nz/~paul/RGraphics/interactgrid-calcdraw.R
+#'   https://www.stat.Auckland.ac.nz/~paul/RGraphics/integrated-calcdraw.R
 #' @param text      A string. 
 #' @param ...       See grid::grob()
 #' @param width     grid::unit
@@ -84,7 +84,7 @@ splitString <- function(text) {
 #' # grid::grid.newpage()
 #' library(grid)
 #' t_1 <- "This is a sample text. "
-#' t_2 <- "When longer than viewpeort width, "
+#' t_2 <- "When longer than viewport width, "
 #' t_3 <- "text will be split and add a break. "
 #' t_4 <- "This text is separated into 5 objects, "
 #' t_5 <- "because of R document specification."

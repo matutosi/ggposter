@@ -8,7 +8,7 @@
 #'                      to improve performance. 
 #'                      Not implemented yet.
 #' @param shrink        A numeric. Shrink rate of font size. 
-#'                      In preperation, 0.25 is recomended. 
+#'                      In preparation, 0.25 is recommended. 
 #'                      This make the paper size from A0 (810mm * 1189) to A4 (210 * 297).
 #' @param silent        Logical. TRUE: no massage, FALSE: shows massage.
 #' @return              textGrob
@@ -45,7 +45,7 @@ arrange_txt <- function(..., x=0, y=0.5, hjust=0, vjust=0.5, widths=grid::unit(8
 #' @param heights A numeric. Default is null to fit text grob.
 #' @param row_margin A numeric. Default is 1.5. This makes rows 1.5 heights of text grobs.
 #' 
-#' @return Lauyout grob
+#' @return Layout grob
 #' 
 #' @export
 tg2layout <- function(tg, widths=grid::unit(841, "mm"), heights=NULL, row_margin=1.5  # height = height * row_margin
@@ -58,7 +58,7 @@ tg2layout <- function(tg, widths=grid::unit(841, "mm"), heights=NULL, row_margin
 #'
 #' @param tg A text grob
 #' @param layout A Grid layout, or NULL.
-#'        This can be used to initialise the frame with a number of rows.
+#'        This can be used to initialize the frame with a number of rows.
 #' @param name A character identifier of frame name.
 #'
 #' @export
