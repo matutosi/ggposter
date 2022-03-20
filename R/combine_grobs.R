@@ -184,6 +184,7 @@ stack_grobs_conv <- function(..., space=grid::unit(0, "mm"), gp=grid::gpar(), na
 #' @export
 appose_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="height", space=grid::unit(0, "mm"), gp=grid::gpar(), name=NULL){
   grobs <- list(...)
+  if(length(grobs)==1) grobs <- grobs[[1]]
   n <- length(grobs)
     # convert width and height
   if(!is.null(width))  width  <- grid::convertUnit(width,  "mm", valueOnly=TRUE)

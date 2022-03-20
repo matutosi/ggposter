@@ -14,7 +14,7 @@
 #' data(font_size_list)
 #' font_size_list %>% split(.$base_size)
 #' # 
-#' # You can show font size as plot by ggplot visualisation as below. 
+#' # You can show font size as plot by ggplot visualization as below. 
 #' font_size_list %>%
 #'   ggplot2::ggplot(ggplot2::aes(x=base_size, y=size)) + 
 #'     ggplot2::geom_point() + 
@@ -25,7 +25,7 @@
 #' # ratio <- round(c(1/(1.2^(4:1)), 1.2^(0:6)), 2)
 #' # name  <- c(
 #' #        "tiny",         "scriptsize", "footnotesize", "small",   
-#' #        "normalsize",   "large",      "Large",        "LARGE",     
+#' #        "normalize",   "large",      "Large",        "LARGE",     
 #' #        "huge",         "Huge",       "HUGE"
 #' #         )
 #' # use   <- c(

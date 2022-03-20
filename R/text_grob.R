@@ -37,7 +37,7 @@ txt2tibble <- function(...){
 #'             If base=NULL, base=26 will be set in get_font_size(). 
 #' @param name A string of font size name. 
 #'             "tiny", "scriptsize", "footnotesize", "small", 
-#'             "normalsize", "large", "Large", "LARGE", 
+#'             "normalize", "large", "Large", "LARGE", 
 #'             "huge", "Huge", or "HUGE"
 #' @param use A string of font size name for use. 
 #'             "tiny", "script", "footnote", "caption", 
@@ -48,7 +48,7 @@ txt2tibble <- function(...){
 #'               subt: subtitle
 #'               kw: keyword
 #' @param shrink A numeric. Shrink rate of font size. 
-#'               In preperation, 0.25 is recomended. 
+#'               In preparation, 0.25 is recommended. 
 #'               This make the paper size from A0 (810mm * 1189) to A4 (210 * 297).
 #' @param text   A string, but this argument will be omitted.
 #' @param silent Logical. TRUE: no massage, FALSE: shows massage. 
