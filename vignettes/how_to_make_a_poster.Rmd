@@ -68,7 +68,7 @@ Argument `shrink` in ggposter decide how much it will be shrunk.
 `shrink`=0.25 make poster just size for A4 paper. 
 
 We can use `full` and `half` for paper width as grid unit, which are defined by `grid::unit()`. 
-In addition, space defined by `grid::unit()` among grob are set here. 
+In addition, space defined by `grid::unit()` between grob are set here. 
 We can change it. 
 
 ```{r poster_size}
@@ -242,7 +242,7 @@ Aspect ratio of the image grobs keep in original.
 
 We can stack images and combined images like string grobs. 
 The difference between `unify="height"` and `unify="width"` can be seen as below. 
-As combined strings, space amoung grobs can be specified. 
+As combined strings, space between grobs can be specified. 
 
 ```{r jpgs, fig.width=8.3, out.width="100%"}
 jpg_grobs <- 
