@@ -13,6 +13,7 @@ Imports:
     gridExtra,
     gridtext,
     gtable,
+    jpeg,
     knitr,
     magrittr,
     purrr,
