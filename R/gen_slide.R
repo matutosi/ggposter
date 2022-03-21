@@ -71,3 +71,53 @@ gen_slide <- function(title, fig, text, gp_title, gp_text, paper="", width=grid:
   slide <- grid::placeGrob(slide, tbg_text,  row=2, col=2)
   slide
 }
+
+
+#' Fix grob size and shrink cex
+#' 
+#' @param grb          A grob. 
+#' @param width,height A grid unit. 
+#' @param name         A string.
+#' @return Grob.
+#' 
+#' @examples
+#' fig <- 
+#'   ggplot2::ggplot(mpg) + 
+#'   ggplot2::geom_point(ggplot2::aes(x = .data[["displ"]], y = .data[["hwy"]])) +
+#'   ggplot2::theme_bw()
+#' grb <- ggplot2::ggplotGrob(fig)
+#' grb %>%
+#' fix_size(width=grid::unit(80, "mm")) %>%
+#'   grid::grid.draw()
+#' grid::grid.newpage()
+#' grb %>%
+#' fix_size(width=grid::unit(40, "mm"), height=grid::unit(80, "mm")) %>%
+#'   grid::grid.draw()
+#' 
+#' @export
+fix_size <- function(grb, width=grid::unit(50, "mm"), height=width, shrink=1){
+  n <- 1
+  layout <- grid::grid.layout(n, n, width=width, height=height)
+  gp=grid::gpar(cex=shrink)
+  res <- grid::frameGrob(layout=layout, gp=gp)
+  grid::placeGrob(res, grb, row=n, col=n)
+}
+
+#' Shrink font size of ggplot object.
+#' 
+#' Helper function of ggplot2::theme().
+#' @param gg     A ggplot object.
+#' @param shrink A numeric.
+#' @return A ggplot object.
+#' 
+#' @examples
+#' ggplot2::ggplot(mpg, aes(x=displ, y=hwy)) + 
+#'   geom_point() +
+#'   theme_bw() %>%
+#' shrink_font(shrink=0.5)
+#' 
+#' @export
+shrink_font <- function(gg, shrink){
+  fontsize <- grid::get.gpar()$fontsize * shrink
+  gg + ggplot2::theme(text=element_text(size=fontsize))
+}
