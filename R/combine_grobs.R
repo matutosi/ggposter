@@ -92,6 +92,7 @@ stack_grob <- function(gx, gy, space=grid::unit(0, "mm"), gp=grid::gpar(), name=
 #' @export
 appose_grobs <- function(..., space=grid::unit(0, "mm"), gp=grid::gpar(), name=NULL){
   grobs <- list(...)
+  grobs[sapply(grobs, is.null)] <- NULL # remove NULL
   n <- length(grobs)
     # layout
   widths <- grid::unit(rep(1, n), rep("grobwidth", n), grobs) + space
@@ -109,6 +110,7 @@ appose_grobs <- function(..., space=grid::unit(0, "mm"), gp=grid::gpar(), name=N
 #' @export
 stack_grobs <- function(..., space=grid::unit(0, "mm"), gp=grid::gpar(), name=NULL){
   grobs <- list(...)
+  grobs[sapply(grobs, is.null)] <- NULL # remove NULL
   n <- length(grobs)
     # layout
   widths <- max(grid::unit(rep(1, n), rep("grobwidth", n), grobs))
@@ -126,6 +128,7 @@ stack_grobs <- function(..., space=grid::unit(0, "mm"), gp=grid::gpar(), name=NU
 #' @export
 appose_grobs_conv <- function(..., space=grid::unit(0, "mm"), gp=grid::gpar(), name=NULL){
   grobs <- list(...)
+  grobs[sapply(grobs, is.null)] <- NULL # remove NULL
   n <- length(grobs)
     # layout
   widths  <- grid::convertUnit(grid::unit(rep(1, n), rep("grobwidth", n), grobs),       "mm") + space
@@ -143,6 +146,7 @@ appose_grobs_conv <- function(..., space=grid::unit(0, "mm"), gp=grid::gpar(), n
 #' @export
 stack_grobs_conv <- function(..., space=grid::unit(0, "mm"), gp=grid::gpar(), name=NULL){
   grobs <- list(...)
+  grobs[sapply(grobs, is.null)] <- NULL # remove NULL
   n <- length(grobs)
     # layout
   widths  <- grid::convertUnit(max(grid::unit(rep(1, n), rep("grobwidth", n), grobs)), "mm")
@@ -184,6 +188,7 @@ stack_grobs_conv <- function(..., space=grid::unit(0, "mm"), gp=grid::gpar(), na
 #' @export
 appose_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="height", space=grid::unit(0, "mm"), gp=grid::gpar(), name=NULL){
   grobs <- list(...)
+  grobs[sapply(grobs, is.null)] <- NULL # remove NULL
   if(length(grobs)==1) grobs <- grobs[[1]]
   n <- length(grobs)
     # convert width and height
@@ -275,6 +280,7 @@ reverse_ratio <- function(lengths){
 #' @export
 stack_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="width", space=grid::unit(0, "mm"), gp=grid::gpar(), name=NULL){
   grobs <- list(...)
+  grobs[sapply(grobs, is.null)] <- NULL # remove NULL
   n <- length(grobs)
     # convert width and height
   if(!is.null(width))  width  <- grid::convertUnit(width,  "mm", valueOnly=TRUE)
