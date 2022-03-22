@@ -7,9 +7,9 @@
 \alias{splitTextGrob}
 \title{Split text to fit viewport width}
 \usage{
-split_string(text, width = grid::unit(1, "npc"))
+split_string(text, width = grid::unit(1, "npc"), gp = NULL)
 
-split_text_grob(text, width = NULL)
+split_text_grob(text, width = NULL, gp = NULL, name = NULL)
 
 splitTextGrob(text, ...)
 }
@@ -18,11 +18,11 @@ splitTextGrob(text, ...)
 
 \item{width}{grid::unit}
 
-\item{...}{See grid::grob()}
-
 \item{gp}{gpar().}
 
 \item{name}{A string. grob name.}
+
+\item{...}{See grid::grob()}
 }
 \value{
 textGrob

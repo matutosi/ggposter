@@ -7,7 +7,7 @@
 #' @name            combine_grobs
 #' @param gx,gy,... grob.
 #' @param gp        gpar(). 
-#' @param space     A grid unit. Space among grobs. 
+#' @param space     A grid unit. Space between grobs. 
 #' @param name      A string. grob name
 #' @return          combined (apposed or stacked) grob in a line.
 #' @examples

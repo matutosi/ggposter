@@ -417,60 +417,52 @@ head(iris) %>%
 -->
 
 
-
-
 ## With ggplot2 
   # (and cowplot)
 
-
 ```{r ggplot2}
- # fig
-fig <- 
-  ggplot(mpg, aes(x=displ, y=hwy)) + 
-  geom_point() +
-  theme_bw()
 
-fig %>%
-  ggplotGrob() %>%
-  fix_size(shrink=0.25) %>%
-  grid.draw()
+library(grid)
+ # fig
+text <- 
+  "abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc"
+
+space=grid::unit(1, "mm"); widths=grid::unit(rep(50, 2), "mm")
+
+fig <- 
+  ggplot2::ggplot(mpg, aes(x=displ, y=hwy)) + 
+  geom_point() + 
+  theme_bw()
+fontsize <- 8
+shrink <- 1
+
+grid::grid.draw(appose_fig_text(fig, text, fontsize=26, shrink=0.5))
 
 
    # title
 title <- "Colab with ggplot2 and gridtext"
 fontsize <- 60
 gp_title <- grid::gpar(fontsize=fontsize)
-
+ # text
 txt_body_31 <- "As shown in this example, we can use ggplot object in ggposter. "
 txt_body_32 <- "We can write description aroud it."
 description <- stringr::str_c(txt_body_31, txt_body_32)
-
- # text
 fontsize <- 30
 lineheight <- 1.1
 gp_text <- grid::gpar(fontsize=fontsize, lineheight=lineheight)
-
  # generate slide and draw
 slide <- gen_slide(title, fig, description, gp_title, gp_text, width=half)
-
 grid.newpage()
 grid::grid.draw(slide)
-
-
-grid.newpage()
-pushViewport(vp=viewport(width=full))
-
 
 description_1 <- 
   arrange_txt(
     txt_body_31, txt_body_32, 
     widths=half)
-
 grid.newpage()
 grid.draw(appose_image_grobs(ggplot2::ggplotGrob(fig), description_1, unify="width"))
-
-
 ```
+
 
 
 ## With gridtext
@@ -594,11 +586,12 @@ fig_font_size <-
     ggplot2::theme_bw()
 
 
-
-fig_font_size %>%
+fig_font_size_grob <-
+  fig_font_size %>%
   ggplotGrob() %>%
-  fix_size(width=grid::unit(80, "mm"), shrink=shrink * 26 / 12) %>%
-  grid.draw()
+  fix_size(width=grid::unit(80, "mm"), shrink=shrink * 26 / 12)
+
+grid.draw(fig_font_size_grob)
 
 
 
@@ -611,6 +604,7 @@ fig_description <-
 - We can change font size according to preference.<br>
 " %>%
   gridtext::textbox_grob(width=0.5*half, use_markdown=FALSE)
+
 
 fig_apposed <- appose_grobs_conv(fig_font_size_grob, fig_description)
 grid::grid.draw(fig_apposed)
@@ -656,6 +650,12 @@ grid.newpage()
 
 ```{r slide}
 library(grid)
+
+fig <- 
+  ggplot2::ggplot(mpg, aes(x=displ, y=hwy)) + 
+  geom_point() +
+  theme_bw()
+
   # text
 t_1 <- "This is a sample text. "
 t_2 <- "When longer than width, "
