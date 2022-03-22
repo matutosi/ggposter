@@ -42,7 +42,7 @@ fix_table_unit <- function(tg){
 #' @name table_grob
 #' @export
 booktab_table_grob <- function(df, title=NULL, caption=NULL, fontsize=NULL, shrink=1, lwd_out=2, lwd_in=1){
-  if(is.null(fontsize)) fontsize <- get.gpar()$fontsize
+  if(is.null(fontsize)) fontsize <- grid::get.gpar()$fontsize
   fontsize <- fontsize * shrink
   lwd_out  <- lwd_out  * shrink
   lwd_in   <- lwd_in   * shrink
@@ -96,8 +96,8 @@ add_annotation <- function(tg, title=NULL, caption=NULL, fontsize=NULL, shrink=1
   if(is.null(title) & is.null(caption)){
     return(tg)
   }
-  if(is.null(fontsize)) fontsize <- get.gpar()$fontsize
-  if(!is.null(title))   title   <- grid::textGrob(label=title,   x=0, hjust=0, gp=gpar(fontsize=fontsize * 1.5))
-  if(!is.null(caption)) caption <- grid::textGrob(label=caption, x=0, hjust=0, gp=gpar(fontsize=fontsize))
+  if(is.null(fontsize)) fontsize <- grid::get.gpar()$fontsize
+  if(!is.null(title))   title   <- grid::textGrob(label=title,   x=0, hjust=0, gp=grid::gpar(fontsize=fontsize * 1.5))
+  if(!is.null(caption)) caption <- grid::textGrob(label=caption, x=0, hjust=0, gp=grid::gpar(fontsize=fontsize))
   stack_grobs(title, tg, caption, space=space)
 }

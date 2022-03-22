@@ -737,7 +737,7 @@ grid::grid.newpage()
 head(iris) %>%
   gridExtra::tableGrob(rows=NULL, theme=gridExtra::ttheme_minimal()) %>%
   add_booktab(lwd_out=2, lwd_in=1) %>%
-  add_annotation(title="title words", caption="caption words")
+  add_annotation(title="title words", caption="caption words") %>%
   grid::grid.draw()
 ```
 
