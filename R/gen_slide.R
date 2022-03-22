@@ -81,6 +81,7 @@ gen_slide <- function(title, fig, text, gp_title, gp_text, paper="", width=grid:
 #' @return Grob.
 #' 
 #' @examples
+#' data("mpg", package="ggplot2")
 #' fig <- 
 #'   ggplot2::ggplot(mpg) + 
 #'   ggplot2::geom_point(ggplot2::aes(x = .data[["displ"]], y = .data[["hwy"]])) +
@@ -112,10 +113,11 @@ fix_size <- function(grb, width=grid::unit(50, "mm"), height=width, shrink=1){
 #' @return         A ggplot object.
 #' 
 #' @examples
+#' data("mpg", package="ggplot2")
 #' fig <- 
-#'   ggplot2::ggplot(mpg, aes(x=displ, y=hwy)) + 
-#'   geom_point() +
-#'   theme_bw() %>%
+#'   ggplot2::ggplot(mpg, ggplot2::aes(x=displ, y=hwy)) + 
+#'   ggplot2::geom_point() +
+#'   ggplot2::theme_bw()
 #' set_font_size(fig, fontsize=26)
 #' shrink_font(fig, shrink=0.5)
 #' 
