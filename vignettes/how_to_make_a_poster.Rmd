@@ -121,7 +121,6 @@ TODO:
   - `font_size_list` should be speciefied as an argument in `arrange_txt()` and `get_font_size()`.    
 -->
 
-
 ```{r}
 base  <- c(8, 10, 12, 14, 18, 22, 26, 32, 38)
 ratio <- round(c(1/(1.2^(4:1)), 1.2^(0:6)), 2)
@@ -340,81 +339,29 @@ TODO:
 https://github.com/baptiste/gridExtra/blob/master/R/tableGrob.r
 -->
 
-We can make a table grob using `tableGrob()` in gridExtra, and draw it. 
-
-```{r make_table, fig.width=8.3, out.width="100%", fig.height=4}
-font_size_table <- 
-  font_size_list %>%
-  dplyr::filter(base_size==26) %>%
-  gridExtra::tableGrob(rows=NULL)
-
-base_size_table <- 
-  font_size_list %>%
-  dplyr::filter(ratio==1) %>%
-  gridExtra::tableGrob(rows=NULL)
-
-grid::grid.draw(font_size_table)
-```
-
-
-Since the widths and heights given by these function might not be correct, 
-thus the apposed or stacked table grob will be overwra. 
-I can not exactly identify the cause, maybe bug of the function `row_heighst()` and `col_widths`. 
-Thus, I can not suggest fundamental solution to it. 
-
-
-```{r apposed_table, fig.width=8.3, out.width="100%", fig.height=4}
-convertUnit(grobWidth(font_size_table), "mm")  # wrong unit
-convertUnit(grobWidth(base_size_table), "mm")  # wrong unit
-apposed <- appose_grobs(font_size_table, base_size_table, space=space)
-grid::grid.draw(apposed)
-```
-
-Using `fix_table_unit` make it possible to arrange table grobs at correct position. 
-This function fix width and height of a table grob, 
-so I recommend users not to use under other situations because of a table grob returned does not fit resized viewpot. 
-
-```{r fixed_apposed_table, fig.width=8.3, out.width="100%", fig.height=4}
-font_size_table <- fix_table_unit(font_size_table)
-base_size_table <- fix_table_unit(base_size_table)
-convertUnit(grobWidth(font_size_table), "mm")  # correct unit
-convertUnit(grobWidth(base_size_table), "mm")  # correct unit
-apposed_fixed <- appose_grobs(font_size_table, base_size_table, space=space)
-grid::grid.draw(apposed_fixed)
-```
-
 When we want make a table like booktab in LaTeX or in a academic journal, 
-
 Function `booktab_table_grob()` generate a booktab like table grob in a step. 
+
 
 ```{r fig.width=8.3, out.width="100%", fig.height=4}
 grid::grid.newpage()
 head(iris) %>%
-  booktab_table_grob(title="title words", caption="caption words") %>%
-  grid::grid.draw()
-
-```
-
-All `booktab_table_grob()` does is call `gridExtra::tableGrob()`, `add_booktab()`, and `add_annotation()`. 
-We can change appearance of table grob by customizing gridExtra::tableGrob(). 
-See in detail at [Displaying tables as grid graphics]
-( https://cran.r-project.org/web/packages/gridExtra/vignettes/tableGrob.html ) by Baptiste Auguie. 
-
-
-```{r example_table, fig.width=8.3, out.width="100%", fig.height=4}
-grid::grid.newpage()
-head(iris) %>%
-  gridExtra::tableGrob(rows=NULL, theme=gridExtra::ttheme_minimal())  %>%
-  add_booktab(lwd_out=2, lwd_in=1) %>%
+  booktab_table_grob(title="title words", caption="caption words", fontsize=20, shrink=0.5) %>%
   grid::grid.draw()
 ```
 
+```{r fig.width=8.3, out.width="100%", fig.height=4}
+font_size_table <- 
+  font_size_list %>%
+  dplyr::filter(base_size==26) %>%
+  booktab_table_grob(title="Font size of ggposter", fontsize=20, shrink=0.5)
+base_size_table <- 
+  font_size_list %>%
+  dplyr::filter(ratio==1) %>%
+  booktab_table_grob(title="Base font size of ggposter", caption="Font size increases every 1.2 times approximately.", fontsize=20, shrink=0.5)
 
-<!--
-  - https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html   
-  - https://gedevan-aleksizde.github.io/rmarkdown-cookbook/kableextra.html   
-  - https://cran.r-project.org/web/packages/gridExtra/vignettes/tableGrob.html   
--->
+grid::grid.draw(appose_grobs(font_size_table, base_size_table, space=grid::unit(10, "mm")))
+```
 
 
 ## With ggplot2 
@@ -462,7 +409,6 @@ description_1 <-
 grid.newpage()
 grid.draw(appose_image_grobs(ggplot2::ggplotGrob(fig), description_1, unify="width"))
 ```
-
 
 
 ## With gridtext
@@ -735,6 +681,71 @@ http://www.sthda.com/english/wiki/wiki.php?id_contents=7930
 -->
 
 
+## table grob
+
+We can make a table grob using `tableGrob()` in gridExtra, and draw it. 
+
+```{r make_table, fig.width=8.3, out.width="100%", fig.height=4}
+font_size_table <- 
+  font_size_list %>%
+  dplyr::filter(base_size==26) %>%
+  gridExtra::tableGrob(rows=NULL)
+
+base_size_table <- 
+  font_size_list %>%
+  dplyr::filter(ratio==1) %>%
+  gridExtra::tableGrob(rows=NULL)
+
+grid::grid.draw(font_size_table)
+```
+
+Since the widths and heights given by these function might not be correct, 
+thus the apposed or stacked table grob will be overwra. 
+I can not exactly identify the cause, maybe bug of the function `row_heighst()` and `col_widths`. 
+Thus, I can not suggest fundamental solution to it. 
+
+
+```{r apposed_table, fig.width=8.3, out.width="100%", fig.height=4}
+convertUnit(grobWidth(font_size_table), "mm")  # wrong unit
+convertUnit(grobWidth(base_size_table), "mm")  # wrong unit
+apposed <- appose_grobs(font_size_table, base_size_table, space=space)
+grid::grid.draw(apposed)
+```
+
+Using `fix_table_unit` make it possible to arrange table grobs at correct position. 
+This function fix width and height of a table grob, 
+so I recommend users not to use under other situations because of a table grob returned does not fit resized viewpot. 
+
+```{r fixed_apposed_table, fig.width=8.3, out.width="100%", fig.height=4}
+font_size_table <- fix_table_unit(font_size_table)
+base_size_table <- fix_table_unit(base_size_table)
+convertUnit(grobWidth(font_size_table), "mm")  # correct unit
+convertUnit(grobWidth(base_size_table), "mm")  # correct unit
+apposed_fixed <- appose_grobs(font_size_table, base_size_table, space=space)
+grid::grid.draw(apposed_fixed)
+```
+
+
+All `booktab_table_grob()` does is call `gridExtra::tableGrob()`, `add_booktab()`, and `add_annotation()`. 
+We can change appearance of table grob by customizing gridExtra::tableGrob(). 
+See in detail at [Displaying tables as grid graphics]
+( https://cran.r-project.org/web/packages/gridExtra/vignettes/tableGrob.html ) by Baptiste Auguie. 
+
+
+```{r example_table, fig.width=8.3, out.width="100%", fig.height=4}
+grid::grid.newpage()
+head(iris) %>%
+  gridExtra::tableGrob(rows=NULL, theme=gridExtra::ttheme_minimal()) %>%
+  add_booktab(lwd_out=2, lwd_in=1) %>%
+  add_annotation(title="title words", caption="caption words")
+  grid::grid.draw()
+```
+
+<!--
+  - https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html   
+  - https://gedevan-aleksizde.github.io/rmarkdown-cookbook/kableextra.html   
+  - https://cran.r-project.org/web/packages/gridExtra/vignettes/tableGrob.html   
+-->
 
 
 # References
