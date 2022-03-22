@@ -70,12 +70,13 @@ arrange_split_txt <- function(..., width=NULL, silent=TRUE){
 #' grid::grid.gedit("test", gp=grid::gpar(fontsize=40))
 #' 
 #' @export
-split_string <- function(text, width=grid::unit(1, "npc")){
+split_string <- function(text, width=grid::unit(1, "npc"), gp=NULL){
     # base::split() -> stringr::str_split()
     # base::paste() -> stringr::str_c()
     # "inches"     -> "mm"
     #  availwidth  -> width
     #  width       -> stri_width
+  if(!is.null(gp)) grid::pushViewport(vp=grid::viewport(gp=gp))
   strings    <- stringr::str_split(text, " ")[[1]]
   newstring  <- strings[1]
   linewidth  <- grid::stringWidth(newstring)
@@ -92,6 +93,7 @@ split_string <- function(text, width=grid::unit(1, "npc")){
     }
     newstring <- stringr::str_c(newstring, strings[i], sep=sep)
   }
+  if(!is.null(gp)) grid::popViewport()
   newstring
 }
 
@@ -99,9 +101,10 @@ split_string <- function(text, width=grid::unit(1, "npc")){
 #' 
 #' @rdname split_text
 #' @export
-split_text_grob <- function(text, width=NULL){
-  split_string <- split_string(text, width)
-  grid::textGrob(split_string, x=0, y=1, just=c("left", "top"))
+split_text_grob <- function(text, width=NULL, gp=NULL, name=NULL){
+  if(is.null(width)) width <- grid::unit(1, "npc")
+  sp_st <- split_string(text=text, width=width, gp=gp)
+  grid::textGrob(sp_st, x=0, y=1, just=c("left", "top"), gp=gp, name=name)
 }
 
 #' split string
