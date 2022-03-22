@@ -32,18 +32,24 @@ fix_table_unit <- function(tg){
 #' 
 #' @param tg             A table grob. 
 #' @param df             A data frame. 
-#' @param lwd_out,lwd_in A numeric. Line width. 
 #' @param title,caption  A string. 
+#' @param fontsize       A numeric. 
+#' @param shrink         A numeric.
+#' @param lwd_out,lwd_in A numeric. Line width. 
 #' @param space          grid unit. Space between grobs. 
 #' @return tableGrob
 #' 
 #' @name table_grob
 #' @export
-booktab_table_grob <- function(df, lwd_out=2, lwd_in=1, title=NULL, caption=NULL){
+booktab_table_grob <- function(df, title=NULL, caption=NULL, fontsize=NULL, shrink=1, lwd_out=2, lwd_in=1){
+  if(is.null(fontsize)) fontsize <- get.gpar()$fontsize
+  fontsize <- fontsize * shrink
+  lwd_out  <- lwd_out  * shrink
+  lwd_in   <- lwd_in   * shrink
   df %>%
-    gridExtra::tableGrob(rows=NULL, theme=gridExtra::ttheme_minimal()) %>%
+    gridExtra::tableGrob(rows=NULL, theme=gridExtra::ttheme_minimal(base_size=fontsize)) %>%
     add_booktab(lwd_out=lwd_out, lwd_in=lwd_in) %>%
-    add_annotation(title, caption)
+    add_annotation(title=title, caption=caption, fontsize=fontsize)
 }
 
 #' Add book tab to table grob
@@ -86,11 +92,12 @@ add_tb_line <- function(tg, lwd_out=2, space=grid::unit(0.1, "mm")){
 #' 
 #' @rdname table_grob
 #' @export
-add_annotation <- function(tg, title=NULL, caption=NULL, space=grid::unit(3, "mm")){
+add_annotation <- function(tg, title=NULL, caption=NULL, fontsize=NULL, shrink=1, space=grid::unit(2, "mm")){
   if(is.null(title) & is.null(caption)){
     return(tg)
   }
-  if(!is.null(title))   title   <- grid::textGrob(label=title)
-  if(!is.null(caption)) caption <- grid::textGrob(label=caption)
+  if(is.null(fontsize)) fontsize <- get.gpar()$fontsize
+  if(!is.null(title))   title   <- grid::textGrob(label=title,   x=0, hjust=0, gp=gpar(fontsize=fontsize * 1.5))
+  if(!is.null(caption)) caption <- grid::textGrob(label=caption, x=0, hjust=0, gp=gpar(fontsize=fontsize))
   stack_grobs(title, tg, caption, space=space)
 }
