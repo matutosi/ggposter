@@ -170,9 +170,10 @@ stack_grobs_conv <- function(..., space=grid::unit(0, "mm"), gp=grid::gpar(), na
 #'                     Work ONLY when both of width and height are set. 
 #' @name               combine_iamge_grobs
 #' @param unify        A string.
-#' @param gp           gpar() object.
-#' @param name         A string. grob name
 #' @param space        A grid unit. Space among grobs. 
+#' @param gp           gpar() object.
+#' @param shrink       A numeric.
+#' @param name         A string. grob name
 #' @return             combined (apposed or stacked) grob in a line.
 #' @examples
 #' library(grid)
@@ -186,7 +187,7 @@ stack_grobs_conv <- function(..., space=grid::unit(0, "mm"), gp=grid::gpar(), na
 #' grid.draw(combined_grobs)
 #' 
 #' @export
-appose_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="height", space=grid::unit(0, "mm"), gp=grid::gpar(), name=NULL){
+appose_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="height", space=grid::unit(0, "mm"), gp=grid::gpar(), shrink=1, name=NULL){
   grobs <- list(...)
   grobs[sapply(grobs, is.null)] <- NULL # remove NULL
   if(length(grobs)==1) grobs <- grobs[[1]]
@@ -220,6 +221,9 @@ appose_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="h
   }
   widths  <- widths  * expantion
   heights <- heights * expantion
+    # shrink
+  widths  <- widths  * shrink
+  heights <- heights * shrink
     # layout
   layout <- grid::grid.layout(nrow=1, ncol=n, widths=widths + space, heights=max(heights))
     # overwrite setting when unify=="grow"
@@ -278,7 +282,7 @@ reverse_ratio <- function(lengths){
 
 #' @rdname combine_iamge_grobs
 #' @export
-stack_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="width", space=grid::unit(0, "mm"), gp=grid::gpar(), name=NULL){
+stack_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="width", space=grid::unit(0, "mm"), gp=grid::gpar(), shrink=1, name=NULL){
   grobs <- list(...)
   grobs[sapply(grobs, is.null)] <- NULL # remove NULL
   n <- length(grobs)
@@ -311,6 +315,9 @@ stack_image_grobs <- function(..., width=NULL, height=NULL, grow=TRUE, unify="wi
   }
   widths  <- widths  * expantion
   heights <- heights * expantion
+    # shrink
+  widths  <- widths  * shrink
+  heights <- heights * shrink
     # layout
   layout <- grid::grid.layout(nrow=n, ncol=1, heights=heights + space, widths=max(widths))
     # overwrite setting when unify=="grow"

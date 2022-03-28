@@ -25,6 +25,7 @@
 #'
 #' @export
 arrange_txt <- function(..., x=0, y=0.5, hjust=0, vjust=0.5, widths=grid::unit(841, "mm"), convert=FALSE, shrink=1, silent=TRUE){
+  widths <- widths * shrink
   tbl <- txt2tibble(...)
   tg <-
     tbl %>%
