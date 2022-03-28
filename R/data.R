@@ -24,14 +24,14 @@
 #' # base  <- c(8, 10, 12, 14, 18, 22, 26, 32, 38)
 #' # ratio <- round(c(1/(1.2^(4:1)), 1.2^(0:6)), 2)
 #' # name  <- c(
-#' #        "tiny",         "scriptsize", "footnotesize", "small",   
-#' #        "normalize",   "large",      "Large",        "LARGE",     
-#' #        "huge",         "Huge",       "HUGE"
+#' #        'tiny',         'scriptsize', 'footnotesize', 'small',   
+#' #        'normalize',   'large',      'Large',        'LARGE',     
+#' #        'huge',         'Huge',       'HUGE'
 #' #         )
 #' # use   <- c(
-#' #        "tiny",         "script",     "footnote",     "caption", 
-#' #        "body",         "BODY",       "item",         "ITEM|thank",
-#' #        "author|affil", "subt|kw",    "title"
+#' #        'tiny',         'script',     'footnote',     'caption', 
+#' #        'body',         'BODY',       'item',         'ITEM|thank',
+#' #        'author|affil', 'subt|kw',    'title'
 #' #        )
 #' # font_size_list <- 
 #' #   tibble::tibble(

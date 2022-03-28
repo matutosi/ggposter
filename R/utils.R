@@ -1,6 +1,6 @@
 #' @importFrom rlang .data
 #' @export
-rlang::`.data`
+rlang::.data
 
 #' @importFrom grid grobName
 #' @export
@@ -13,31 +13,31 @@ grid:::grobName
 #' @name check_class
 #' @examples
 #' x <- 1
-#' y <- "text"
+#' y <- 'text'
 #' check_text(x)
 #' check_text(y)
 #' check_numeric(x)
 #' check_numeric(y)
 #' 
 #' @export
-check_text <- function(x){
-  if(!is.null(x)){
-    if(!is.character(x)){
-       warning("text MUST be character!")
-       return(FALSE)
+check_text <- function(x) {
+    if (!is.null(x)) {
+        if (!is.character(x)) {
+            warning("text MUST be character!")
+            return(FALSE)
+        }
     }
-  }
-  return(TRUE)
+    return(TRUE)
 }
 
 #' @rdname check_class
 #' @export
-check_numeric <- function(x){
-  if(!is.null(x)){
-    if(!is.numeric(x)){
-       warning("x MUST be numeric!")
-       return(FALSE)
+check_numeric <- function(x) {
+    if (!is.null(x)) {
+        if (!is.numeric(x)) {
+            warning("x MUST be numeric!")
+            return(FALSE)
+        }
     }
-  }
-  return(TRUE)
+    return(TRUE)
 }
