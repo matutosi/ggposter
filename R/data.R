@@ -1,6 +1,6 @@
-#' List of font size for ggposter. 
+#' List of font size for ggposter.
 #'
-#' @format A tibble with : 99 rows and 5 variables. 
+#' @format A tibble with : 99 rows and 5 variables.
 #' \describe{
 #'   \item{base_size}{base font size in ggposter}
 #'   \item{ratio}{ratio to base_size}
@@ -8,36 +8,36 @@
 #'   \item{font_use}{use case for poster}
 #'   \item{size}{font size}
 #' }
-#' 
+#'
 #' @examples
-#' # You can check font size by base_size. 
+#' # You can check font size by base_size.
 #' data(font_size_list)
 #' font_size_list %>% split(.$base_size)
-#' # 
-#' # You can show font size as plot by ggplot visualization as below. 
+#' #
+#' # You can show font size as plot by ggplot visualization as below.
 #' font_size_list %>%
-#'   ggplot2::ggplot(ggplot2::aes(x=base_size, y=size)) + 
-#'     ggplot2::geom_point() + 
-#'     ggplot2::theme_bw()
-#' # 
-#' # This data was generated as below. 
+#'   ggplot2::ggplot(ggplot2::aes(x = base_size, y = size)) +
+#'   ggplot2::geom_point() +
+#'   ggplot2::theme_bw()
+#' #
+#' # This data was generated as below.
 #' # base  <- c(8, 10, 12, 14, 18, 22, 26, 32, 38)
 #' # ratio <- round(c(1/(1.2^(4:1)), 1.2^(0:6)), 2)
 #' # name  <- c(
-#' #        'tiny',         'scriptsize', 'footnotesize', 'small',   
-#' #        'normalize',   'large',      'Large',        'LARGE',     
+#' #        'tiny',         'scriptsize', 'footnotesize', 'small',
+#' #        'normalize',   'large',      'Large',        'LARGE',
 #' #        'huge',         'Huge',       'HUGE'
 #' #         )
 #' # use   <- c(
-#' #        'tiny',         'script',     'footnote',     'caption', 
+#' #        'tiny',         'script',     'footnote',     'caption',
 #' #        'body',         'BODY',       'item',         'ITEM|thank',
 #' #        'author|affil', 'subt|kw',    'title'
 #' #        )
-#' # font_size_list <- 
+#' # font_size_list <-
 #' #   tibble::tibble(
-#' #     base_size=rep(base,   each=length(ratio)), 
-#' #     ratio=rep(ratio,      times=length(base)), 
-#' #     font_name=rep(name,   times=length(base)), 
+#' #     base_size=rep(base,   each=length(ratio)),
+#' #     ratio=rep(ratio,      times=length(base)),
+#' #     font_name=rep(name,   times=length(base)),
 #' #     font_use=rep(use,     times=length(base))) %>%
 #' #   dplyr::mutate(size=round(base_size * ratio, 0))
 #' # usethis::use_data(font_size_list, font_size_list)
