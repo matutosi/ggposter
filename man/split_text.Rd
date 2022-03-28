@@ -28,7 +28,7 @@ splitTextGrob(text, ...)
 textGrob
 }
 \description{
-This function is a little bit modified version of splitString in "R Graphics"
+This function is a little bit modified version of splitString in 'R Graphics'
 Chapter 6: Developing New Graphics Functions and Objects
 https://www.stat.auckland.ac.nz/~paul/RGraphics/interactgrid-calcdraw.R
 
@@ -44,8 +44,8 @@ t_4 <- "This text is separated into 5 objects, "
 t_5 <- "because of R document specification."
 text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
 fontsize <- 40
-stg <- splitTextGrob(text, name="test", gp=grid::gpar(fontsize=fontsize))
+stg <- splitTextGrob(text, name = "test", gp = grid::gpar(fontsize = fontsize))
 grid.draw(stg)
-grid::grid.gedit("test", gp=grid::gpar(fontsize=40))
+grid::grid.gedit("test", gp = grid::gpar(fontsize = 40))
 
 }
