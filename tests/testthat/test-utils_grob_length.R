@@ -12,7 +12,10 @@ test_that("grob_widths and grob_heights work", {
   h2 <- grob_heights(grobs)
   expect_equal(h1, h2)
   # converted
-  expect_equal(grid::convertUnit(w1, "mm"), grid::convertUnit(w2, "mm"))
-  expect_equal(grid::convertUnit(h1, "mm"), grid::convertUnit(h2, "mm"))
+  w1 <- grid::convertUnit(grid::unit(rep(1, n), rep("grobwidth",  n), grobs), "mm")
+  w2 <- grob_widths(grobs, convert_to="mm")
+  expect_equal(w1, w2)
+  # height
+  h1 <- grid::convertUnit(grid::unit(rep(1, n), rep("grobheight", n), grobs), "mm")
+  h2 <- grob_heights(grobs, convert_to="mm")
 })
-
