@@ -1,23 +1,13 @@
-#' @importFrom rlang :=
-NULL
-
-#' @importFrom rlang .data
-NULL
-
-#' Pipe operator
-#'
-#' See \code{magrittr::\link[magrittr:pipe]{\%>\%}} for details.
-#'
-#' @name %>%
-#' @rdname pipe
-#' @keywords internal
+#' Convert inputs into a list.
+#' @param ... Vectors or a list.
 #' @export
-#' @importFrom magrittr %>%
-#' @usage lhs \%>\% rhs
-#' @param lhs A value or the magrittr placeholder.
-#' @param rhs A function call using the magrittr semantics.
-#' @return The result of calling `rhs(lhs)`.
-NULL
+dots2list <- function(...){
+  res <- list(...)
+  res[sapply(res, is.null)] <- NULL # remove NULL
+  if (length(res) == 1) res <- res[[1]]
+  return(res)
+}
+
 
 #' @importFrom grid grobName
 #' @export
