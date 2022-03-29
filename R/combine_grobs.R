@@ -187,9 +187,6 @@ appose_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, un
                                gp = grid::gpar(), shrink = 1, name = NULL) {
   grobs <- dots2list(...)
 
-  # convert width and height
-  if (!is.null(width))  width <- grid::convertUnit(width,  "mm", valueOnly = TRUE)
-  if (!is.null(height)) height <- grid::convertUnit(height, "mm", valueOnly = TRUE)
   # if(!is.null(height) & !is.null(width)) unify <- 'grow' widths and heights (convert into
   # simple unit to improve performance)
   widths <-  grob_widths(grobs, convert_to = "mm")
@@ -198,17 +195,18 @@ appose_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, un
   # reverse ratio
   ratio_rev <- ratio_reverse(heights = heights, widths = widths, unify=unify)
   # output widths and heights
-  widths <- widths * ratio_rev
+  widths  <- widths  * ratio_rev
   heights <- heights * ratio_rev
 
   # expantion rate
   expantion <- ratio_expantion(height = height, width = width, 
-                               heights = heights, widths = widths, space = space)
-  widths <- widths * expantion
+                               heights = heights, widths = widths, space = space,
+                               method="stack")
+  widths <-  widths  * expantion
   heights <- heights * expantion
 
   # shrink
-  widths <- widths * shrink
+  widths <-  widths  * shrink
   heights <- heights * shrink
 
   # layout
@@ -295,6 +293,7 @@ ratio_reverse <- function(heights, widths, unify = unify) {
 #' @param heights   Grid units.
 #' @param widths    Grid units.
 #' @param space     A grid unit.
+#' @param method    A string. "appose" or "stack".
 #' @return          Numerics.
 #' @examples
 #' height <- grid::unit(80, "mm")
@@ -302,21 +301,33 @@ ratio_reverse <- function(heights, widths, unify = unify) {
 #' heights <- grid::unit(c(10, 20, 40), "mm")
 #' widths  <- grid::unit(c(10, 20, 40), "mm")
 #' space <- grid::unit(10, "mm")
-#'
+#' ratio_expantion(height = height, heights = heights, widths = widths, space = space)
+#' ratio_expantion(width  = width,  heights = heights, widths = widths, space = space)
+#' 
 #' @export
-ratio_expantion <- function(height, width, heights, widths, space){
+ratio_expantion <- function(height = NULL, width = NULL, heights, widths, space, method="appose"){
+  if(!is.null(height) & !is.null(width)) stop("can NOT use BOTH of height and width!")
+  # convert unit
+  if (!is.null(height)) height <- grid::convertUnit(height, "mm", valueOnly = TRUE)
+  if (!is.null(width))  width  <- grid::convertUnit(width,  "mm", valueOnly = TRUE)
+  heights <- grid::convertUnit(heights, "mm", valueOnly = TRUE)
+  widths  <- grid::convertUnit(widths,  "mm", valueOnly = TRUE)
+  space <- grid::convertUnit(space, "mm", valueOnly = TRUE) * length(heights)
+
+  # default
   expantion <- 1
   if(is.null(height) & is.null(width)) return(expantion)
-  if (!is.null(height)) {
-    n <- length(heights)
-    expantion <- 
-      sum(
-        height - grid::convertUnit(space * n, "mm", valueOnly = TRUE)) / 
-             sum(grid::convertUnit(heights, "mm", valueOnly = TRUE
-    ))
-  } else if (!is.null(width)) {
-    expantion <- width / max(grid::convertUnit(widths, "mm", valueOnly = TRUE))
+
+  if(method=="appose"){
+    if (!is.null(width))       expantion <- (width - space) / sum(widths)
+    else if (!is.null(height)) expantion <- height          / max(heights)
+  } else if(method=="stack"){
+    if (!is.null(height))     expantion <- (height - space) / sum(heights)
+    else if (!is.null(width)) expantion <- width            / max(widths)
+  } else {
+    message("method should be 'appose' or 'stack'")
   }
+
   return(expantion)
 }
 
@@ -327,9 +338,6 @@ stack_image_grobs <- function(..., width = NULL, height = NULL,
                               space = grid::unit(0, "mm"), 
                               gp = grid::gpar(), shrink = 1, name = NULL) {
   grobs <- dots2list(...)
-  # convert width and height
-  if (!is.null(width))  width <-  grid::convertUnit(width,  "mm", valueOnly = TRUE)
-  if (!is.null(height)) height <- grid::convertUnit(height, "mm", valueOnly = TRUE)
   # if(!is.null(height) & !is.null(width))  unify <- 'grow' 
   #   widths and heights (convert intosimple unit to improve performance)
   widths  <- grob_widths(grobs,  convert_to = "mm")
@@ -343,7 +351,8 @@ stack_image_grobs <- function(..., width = NULL, height = NULL,
 
   # expantion rate
   expantion <- ratio_expantion(height = height, width = width, 
-                               heights = heights, widths = widths, space = space)
+                               heights = heights, widths = widths, space = space,
+                               method="stack")
   widths <- widths * expantion
   heights <- heights * expantion
 
