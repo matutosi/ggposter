@@ -196,13 +196,13 @@ appose_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, un
   heights <- grob_heights(grobs, convert_to = "mm")
 
   # reverse ratio
-  rev_ratio <- reverse_ratio(heights = heights, widths = widths, unify=unify)
+  ratio_rev <- ratio_reverse(heights = heights, widths = widths, unify=unify)
   # output widths and heights
-  widths <- widths * rev_ratio
-  heights <- heights * rev_ratio
+  widths <- widths * ratio_rev
+  heights <- heights * ratio_rev
 
   # expantion rate
-  expantion <- expantion_ratio(height = height, width = width, 
+  expantion <- ratio_expantion(height = height, width = width, 
                                heights = heights, widths = widths, space = space)
   widths <- widths * expantion
   heights <- heights * expantion
@@ -258,7 +258,7 @@ frame_place_grobs <- function(grobs, layout,
   combined_grobs
 }
 
-#' Compute rev_ratio of length to max length
+#' Compute ratio_rev of length to max length
 #'
 #' This function is used in appose_image_grobs() and stack_image_grobs().
 #' @param heights   A grid units.
@@ -268,11 +268,11 @@ frame_place_grobs <- function(grobs, layout,
 #' @examples
 #' heights <- grid::unit(c(10, 20, 40), "mm")
 #' widths  <- grid::unit(c(10, 20, 40), "mm")
-#' reverse_ratio(widths, heights, unify = "heights")
-#' reverse_ratio(widths, heights, unify = "widths")
+#' ratio_reverse(widths, heights, unify = "heights")
+#' ratio_reverse(widths, heights, unify = "widths")
 #'
 #' @export
-reverse_ratio <- function(heights, widths, unify = unify) {
+ratio_reverse <- function(heights, widths, unify = unify) {
   if (unify == "height") {
     lengths <- heights
   } else if (unify == "width") {
@@ -287,7 +287,7 @@ reverse_ratio <- function(heights, widths, unify = unify) {
   return(max(lengths) / lengths)
 }
 
-#' Compute expantion_ratio
+#' Compute ratio_expantion
 #'
 #' This function is used in appose_image_grobs() and stack_image_grobs().
 #' @param height    A grid unit.
@@ -304,7 +304,7 @@ reverse_ratio <- function(heights, widths, unify = unify) {
 #' space <- grid::unit(10, "mm")
 #'
 #' @export
-expantion_ratio <- function(height, width, heights, widths, space){
+ratio_expantion <- function(height, width, heights, widths, space){
   expantion <- 1
   if(is.null(height) & is.null(width)) return(expantion)
   if (!is.null(height)) {
@@ -336,13 +336,13 @@ stack_image_grobs <- function(..., width = NULL, height = NULL,
   heights <- grob_heights(grobs, convert_to = "mm")
 
   # reverse ratio
-  rev_ratio <- reverse_ratio(heights = heights, widths = widths, unify=unify)
+  ratio_rev <- ratio_reverse(heights = heights, widths = widths, unify=unify)
   # output widths and heights
-  widths <- widths * rev_ratio
-  heights <- heights * rev_ratio
+  widths <- widths * ratio_rev
+  heights <- heights * ratio_rev
 
   # expantion rate
-  expantion <- expantion_ratio(height = height, width = width, 
+  expantion <- ratio_expantion(height = height, width = width, 
                                heights = heights, widths = widths, space = space)
   widths <- widths * expantion
   heights <- heights * expantion
