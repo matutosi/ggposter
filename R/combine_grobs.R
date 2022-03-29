@@ -224,10 +224,14 @@ appose_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, un
   heights <- heights * shrink
   # layout
   layout <- grid::grid.layout(nrow = 1, ncol = n, widths = widths + space, heights = max(heights))
-  # overwrite setting when unify=='grow' if(unify=='grow'){ widths <- grid::unit(rep(width/n,
-  # n), 'mm') - space heights <- grid::unit(rep(height, n), 'mm') layout <-
-  # grid::grid.layout(nrow=1, ncol=n, widths=widths + space, heights=max(heights)) } frame
-  # and place
+  # overwrite setting when unify=='grow' 
+  # if(unify=='grow'){ 
+  #   widths <- grid::unit(rep(width/n, n), 'mm') - space 
+  #   heights <- grid::unit(rep(height, n), 'mm') 
+  #   layout  <- grid::grid.layout(nrow=1, ncol=n, widths=widths + space, heights=max(heights)) 
+  # } 
+  # 
+  # frame and place
   combined_grobs <- frame_place_grobs(grobs, layout, widths, heights, by_row = TRUE, gp, name)
   combined_grobs
 }
