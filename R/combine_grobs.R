@@ -61,18 +61,17 @@ appose_grob <- function(gx, gy, space = grid::unit(0, "mm"), gp = grid::gpar(), 
   widths <- grid::unit(rep(1, 2), rep("grobwidth", 2), list(gx, gy)) + space
   heights <- max(grid::unit(rep(1, 2), rep("grobheight", 2), list(gx, gy)))
   layout <- grid::grid.layout(nrow = 1, ncol = 2, widths = widths, heights = heights)
-    # frame and place
+  # frame and place
   gx_gy <- grid::frameGrob(layout = layout, gp = gp, name = name)
   gx_gy <- grid::placeGrob(gx_gy, gx, col = 1)
   gx_gy <- grid::placeGrob(gx_gy, gy, col = 2)
-  #   frame_place_grobs(grobs=list(gx, gy), layout = layout, widths, heights, space, by_row=FALSE, gp, name)
   gx_gy
 }
 
 #' @rdname combine_grobs
 #' @export
 stack_grob <- function(gx, gy, space = grid::unit(0, "mm"), gp = grid::gpar(), name = NULL) {
-layout
+  # layout
   widths <- max(grid::unit(rep(1, 2), rep("grobwidth", 2), list(gx, gy)))
   heights <- grid::unit(rep(1, 2), rep("grobheight", 2), list(gx, gy)) + space
   layout <- grid::grid.layout(nrow = 2, ncol = 1, widths = widths, heights = heights)
@@ -98,8 +97,8 @@ appose_grobs <- function(..., space = grid::unit(0, "mm"), gp = grid::gpar(), na
   grobs[sapply(grobs, is.null)] <- NULL # remove NULL
   n <- length(grobs)
   # layout
-  widths <- grid::unit(rep(1, n), rep("grobwidth", n), grobs) + space
-  heights <- max(grid::unit(rep(1, n), rep("grobheight", n), grobs))
+  widths  <- grob_widths(grobs) + space
+  heights <- max(grob_heights(grobs))
   layout <- grid::grid.layout(nrow = 1, ncol = n, widths = widths, heights = heights)
   # frame and place
   combined_grobs <- grid::frameGrob(layout = layout, gp = gp, name = name)
@@ -109,6 +108,7 @@ appose_grobs <- function(..., space = grid::unit(0, "mm"), gp = grid::gpar(), na
   combined_grobs
 }
 
+
 #' @rdname combine_grobs
 #' @export
 stack_grobs <- function(..., space = grid::unit(0, "mm"), gp = grid::gpar(), name = NULL) {
@@ -116,8 +116,8 @@ stack_grobs <- function(..., space = grid::unit(0, "mm"), gp = grid::gpar(), nam
   grobs[sapply(grobs, is.null)] <- NULL # remove NULL
   n <- length(grobs)
   # layout
-  widths <- max(grid::unit(rep(1, n), rep("grobwidth", n), grobs))
-  heights <- grid::unit(rep(1, n), rep("grobheight", n), grobs) + space
+  widths  <- max(grob_widths(grobs))
+  heights <- grob_heights(grobs) + space
   layout <- grid::grid.layout(nrow = n, ncol = 1, widths = widths, heights = heights)
   # frame and place
   combined_grobs <- grid::frameGrob(layout = layout, gp = gp, name = name)
@@ -134,8 +134,8 @@ appose_grobs_conv <- function(..., space = grid::unit(0, "mm"), gp = grid::gpar(
   grobs[sapply(grobs, is.null)] <- NULL # remove NULL
   n <- length(grobs)
   # layout
-  widths <- grid::convertUnit(grid::unit(rep(1, n), rep("grobwidth", n), grobs), "mm") + space
-  heights <- grid::convertUnit(max(grid::unit(rep(1, n), rep("grobheight", n), grobs)), "mm")
+  widths  <- grid::convertUnit(grob_widths(grobs), "mm") + space
+  heights <- grid::convertUnit(max(grob_heights(grobs)), "mm")
   layout <- grid::grid.layout(nrow = 1, ncol = n, widths = widths, heights = heights)
   # frame and place
   combined_grobs <- grid::frameGrob(layout = layout, gp = gp, name = name)
@@ -152,8 +152,8 @@ stack_grobs_conv <- function(..., space = grid::unit(0, "mm"), gp = grid::gpar()
   grobs[sapply(grobs, is.null)] <- NULL # remove NULL
   n <- length(grobs)
   # layout
-  widths <- grid::convertUnit(max(grid::unit(rep(1, n), rep("grobwidth", n), grobs)), "mm")
-  heights <- grid::convertUnit(grid::unit(rep(1, n), rep("grobheight", n), grobs), "mm") + space
+  widths  <- grid::convertUnit(max(grob_widths(grobs)), "mm")
+  heights <- grid::convertUnit(grob_heights(grobs), "mm") + space
   layout <- grid::grid.layout(nrow = n, ncol = 1, widths = widths, heights = heights)
   # frame and place
   combined_grobs <- grid::frameGrob(layout = layout, gp = gp, name = name)
@@ -173,7 +173,7 @@ stack_grobs_conv <- function(..., space = grid::unit(0, "mm"), gp = grid::gpar()
 #'                     Work ONLY when both of width and height are set.
 #' @name               combine_iamge_grobs
 #' @param unify        A string.
-#' @param space        A grid unit. Space among grobs.
+#' @param space        A grid unit.
 #' @param gp           gpar() object.
 #' @param shrink       A numeric.
 #' @param name         A string. grob name
@@ -191,7 +191,8 @@ stack_grobs_conv <- function(..., space = grid::unit(0, "mm"), gp = grid::gpar()
 #'
 #' @export
 appose_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, unify = "height", 
-                              space = grid::unit(0, "mm"), gp = grid::gpar(), shrink = 1, name = NULL) {
+                               space = grid::unit(0, "mm"), 
+                               gp = grid::gpar(), shrink = 1, name = NULL) {
   grobs <- list(...)
   grobs[sapply(grobs, is.null)] <- NULL # remove NULL
   if (length(grobs) == 1) {
@@ -199,16 +200,12 @@ appose_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, un
   }
   n <- length(grobs)
   # convert width and height
-  if (!is.null(width)) {
-    width <- grid::convertUnit(width, "mm", valueOnly = TRUE)
-  }
-  if (!is.null(height)) {
-    height <- grid::convertUnit(height, "mm", valueOnly = TRUE)
-  }
+  if (!is.null(width))  width <- grid::convertUnit(width,  "mm", valueOnly = TRUE)
+  if (!is.null(height)) height <- grid::convertUnit(height, "mm", valueOnly = TRUE)
   # if(!is.null(height) & !is.null(width)) unify <- 'grow' widths and heights (convert into
   # simple unit to improve performance)
-  widths <- grid::convertUnit(grid::unit(rep(1, n), rep("grobwidth", n), grobs), "mm")
-  heights <- grid::convertUnit(grid::unit(rep(1, n), rep("grobheight", n), grobs), "mm")
+  widths <-  grid::convertUnit(grob_widths(grobs), "mm")
+  heights <- grid::convertUnit(grob_heights(grobs), "mm")
   # reverse ratio
   if (unify == "height") {
     rev_ratio <- reverse_ratio(heights)
@@ -227,10 +224,9 @@ appose_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, un
   # expantion rate
   expantion <- 1
   if (!is.null(width)) {
-    expantion <- sum(width - grid::convertUnit(space * n, "mm", valueOnly = TRUE)) / sum(grid::convertUnit(widths,
-      "mm",
-      valueOnly = TRUE
-    ))
+    expantion <- 
+      sum(width - grid::convertUnit(space * n, "mm", valueOnly = TRUE)) / 
+      sum(grid::convertUnit(widths, "mm", valueOnly = TRUE))
   } else if (!is.null(height)) {
     expantion <- height / max(grid::convertUnit(heights, "mm", valueOnly = TRUE))
   }
@@ -241,14 +237,11 @@ appose_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, un
   heights <- heights * shrink
   # layout
   layout <- grid::grid.layout(nrow = 1, ncol = n, widths = widths + space, heights = max(heights))
-      # overwrite setting when unify=='grow' 
-      # if(unify=='grow'){ widths <- grid::unit(rep(width/n, n), 'mm') - space 
-      # heights <- grid::unit(rep(height, n), 'mm') 
-      #   layout <- grid::grid.layout(nrow=1, ncol=n, widths=widths + space, heights=max(heights)) 
-      # }
-  # frame and place
-  combined_grobs <- 
-    frame_place_grobs(grobs, layout, widths, heights, space, by_row = TRUE, gp, name)
+  # overwrite setting when unify=='grow' if(unify=='grow'){ widths <- grid::unit(rep(width/n,
+  # n), 'mm') - space heights <- grid::unit(rep(height, n), 'mm') layout <-
+  # grid::grid.layout(nrow=1, ncol=n, widths=widths + space, heights=max(heights)) } frame
+  # and place
+  combined_grobs <- frame_place_grobs(grobs, layout, widths, heights, by_row = TRUE, gp, name)
   combined_grobs
 }
 
@@ -265,13 +258,14 @@ appose_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, un
 #' @return           combined grobs by layout.
 #'
 #' @export
-frame_place_grobs <- function(grobs, layout, widths=NULL, heights=NULL, 
+frame_place_grobs <- function(grobs, layout, 
+                              widths = NULL, heights = NULL, 
                               by_row = TRUE, gp = grid::gpar(), name = NULL) {
   combined_grobs <- grid::frameGrob(layout = layout, name = name)
   col <- 1
   row <- 1
   for (i in seq_along(grobs)) {
-    if(!is.null(widths))  grobs[[i]]$width  <- widths[[i]]
+    if(!is.null(widths))  grobs[[i]]$width <- widths[[i]]
     if(!is.null(heights)) grobs[[i]]$height <- heights[[i]]
     if (by_row) {
       col <- i
@@ -300,21 +294,18 @@ reverse_ratio <- function(lengths) {
 #' @rdname combine_iamge_grobs
 #' @export
 stack_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, unify = "width", 
-                              space = grid::unit(0, "mm"), gp = grid::gpar(), shrink = 1, name = NULL) {
+                               space = grid::unit(0, "mm"), 
+                               gp = grid::gpar(), shrink = 1, name = NULL) {
   grobs <- list(...)
   grobs[sapply(grobs, is.null)] <- NULL # remove NULL
   n <- length(grobs)
   # convert width and height
-  if (!is.null(width)) {
-    width <- grid::convertUnit(width, "mm", valueOnly = TRUE)
-  }
-  if (!is.null(height)) {
-    height <- grid::convertUnit(height, "mm", valueOnly = TRUE)
-  }
-  # if(!is.null(height) & !is.null(width)) unify <- 'grow' widths and heights (convert into
-  # simple unit to improve performance)
-  widths <- grid::convertUnit(grid::unit(rep(1, n), rep("grobwidth", n), grobs), "mm")
-  heights <- grid::convertUnit(grid::unit(rep(1, n), rep("grobheight", n), grobs), "mm")
+  if (!is.null(width))  width <- grid::convertUnit(width,  "mm", valueOnly = TRUE)
+  if (!is.null(height)) height <- grid::convertUnit(height, "mm", valueOnly = TRUE)
+  # if(!is.null(height) & !is.null(width))  unify <- 'grow' 
+  #   widths and heights (convert intosimple unit to improve performance)
+  widths <- grid::convertUnit(grob_widths(grobs), "mm")
+  heights <- grid::convertUnit(grob_heights(grobs), "mm")
   # reverse ratio
   if (unify == "height") {
     rev_ratio <- reverse_ratio(heights)
@@ -347,13 +338,12 @@ stack_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, uni
   heights <- heights * shrink
   # layout
   layout <- grid::grid.layout(nrow = n, ncol = 1, heights = heights + space, widths = max(widths))
-  # overwrite setting when unify=='grow' if(unify=='grow'){ widths <- grid::unit(rep(width/n,
-  # n), 'mm') - space heights <- grid::unit(rep(height, n), 'mm') layout <-
-  # grid::grid.layout(nrow=1, ncol=n, widths=widths + space, heights=max(heights)) } frame
-  # and place
-  combined_grobs <- frame_place_grobs(grobs, layout, widths, heights, space,
-    by_row = FALSE, gp,
-    name
-  )
+  # overwrite setting when unify=='grow' 
+  #   if(unify=='grow'){ widths <- grid::unit(rep(width/n, n), 'mm') - space
+  #   heights <- grid::unit(rep(height, n), 'mm') 
+  #   layout <-grid::grid.layout(nrow=1, ncol=n, widths=widths + space, heights=max(heights)) 
+  #   } 
+  # frame and place
+  combined_grobs <- frame_place_grobs(grobs, layout, widths, heights, by_row = FALSE, gp, name)
   combined_grobs
 }
