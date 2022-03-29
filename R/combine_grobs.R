@@ -108,7 +108,6 @@ appose_grobs <- function(..., space = grid::unit(0, "mm"), gp = grid::gpar(), na
   combined_grobs
 }
 
-
 #' @rdname combine_grobs
 #' @export
 stack_grobs <- function(..., space = grid::unit(0, "mm"), gp = grid::gpar(), name = NULL) {
@@ -173,7 +172,6 @@ stack_grobs_conv <- function(..., space = grid::unit(0, "mm"), gp = grid::gpar()
 #'                     Work ONLY when both of width and height are set.
 #' @name               combine_iamge_grobs
 #' @param unify        A string.
-#' @param space        A grid unit.
 #' @param gp           gpar() object.
 #' @param shrink       A numeric.
 #' @param name         A string. grob name
@@ -252,6 +250,7 @@ appose_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, un
 #' @param widths     grid unit.
 #' @param heights    grid unit.
 #' @param layout     grid layout.
+#' @param space      A grid unit. Space among grobs.
 #' @param by_row     A logical. TRUE: line in a row. FALSE: line in a col.
 #' @param gp        gpar().
 #' @param name       A string. Name of combined grob.

@@ -1,7 +1,7 @@
 test_that("grob_widths and grob_heights work", {
-  small <- grid::rectGrob(width=grid::unit(1, "cm"), height=grid::unit(1, "cm"), gp=grid::gpar(fill="black"))
-  tall  <- grid::rectGrob(width=grid::unit(1, "cm"), height=grid::unit(2, "cm"), gp=grid::gpar(fill="red"))
-  grobs <- list(small, tall)
+  small <- grid::rectGrob(width=unit(1, "cm"), height=unit(1, "cm"), gp=gpar(fill="black"))
+  tall  <- grid::rectGrob(width=unit(1, "cm"), height=unit(2, "cm"), gp=gpar(fill="red"))
+  grobs <- list(small, large)
   n <- length(grobs)
   # width
   w1 <- grid::unit(rep(1, n), rep("grobwidth",  n), grobs)
