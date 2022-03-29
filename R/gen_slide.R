@@ -150,10 +150,10 @@ shrink_font <- function(gg, shrink) {
 #' @return A combined grob.
 #'
 #' @export
-appose_fig_text <- function(fig, text, space = grid::unit(1, "mm"), widths = grid::unit(
-                              rep(50, 2),
-                              "mm"
-                            ), fontsize = NULL, shrink = 1) {
+appose_fig_text <- function(fig, text, 
+                            space = grid::unit(1, "mm"), 
+                            widths = grid::unit(rep(50, 2), "mm"), 
+                            fontsize = NULL, shrink = 1) {
   # set font size
   if (is.null(fontsize)) {
     fontsize <- grid::get.gpar()$fontsize
