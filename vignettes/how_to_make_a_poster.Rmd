@@ -532,13 +532,6 @@ We can draw combined grob (part_1).
 In this case, the paper size is A4, so you can check small manuscript on a paper or your pc screen. 
 
 ```{r combine_part_1, fig.width=8.3, out.width="100%"}
-part_1 <- 
-  stack_grobs_conv(title, 
-    appose_grobs_conv(
-      stack_grob(objectives, backgrounds, space=space),
-      conclusions), space=space)
-grid.draw(part_1)
-
 grid::grid.newpage()
 part_1 <- 
   combine_image_grobs(title, 
@@ -580,8 +573,6 @@ fig_description <-
 " %>%
   gridtext::textbox_grob(width=0.5*half, use_markdown=FALSE)
 
-
-fig_apposed <- appose_grobs_conv(fig_font_size_grob, fig_description)
 fig_apposed <- combine_image_grobs(fig_font_size_grob, fig_description, direction="horizontal", unify="as_is")
 grid::grid.draw(fig_apposed)
 
@@ -730,7 +721,6 @@ I can not exactly identify the code that causes this, I can not suggest fundamen
 ```{r apposed_table, fig.width=8.3, out.width="100%", fig.height=4}
 convertUnit(grobWidth(font_size_table), "mm")  # wrong unit
 convertUnit(grobWidth(base_size_table), "mm")  # wrong unit
-  # apposed <- appose_grobs(font_size_table, base_size_table, space=space)
 apposed <- combine_image_grobs(font_size_table, base_size_table, direction="horizontal", unify="as_is", space=space)
 grid::grid.draw(apposed)
 ```
@@ -744,7 +734,8 @@ font_size_table <- fix_table_unit(font_size_table)
 base_size_table <- fix_table_unit(base_size_table)
 convertUnit(grobWidth(font_size_table), "mm")  # correct unit
 convertUnit(grobWidth(base_size_table), "mm")  # correct unit
-apposed_fixed <- appose_grobs(font_size_table, base_size_table, space=space)
+
+apposed_fixed <- combine_image_grobs(font_size_table, base_size_table, direction="horizontal", unify="as_is", space=space)
 grid::grid.draw(apposed_fixed)
 ```
 
@@ -793,10 +784,10 @@ rlogo <-
     system.file("extdata", "Rlogo.png", package = "gridtext") %>%
   png::readPNG() %>%
   grid::rasterGrob()
-grid::grid.draw(appose_image_grobs(rlogo, rlogo, rlogo, space=grid::unit(1, "mm"), unify="as_is"))
+grid::grid.draw(combine_image_grobs(rlogo, rlogo, rlogo, direction = "horizontal", space=grid::unit(1, "mm"), unify="as_is"))
 
 rlogo$width <- grid::unit(20, "mm")
-grid::grid.draw(appose_image_grobs(rlogo, rlogo, rlogo, space=grid::unit(1, "mm"), unify="as_is"))
+grid::grid.draw(combine_image_grobs(rlogo, rlogo, rlogo, direction = "horizontal", space=grid::unit(1, "mm"), unify="as_is"))
 
 
 
@@ -844,7 +835,7 @@ because grobHeight() and grobWidth() become 0 mm !!
 
   grid.draw(t1)
 
-  t2 <- appose_image_grobs(t1, t1)
+  t2 <- combine_image_grobs(t1, t1, direction="horizontal", unify="as_is")
   grid::grid.show.layout(t2$frame$layout)
   grid::grid.draw(t2)
 
