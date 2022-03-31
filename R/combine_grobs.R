@@ -1,6 +1,7 @@
 #' Combine grobs horizontally or vertically in a line.
 #' 
-#' 
+#' appose_grobs() and stack_grobs() are helper function that set arguments 
+#' direction ("horizontal" and "vertical") and unify ("as_is").
 #' @param ...            grobs.
 #' @param direction      A string. "horizontal" or "vertical".
 #' @param height,width   A grid unit.
@@ -62,6 +63,28 @@ combine_grobs <- function(..., direction = "horizontal",
   combined_grobs <- 
     frame_place_grobs(grobs, layout, widths, heights, direction = direction, gp, name)
   combined_grobs
+}
+
+#' @rdname combine_grobs
+#' @export
+appose_grobs <- function(...,  width = NULL, height = NULL, 
+                                grow = TRUE, unify = "as_is", 
+                                space = grid::unit(0, "mm"), 
+                                gp = grid::gpar(), shrink = 1, name = NULL) {
+  combine_grobs(
+    ..., direction = "horizontal", 
+    width, height, grow, unify, space, gp, shrink, name)
+}
+
+#' @rdname combine_grobs
+#' @export
+stack_grobs <- function(...,  width = NULL, height = NULL, 
+                                grow = TRUE, unify = "as_is", 
+                                space = grid::unit(0, "mm"), 
+                                gp = grid::gpar(), shrink = 1, name = NULL) {
+  combine_grobs(
+    ..., direction = "vertical", 
+    width, height, grow, unify, space, gp, shrink, name)
 }
 
 #' @rdname combine_grobs
