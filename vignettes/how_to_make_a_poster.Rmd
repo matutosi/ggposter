@@ -73,13 +73,12 @@ We can change it.
 ```{r poster_size}
 size <- "A0"
 size <- "A4" # for preparation
-if(size=="A0") i <- 1 else 
-if(size=="A4") i <- 2
+if(size=="A0") shrink <- 1
+if(size=="A4") shrink <- 0.25
+space <- grid::unit(2, "mm") * shrink
 
-full <- grid::unit(c(841, 210), "mm")[i]
-half <- grid::unit(c(420, 105), "mm")[i]
-shrink <- c(1, 0.25)[i]
-space <- grid::unit(2, "mm")
+full <- grid::unit(841, "mm")
+half <- grid::unit(420, "mm")
 ```
 
 ## Font size
@@ -222,7 +221,7 @@ font_size_example <-
     txt_ITEM, txt_item, txt_BODY, txt_body, 
     txt_caption, txt_footnote, txt_script, txt_tiny,
     txt_body_add, 
-    widths=full, shrink=0.5)
+    widths = full * shrink, shrink=0.5)
 grid::grid.draw(font_size_example)
 ```
 
@@ -302,12 +301,12 @@ jpg_grobs <-
   purrr::map(jpeg::readJPEG) %>%
   purrr::map(grid::rasterGrob)
 
-fix_width_height <- combine_grobs(jpg_grobs, direction = "horizontal", width=half, unify="height", space=space)
-fix_width_width  <- combine_grobs(jpg_grobs, direction = "horizontal", width=half, unify="width",  space=space)
+fix_width_height <- combine_grobs(jpg_grobs, direction = "horizontal", width=half * shrink, unify="height", space=space)
+fix_width_width  <- combine_grobs(jpg_grobs, direction = "horizontal", width=half * shrink, unify="width",  space=space)
   # Can specify multiple image grobs (not a list of grobs) as shown below
   # appose_image_grobs(jpg_grob_1, jpg_grob_2, png_grob_1, width=half)
 stacked_image_grob <- 
-  combine_grobs(fix_width_height, fix_width_width, direction = "vertical", width=half, unify="width",space=space)
+  combine_grobs(fix_width_height, fix_width_width, direction = "vertical", unify="width",space=space)
 
 grid.draw(stacked_image_grob)
 ```
@@ -324,7 +323,7 @@ txt_BODY_43   <- "- Unify height or width of images (argument: unify).<br>"
 txt_BODY_44   <- "- Fix hole width and/or height of combined grob (argument: width, height).<br>"
 txt_BODY_45   <- "- gridtext::textbox_grob() will wrap strings (insert line breaks) longer than specified widht automatically."
 txt <- str_c(txt_ITEM_40, txt_BODY_41, txt_BODY_42, txt_BODY_43, txt_BODY_44, txt_BODY_45)
-image_description <- gridtext::textbox_grob(txt, width=half, use_markdown=FALSE)
+image_description <- gridtext::textbox_grob(txt, width=half * shrink, use_markdown=FALSE)
   # image_and_description <- stack_grobs_conv(image_description, stacked_image_grob, space=space)
 image_and_description <- 
   combine_grobs(image_description, stacked_image_grob, direction = "vertical", unify = "as_is", space=space)
@@ -421,14 +420,14 @@ fontsize <- 30
 lineheight <- 1.1
 gp_text <- grid::gpar(fontsize=fontsize, lineheight=lineheight)
  # generate slide and draw
-slide <- gen_slide(title, fig, description, gp_title, gp_text, width=half)
+slide <- gen_slide(title, fig, description, gp_title, gp_text, width=half * shrink)
 grid.newpage()
 grid::grid.draw(slide)
 
 description_1 <- 
   arrange_txt(
     txt_body_31, txt_body_32, 
-    widths=half)
+    widths=half * shrink)
 grid.newpage()
 grid.draw(combine_grobs(ggplot2::ggplotGrob(fig), description_1, direction="horizontal", unify="width"))
 ```
@@ -478,6 +477,10 @@ title <- arrange_txt(
     txt_title, txt_subt, txt_kw, txt_author, txt_affil,
     x=0.5, y=0.5, hjust=c(rep(0.5, 3), rep(0, 2)), widths=full, shrink=0.25)
 grid::grid.draw(title)
+
+grid::grid.show.layout(title$frame$layout)  # show layout
+grid::grid.draw(title)
+
 ```
 
 ## Objectives

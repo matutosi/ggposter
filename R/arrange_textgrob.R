@@ -24,9 +24,11 @@
 #' grid::grid.draw(arranged_txt_2)
 #'
 #' @export
-arrange_txt <- function(..., x = 0, y = 0.5, hjust = 0, vjust = 0.5, widths = grid::unit(841, "mm"),
+arrange_txt <- function(..., x = 0, y = 0.5, 
+                        hjust = 0, vjust = 0.5, 
+                        widths = grid::unit(841, "mm"),
                         convert = FALSE, shrink = 1, silent = TRUE) {
-  widths <- widths * shrink
+  #   widths <- widths * shrink
   tbl <- txt2tibble(...)
   tg <- tbl %>%
     dplyr::mutate(font_size = purrr::pmap_dbl(tbl, get_font_size, shrink = shrink, silent = silent)) %>%
