@@ -1,5 +1,4 @@
-#' @rdname frame_place_grobs
-#' @param convert_to A grid unit.
+#' @rdname combine_image_grobs
 #' @export
 grob_widths <- function(grobs, convert_to=NULL){
   n <- length(grobs)
@@ -8,8 +7,7 @@ grob_widths <- function(grobs, convert_to=NULL){
   return(widths)
 }
 
-#' @rdname frame_place_grobs
-#' @param convert_to A grid unit.
+#' @rdname combine_image_grobs
 #' @export
 grob_heights <- function(grobs, convert_to=NULL){
   n <- length(grobs)

@@ -1,105 +1,3 @@
-#' Frame and place grobs in line (row or col)
-#'
-#' This function is used in appose_image_grobs() and stack_image_grobs().
-#' @param grobs           A list of grobs to be combined
-#' @param widths,heights  grid units.
-#' @inheritParams         combine_image_grobs
-#' @param layout          grid layout.
-#' @return                A combined grobs.
-#'
-#' @export
-frame_place_grobs <- function(grobs, layout, 
-                              widths = NULL, heights = NULL, 
-                              direction, gp = grid::gpar(), name = NULL) {
-  combined_grobs <- grid::frameGrob(layout = layout, name = name)
-  col <- 1
-  row <- 1
-  for (i in seq_along(grobs)) {
-    if(!is.null(widths))  grobs[[i]]$width <- widths[[i]]
-    if(!is.null(heights)) grobs[[i]]$height <- heights[[i]]
-    if (direction == "horizontal") {
-      col <- i
-    } else {
-      row <- i
-    }
-    combined_grobs <- grid::placeGrob(combined_grobs, grobs[[i]], col = col, row = row)
-  }
-  combined_grobs
-}
-
-#' Compute ratio_rev of length to max length
-#'
-#' This function is used in appose_image_grobs() and stack_image_grobs().
-#' @inheritParams frame_place_grobs
-#' @inheritParams combine_image_grobs
-#' @return        Numerics.
-#' @examples
-#' heights <- grid::unit(c(10, 20, 40), "mm")
-#' widths  <- grid::unit(c(10, 20, 40), "mm")
-#' ratio_reverse(widths, heights, unify = "heights")
-#' ratio_reverse(widths, heights, unify = "widths")
-#'
-#' @export
-ratio_reverse <- function(heights, widths, unify) {
-  if (unify == "height") {
-    lengths <- heights
-  } else if (unify == "width") {
-    lengths <- widths
-  } else if (unify == "as_is") {
-    return(1)
-  } else {
-    message("no match argument, unify=\"as_is\" was set")
-    return(1)
-  }
-  lengths <- grid::convertUnit(lengths, "mm", valueOnly = TRUE)
-  return(max(lengths) / lengths)
-}
-
-#' Compute ratio_expantion
-#'
-#' This function is used in appose_image_grobs() and stack_image_grobs().
-#'
-#' @inheritParams frame_place_grobs
-#' @inheritParams combine_image_grobs
-#' @return        Numerics.
-#' @examples
-#' height <- grid::unit(80, "mm")
-#' width  <- grid::unit(80, "mm")
-#' heights <- grid::unit(c(10, 20, 40), "mm")
-#' widths  <- grid::unit(c(10, 20, 40), "mm")
-#' space <- grid::unit(10, "mm")
-#' ratio_expantion(height = height, heights = heights, widths = widths, 
-#'   space = space, direction = "horizontal")
-#' ratio_expantion(width  = width,  heights = heights, widths = widths, 
-#'   space = space, direction = "vertical")
-#' 
-#' @export
-ratio_expantion <- function(height = NULL, width = NULL, heights, widths, space, direction){
-  if(!is.null(height) & !is.null(width)) stop("can NOT use BOTH of height and width!")
-  # convert unit
-  if (!is.null(height)) height <- grid::convertUnit(height, "mm", valueOnly = TRUE)
-  if (!is.null(width))  width  <- grid::convertUnit(width,  "mm", valueOnly = TRUE)
-  heights <- grid::convertUnit(heights, "mm", valueOnly = TRUE)
-  widths  <- grid::convertUnit(widths,  "mm", valueOnly = TRUE)
-  space <- grid::convertUnit(space, "mm", valueOnly = TRUE) * length(heights)
-
-  # default
-  expantion <- 1
-  if(is.null(height) & is.null(width)) return(expantion)
-
-  if(direction == "horizontal"){
-    if (!is.null(width))       expantion <- (width - space) / sum(widths)
-    else if (!is.null(height)) expantion <- height          / max(heights)
-  } else if(direction == "vertical"){
-    if (!is.null(height))     expantion <- (height - space) / sum(heights)
-    else if (!is.null(width)) expantion <- width            / max(widths)
-  } else {
-    message("direction should be 'horizontal' or 'vertical")
-  }
-
-  return(expantion)
-}
-
 #' Combine grobs horizontally or vertically in a line.
 #' 
 #' @param ...            grobs.
@@ -111,10 +9,15 @@ ratio_expantion <- function(height = NULL, width = NULL, heights, widths, space,
 #' @param gp             A gpar() object.
 #' @param shrink         A numeric.
 #' @param name           A string. grob name.
+#' @param grobs           A list of grobs to be combined
+#' @param layout          grid layout.
+#' @param widths,heights  grid units.
+#' @param convert_to      A grid unit.
 #' 
 #' @return  A combined grobs.
 #' @export
-combine_image_grobs <- function(..., direction = "horizontal", width = NULL, height = NULL, 
+combine_image_grobs <- function(..., direction = "horizontal", 
+                                width = NULL, height = NULL, 
                                 grow = TRUE, unify = "width", 
                                 space = grid::unit(0, "mm"), 
                                 gp = grid::gpar(), shrink = 1, name = NULL) {
@@ -153,7 +56,98 @@ combine_image_grobs <- function(..., direction = "horizontal", width = NULL, hei
     stop('"direction" should be "horizontal" or "vertical"')
   }
   # layout
-  layout <- grid::grid.layout(nrow = nrow, ncol = ncol, heights = layout_heights, widths = layout_widths)
-  combined_grobs <- frame_place_grobs(grobs, layout, widths, heights, direction = direction, gp, name)
+  layout <- 
+    grid::grid.layout(nrow = nrow, ncol = ncol, heights = layout_heights, widths = layout_widths)
+  combined_grobs <- 
+    frame_place_grobs(grobs, layout, widths, heights, direction = direction, gp, name)
   combined_grobs
 }
+
+#' @rdname combine_image_grobs
+#' @export
+frame_place_grobs <- function(grobs, layout, 
+                              widths = NULL, heights = NULL, 
+                              direction, gp = grid::gpar(), name = NULL) {
+  combined_grobs <- grid::frameGrob(layout = layout, name = name)
+  col <- 1
+  row <- 1
+  for (i in seq_along(grobs)) {
+    if(!is.null(widths))  grobs[[i]]$width <- widths[[i]]
+    if(!is.null(heights)) grobs[[i]]$height <- heights[[i]]
+    if (direction == "horizontal") {
+      col <- i
+    } else {
+      row <- i
+    }
+    combined_grobs <- grid::placeGrob(combined_grobs, grobs[[i]], col = col, row = row)
+  }
+  combined_grobs
+}
+
+#' Compute ratio_rev and ratio_expantion.
+#'
+#' This function is used in combine_image_grobs().
+#' @name compute_ratio
+#' @inheritParams combine_image_grobs
+#' @return        Numerics.
+#' @examples
+#' heights <- grid::unit(c(10, 20, 40), "mm")
+#' widths  <- grid::unit(c(10, 20, 40), "mm")
+#' ratio_reverse(widths, heights, unify = "heights")
+#' ratio_reverse(widths, heights, unify = "widths")
+#'
+#' height <- grid::unit(80, "mm")
+#' width  <- grid::unit(80, "mm")
+#' heights <- grid::unit(c(10, 20, 40), "mm")
+#' widths  <- grid::unit(c(10, 20, 40), "mm")
+#' space <- grid::unit(10, "mm")
+#' ratio_expantion(height = height, heights = heights, widths = widths, 
+#'   space = space, direction = "horizontal")
+#' ratio_expantion(width  = width,  heights = heights, widths = widths, 
+#'   space = space, direction = "vertical")
+#'
+#' @export
+ratio_reverse <- function(heights, widths, unify) {
+  if (unify == "height") {
+    lengths <- heights
+  } else if (unify == "width") {
+    lengths <- widths
+  } else if (unify == "as_is") {
+    return(1)
+  } else {
+    message("no match argument, unify=\"as_is\" was set")
+    return(1)
+  }
+  lengths <- grid::convertUnit(lengths, "mm", valueOnly = TRUE)
+  return(max(lengths) / lengths)
+}
+
+#' @rdname compute_ratio
+#' @export
+ratio_expantion <- function(height = NULL, width = NULL, 
+                            heights, widths, space, direction){
+  if(!is.null(height) & !is.null(width)) stop("can NOT use BOTH of height and width!")
+  # convert unit
+  if (!is.null(height)) height <- grid::convertUnit(height, "mm", valueOnly = TRUE)
+  if (!is.null(width))  width  <- grid::convertUnit(width,  "mm", valueOnly = TRUE)
+  heights <- grid::convertUnit(heights, "mm", valueOnly = TRUE)
+  widths  <- grid::convertUnit(widths,  "mm", valueOnly = TRUE)
+  space <- grid::convertUnit(space, "mm", valueOnly = TRUE) * length(heights)
+
+  # default
+  expantion <- 1
+  if(is.null(height) & is.null(width)) return(expantion)
+
+  if(direction == "horizontal"){
+    if (!is.null(width))       expantion <- (width - space) / sum(widths)
+    else if (!is.null(height)) expantion <- height          / max(heights)
+  } else if(direction == "vertical"){
+    if (!is.null(height))     expantion <- (height - space) / sum(heights)
+    else if (!is.null(width)) expantion <- width            / max(widths)
+  } else {
+    message("direction should be 'horizontal' or 'vertical")
+  }
+
+  return(expantion)
+}
+
