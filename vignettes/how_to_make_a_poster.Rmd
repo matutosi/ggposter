@@ -177,11 +177,8 @@ small <- grid::rectGrob(width=grid::unit(10, "mm"), height=grid::unit(10, "mm"),
 tall  <- grid::rectGrob(width=grid::unit(10, "mm"), height=grid::unit(20, "mm"), gp=grid::gpar(fill="red"))
 wide  <- grid::rectGrob(width=grid::unit(20, "mm"), height=grid::unit(10, "mm"), gp=grid::gpar(fill="blue"))
 large <- grid::rectGrob(width=grid::unit(20, "mm"), height=grid::unit(20, "mm"), gp=grid::gpar(fill="white"))
-  # apposed <- appose_grobs_conv(small, tall, wide, large, space=unit(2, "mm"))
 apposed <- combine_image_grobs(small, tall, wide, large, 
                     direction = "horizontal", unify = "as_is", space = grid::unit(2, "mm"))
-
-  # stacked <- stack_grobs_conv(small, tall, wide, large, space=unit(2, "mm"))
 stacked <- combine_image_grobs(small, tall, wide, large, 
                     direction = "vertical", unify = "as_is", space = grid::unit(2, "mm"))
 
@@ -189,7 +186,6 @@ grid::grid.show.layout(apposed$frame$layout)  # show layout
 grid::grid.draw(apposed)
 
 grid::grid.newpage()
-  # combined <- appose_grobs_conv(apposed, apposed2, stacked, stacked2, space=unit(2, "mm"))
 combined <- 
   combine_image_grobs(apposed, stacked, direction = "horizontal", unify = "as_is", space=unit(2, "mm"))
 grid::grid.draw(combined)
@@ -306,16 +302,10 @@ jpg_grobs <-
   purrr::map(jpeg::readJPEG) %>%
   purrr::map(grid::rasterGrob)
 
-  # fix_width_height <- appose_image_grobs(jpg_grobs, width=half, unify="height", space=space)
-  # fix_width_width  <- appose_image_grobs(jpg_grobs, width=half, unify="width",  space=space)
 fix_width_height <- combine_image_grobs(jpg_grobs, direction = "horizontal", width=half, unify="height", space=space)
 fix_width_width  <- combine_image_grobs(jpg_grobs, direction = "horizontal", width=half, unify="width",  space=space)
-
   # Can specify multiple image grobs (not a list of grobs) as shown below
   # appose_image_grobs(jpg_grob_1, jpg_grob_2, png_grob_1, width=half)
-
-  # stacked_image_grob <- 
-  #   stack_image_grobs(fix_width_height, fix_width_width, width=half, unify="width",space=space)
 stacked_image_grob <- 
   combine_image_grobs(fix_width_height, fix_width_width, direction = "vertical", width=half, unify="width",space=space)
 
@@ -375,7 +365,7 @@ base_size_table <-
   dplyr::filter(ratio==1) %>%
   booktab_table_grob(title="Base font size of ggposter", caption="Font size increases every 1.2 times approximately.", fontsize=20, shrink=0.5)
 
-grid::grid.draw(appose_grobs(font_size_table, base_size_table, space=grid::unit(10, "mm")))
+grid::grid.draw(combine_image_grobs(font_size_table, base_size_table, direction="horizontal", unify="as_is", space=grid::unit(10, "mm")))
 ```
 
 All `booktab_table_grob()` does is call `gridExtra::tableGrob()`, `add_booktab()`, and `add_annotation()`. 
@@ -437,7 +427,7 @@ description_1 <-
     txt_body_31, txt_body_32, 
     widths=half)
 grid.newpage()
-grid.draw(appose_image_grobs(ggplot2::ggplotGrob(fig), description_1, unify="width"))
+grid.draw(combine_image_grobs(ggplot2::ggplotGrob(fig), description_1, direction="horizontal", unify="width"))
 ```
 
 
@@ -548,6 +538,15 @@ part_1 <-
       stack_grob(objectives, backgrounds, space=space),
       conclusions), space=space)
 grid.draw(part_1)
+
+grid::grid.newpage()
+part_1 <- 
+  combine_image_grobs(title, 
+    combine_image_grobs(
+      combine_image_grobs(objectives, backgrounds, direction = "vertical", unify="as_is", space=space),
+      conclusions, direction = "horizontal", unify="as_is", space=space), 
+  direction = "vertical", unify="as_is", space=space)
+grid.draw(part_1)
 ```
 
 
@@ -583,16 +582,10 @@ fig_description <-
 
 
 fig_apposed <- appose_grobs_conv(fig_font_size_grob, fig_description)
+fig_apposed <- combine_image_grobs(fig_font_size_grob, fig_description, direction="horizontal", unify="as_is")
 grid::grid.draw(fig_apposed)
 
 ```
-
-
-
-
-
-
-
 
 
 
@@ -605,7 +598,6 @@ table_iris <-
   add_booktab(lwd_out=2, lwd_in=1) %>%
   grid::grid.draw()
 table_description <- ""
-
 
 ```
 
@@ -738,7 +730,8 @@ I can not exactly identify the code that causes this, I can not suggest fundamen
 ```{r apposed_table, fig.width=8.3, out.width="100%", fig.height=4}
 convertUnit(grobWidth(font_size_table), "mm")  # wrong unit
 convertUnit(grobWidth(base_size_table), "mm")  # wrong unit
-apposed <- appose_grobs(font_size_table, base_size_table, space=space)
+  # apposed <- appose_grobs(font_size_table, base_size_table, space=space)
+apposed <- combine_image_grobs(font_size_table, base_size_table, direction="horizontal", unify="as_is", space=space)
 grid::grid.draw(apposed)
 ```
 
