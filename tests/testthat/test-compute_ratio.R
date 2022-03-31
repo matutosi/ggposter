@@ -10,12 +10,12 @@ test_that("multiplication works", {
   expect_equal(ratio_reverse(heights = heights, widths = widths, unify = "height"), c(2, 1, 2, 1))
   expect_equal(ratio_reverse(heights = heights, widths = widths, unify = "width"),  c(2, 2, 1, 1))
 
-  ratio_exp1 <- ratio_expantion(height = height, heights = heights, widths = widths, space = space, method="appose")
-  ratio_exp2 <- ratio_expantion(width  = width,  heights = heights, widths = widths, space = space, method="appose")
+  ratio_exp1 <- ratio_expantion(height = height, heights = heights, widths = widths, space = space, direction = "horizontal")
+  ratio_exp2 <- ratio_expantion(width  = width,  heights = heights, widths = widths, space = space, direction = "horizontal")
   expect_equal(ratio_exp1, 10)
   expect_equal(ratio_exp2, 2)
 
-  ratio_exp3 <- ratio_expantion(heights = heights, widths = widths, space = space, method="appose")
+  ratio_exp3 <- ratio_expantion(heights = heights, widths = widths, space = space, direction = "horizontal")
   expect_equal(ratio_exp3, 1)
 
 })

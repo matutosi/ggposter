@@ -159,6 +159,7 @@ stack_grobs_conv <- function(..., space = grid::unit(0, "mm"), gp = grid::gpar()
 #'
 #' @param ...          grob.
 #' @param width,height A grid unit.
+#' @param direction    A string. Direction to be combined: "horizontal" or "vertical"
 #' @param grow         Do not work yet!
 #'                     A string. 'height', 'width', or 'none'
 #'                     Images will be grown to fill the width or height.
@@ -186,9 +187,10 @@ appose_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, un
                                space = grid::unit(0, "mm"), 
                                gp = grid::gpar(), shrink = 1, name = NULL) {
   grobs <- dots2list(...)
+  direction <- "horizontal"
 
-  # if(!is.null(height) & !is.null(width)) unify <- 'grow' widths and heights (convert into
-  # simple unit to improve performance)
+  # if(!is.null(height) & !is.null(width)) unify <- 'grow' 
+  #   widths and heights (convert into simple unit to improve performance)
   widths <-  grob_widths(grobs, convert_to = "mm")
   heights <- grob_heights(grobs, convert_to = "mm")
 
@@ -201,7 +203,7 @@ appose_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, un
   # expantion rate
   expantion <- ratio_expantion(height = height, width = width, 
                                heights = heights, widths = widths, space = space,
-                               method="stack")
+                               direction = direction)
   widths <-  widths  * expantion
   heights <- heights * expantion
 
@@ -220,7 +222,7 @@ appose_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, un
   # } 
   # 
   # frame and place
-  combined_grobs <- frame_place_grobs(grobs, layout, widths, heights, by_row = TRUE, gp, name)
+  combined_grobs <- frame_place_grobs(grobs, layout, widths, heights, direction = direction, gp, name)
   combined_grobs
 }
 
@@ -231,22 +233,22 @@ appose_image_grobs <- function(..., width = NULL, height = NULL, grow = TRUE, un
 #' @param widths     grid unit.
 #' @param heights    grid unit.
 #' @param layout     grid layout.
-#' @param by_row     A logical. TRUE: line in a row. FALSE: line in a col.
-#' @param gp        gpar().
+#' @param direction  A string. Direction to be combined: "horizontal" or "vertical"
+#' @param gp         gpar().
 #' @param name       A string. Name of combined grob.
 #' @return           combined grobs by layout.
 #'
 #' @export
 frame_place_grobs <- function(grobs, layout, 
                               widths = NULL, heights = NULL, 
-                              by_row = TRUE, gp = grid::gpar(), name = NULL) {
+                              direction, gp = grid::gpar(), name = NULL) {
   combined_grobs <- grid::frameGrob(layout = layout, name = name)
   col <- 1
   row <- 1
   for (i in seq_along(grobs)) {
     if(!is.null(widths))  grobs[[i]]$width <- widths[[i]]
     if(!is.null(heights)) grobs[[i]]$height <- heights[[i]]
-    if (by_row) {
+    if (direction == "horizontal") {
       col <- i
     } else {
       row <- i
@@ -261,7 +263,7 @@ frame_place_grobs <- function(grobs, layout,
 #' This function is used in appose_image_grobs() and stack_image_grobs().
 #' @param heights   A grid units.
 #' @param widths    A grid units.
-#' @param unify     A string.
+#' @param unify     A string. "height", "width", or "as_is"
 #' @return          Numerics.
 #' @examples
 #' heights <- grid::unit(c(10, 20, 40), "mm")
@@ -293,7 +295,7 @@ ratio_reverse <- function(heights, widths, unify = unify) {
 #' @param heights   Grid units.
 #' @param widths    Grid units.
 #' @param space     A grid unit.
-#' @param method    A string. "appose" or "stack".
+#' @param direction A string. "horizontal" or "vertical".
 #' @return          Numerics.
 #' @examples
 #' height <- grid::unit(80, "mm")
@@ -301,11 +303,13 @@ ratio_reverse <- function(heights, widths, unify = unify) {
 #' heights <- grid::unit(c(10, 20, 40), "mm")
 #' widths  <- grid::unit(c(10, 20, 40), "mm")
 #' space <- grid::unit(10, "mm")
-#' ratio_expantion(height = height, heights = heights, widths = widths, space = space)
-#' ratio_expantion(width  = width,  heights = heights, widths = widths, space = space)
+#' ratio_expantion(height = height, heights = heights, widths = widths, 
+#'   space = space, direction = "horizontal")
+#' ratio_expantion(width  = width,  heights = heights, widths = widths, 
+#'   space = space, direction = "vertical")
 #' 
 #' @export
-ratio_expantion <- function(height = NULL, width = NULL, heights, widths, space, method="appose"){
+ratio_expantion <- function(height = NULL, width = NULL, heights, widths, space, direction){
   if(!is.null(height) & !is.null(width)) stop("can NOT use BOTH of height and width!")
   # convert unit
   if (!is.null(height)) height <- grid::convertUnit(height, "mm", valueOnly = TRUE)
@@ -318,14 +322,14 @@ ratio_expantion <- function(height = NULL, width = NULL, heights, widths, space,
   expantion <- 1
   if(is.null(height) & is.null(width)) return(expantion)
 
-  if(method=="appose"){
+  if(direction == "horizontal"){
     if (!is.null(width))       expantion <- (width - space) / sum(widths)
     else if (!is.null(height)) expantion <- height          / max(heights)
-  } else if(method=="stack"){
+  } else if(direction == "vertical"){
     if (!is.null(height))     expantion <- (height - space) / sum(heights)
     else if (!is.null(width)) expantion <- width            / max(widths)
   } else {
-    message("method should be 'appose' or 'stack'")
+    message("direction should be 'horizontal' or 'vertical")
   }
 
   return(expantion)
@@ -338,6 +342,8 @@ stack_image_grobs <- function(..., width = NULL, height = NULL,
                               space = grid::unit(0, "mm"), 
                               gp = grid::gpar(), shrink = 1, name = NULL) {
   grobs <- dots2list(...)
+  direction <- "vertical"
+
   # if(!is.null(height) & !is.null(width))  unify <- 'grow' 
   #   widths and heights (convert intosimple unit to improve performance)
   widths  <- grob_widths(grobs,  convert_to = "mm")
@@ -352,7 +358,7 @@ stack_image_grobs <- function(..., width = NULL, height = NULL,
   # expantion rate
   expantion <- ratio_expantion(height = height, width = width, 
                                heights = heights, widths = widths, space = space,
-                               method="stack")
+                               direction = direction)
   widths <- widths * expantion
   heights <- heights * expantion
 
@@ -368,6 +374,52 @@ stack_image_grobs <- function(..., width = NULL, height = NULL,
   #   layout <-grid::grid.layout(nrow=1, ncol=n, widths=widths + space, heights=max(heights)) 
   # } 
   # frame and place
-  combined_grobs <- frame_place_grobs(grobs, layout, widths, heights, by_row = FALSE, gp, name)
+  combined_grobs <- frame_place_grobs(grobs, layout, widths, heights, direction = direction, gp, name)
+  combined_grobs
+}
+
+#' @rdname combine_iamge_grobs
+#' @export
+combine_image_grobs <- function(..., direction = "horizontal", width = NULL, height = NULL, 
+                                grow = TRUE, unify = "width", 
+                                space = grid::unit(0, "mm"), 
+                                gp = grid::gpar(), shrink = 1, name = NULL) {
+  grobs <- dots2list(...)
+  widths  <- grob_widths(grobs,  convert_to = "mm")
+  heights <- grob_heights(grobs, convert_to = "mm")
+
+  # reverse ratio
+  ratio_rev <- ratio_reverse(heights = heights, widths = widths, unify=unify)
+  # output widths and heights
+  widths <- widths * ratio_rev
+  heights <- heights * ratio_rev
+
+  # expantion rate
+  expantion <- ratio_expantion(height = height, width = width, 
+                               heights = heights, widths = widths, space = space,
+                               direction = direction)
+  widths <- widths * expantion
+  heights <- heights * expantion
+
+  # shrink
+  widths <- widths * shrink
+  heights <- heights * shrink
+
+  if(direction == "horizontal"){
+    nrow <- 1
+    ncol <- length(grobs)
+    layout_heights <- max(heights)
+    layout_widths  <- widths + space
+  } else if (direction == "vertical"){
+    nrow <- length(grobs)
+    ncol <- 1
+    layout_heights <- heights + space
+    layout_widths  <- max(widths)
+  } else {
+    stop('"direction" should be "horizontal" or "vertical"')
+  }
+  # layout
+  layout <- grid::grid.layout(nrow = nrow, ncol = ncol, heights = layout_heights, widths = layout_widths)
+  combined_grobs <- frame_place_grobs(grobs, layout, widths, heights, direction = direction, gp, name)
   combined_grobs
 }

@@ -6,7 +6,6 @@ output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{how_to_make_a_poster}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -178,13 +177,21 @@ small <- grid::rectGrob(width=grid::unit(10, "mm"), height=grid::unit(10, "mm"),
 tall  <- grid::rectGrob(width=grid::unit(10, "mm"), height=grid::unit(20, "mm"), gp=grid::gpar(fill="red"))
 wide  <- grid::rectGrob(width=grid::unit(20, "mm"), height=grid::unit(10, "mm"), gp=grid::gpar(fill="blue"))
 large <- grid::rectGrob(width=grid::unit(20, "mm"), height=grid::unit(20, "mm"), gp=grid::gpar(fill="white"))
-apposed <- appose_grobs_conv(small, tall, wide, large, space=unit(2, "mm"))
-stacked <- stack_grobs_conv(small, tall, wide, large, space=unit(2, "mm"))
+  # apposed <- appose_grobs_conv(small, tall, wide, large, space=unit(2, "mm"))
+apposed <- combine_image_grobs(small, tall, wide, large, 
+                    direction = "horizontal", unify = "as_is", space = grid::unit(2, "mm"))
+
+  # stacked <- stack_grobs_conv(small, tall, wide, large, space=unit(2, "mm"))
+stacked <- combine_image_grobs(small, tall, wide, large, 
+                    direction = "vertical", unify = "as_is", space = grid::unit(2, "mm"))
+
 grid::grid.show.layout(apposed$frame$layout)  # show layout
 grid::grid.draw(apposed)
 
 grid::grid.newpage()
-combined <- appose_grobs_conv(apposed, stacked, space=unit(2, "mm"))
+  # combined <- appose_grobs_conv(apposed, apposed2, stacked, stacked2, space=unit(2, "mm"))
+combined <- 
+  combine_image_grobs(apposed, stacked, direction = "horizontal", unify = "as_is", space=unit(2, "mm"))
 grid::grid.draw(combined)
 ```
 
@@ -298,12 +305,20 @@ jpg_grobs <-
   system.file("extdata", ., package="ggposter") %>%
   purrr::map(jpeg::readJPEG) %>%
   purrr::map(grid::rasterGrob)
-fix_width_height <- appose_image_grobs(jpg_grobs, width=half, unify="height", space=space)
-fix_width_width  <- appose_image_grobs(jpg_grobs, width=half, unify="width",  space=space)
+
+  # fix_width_height <- appose_image_grobs(jpg_grobs, width=half, unify="height", space=space)
+  # fix_width_width  <- appose_image_grobs(jpg_grobs, width=half, unify="width",  space=space)
+fix_width_height <- combine_image_grobs(jpg_grobs, direction = "horizontal", width=half, unify="height", space=space)
+fix_width_width  <- combine_image_grobs(jpg_grobs, direction = "horizontal", width=half, unify="width",  space=space)
+
   # Can specify multiple image grobs (not a list of grobs) as shown below
   # appose_image_grobs(jpg_grob_1, jpg_grob_2, png_grob_1, width=half)
+
+  # stacked_image_grob <- 
+  #   stack_image_grobs(fix_width_height, fix_width_width, width=half, unify="width",space=space)
 stacked_image_grob <- 
-  stack_image_grobs(fix_width_height, fix_width_width, width=half, unify="width",space=space)
+  combine_image_grobs(fix_width_height, fix_width_width, direction = "vertical", width=half, unify="width",space=space)
+
 grid.draw(stacked_image_grob)
 ```
 
