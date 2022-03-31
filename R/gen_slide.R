@@ -170,5 +170,6 @@ appose_fig_text <- function(fig, text,
     text <- split_text_grob(text, width = widths[2], gp = gp)
   }
   # combine
-  appose_grobs(fig, text, space = space)
+  #   appose_grobs(fig, text, space = space)
+  combine_image_grobs(fig, text, direction = "horizontal", unify="as_is", space = space)
 }

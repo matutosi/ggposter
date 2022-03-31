@@ -18,7 +18,9 @@
 #'   gridExtra::tableGrob(rows = NULL)
 #' font_size_table <- fix_table_unit(font_size_table)
 #' base_size_table <- fix_table_unit(base_size_table)
-#' apposed_fixed <- appose_grobs(font_size_table, base_size_table, space = grid::unit(2, "mm"))
+#' apposed_fixed <- 
+#'      combine_image_grobs(font_size_table, base_size_table, 
+#'      direction = "horizontal", unify = "as_is", space = grid::unit(2, "mm"))
 #' grid::grid.draw(apposed_fixed)
 #'
 #' @export
@@ -41,8 +43,8 @@ fix_table_unit <- function(tg) {
 #'
 #' @name table_grob
 #' @export
-booktab_table_grob <- function(df, title = NULL, caption = NULL, fontsize = NULL, shrink = 1, lwd_out = 2,
-                               lwd_in = 1) {
+booktab_table_grob <- function(df, title = NULL, caption = NULL, 
+                               fontsize = NULL, shrink = 1, lwd_out = 2, lwd_in = 1) {
   if (is.null(fontsize)) {
     fontsize <- grid::get.gpar()$fontsize
   }
@@ -72,12 +74,11 @@ add_booktab <- function(tg, lwd_out = 2, lwd_in = 1) {
 #' @export
 add_btw_line <- function(tg, lwd_in = 1) {
   gtable::gtable_add_grob(tg,
-    grobs = grid::segmentsGrob(x0 = grid::unit(0, "npc"), y0 = grid::unit(
-      0,
-      "npc"
-    ), x1 = grid::unit(1, "npc"), y1 = grid::unit(0, "npc"), gp = grid::gpar(lwd = lwd_in)),
-    t = 1, b = 1, l = 1, r = ncol(tg)
-  )
+    grobs = grid::segmentsGrob(
+       x0 = grid::unit(0, "npc"), y0 = grid::unit(0, "npc"), 
+       x1 = grid::unit(1, "npc"), y1 = grid::unit(0, "npc"), 
+       gp = grid::gpar(lwd = lwd_in)),
+       t = 1, b = 1, l = 1, r = ncol(tg))
 }
 
 #' Add top and bottom line to table grob
@@ -87,17 +88,15 @@ add_btw_line <- function(tg, lwd_in = 1) {
 add_tb_line <- function(tg, lwd_out = 2, space = grid::unit(0.1, "mm")) {
   rect_height <- grid::unit(0.1, "mm")
   rg <- grid::rectGrob(width = sum(tg$widths), height = rect_height, gp = grid::gpar(lwd = lwd_out))
-  sg <- stack_grobs(rg, tg, rg, space = space)
+  sg <- combine_image_grobs(rg, tg, rg, direction = "vertical", unify = "width", space = space)
 }
 
 #' Add annotation to table grob
 #'
 #' @rdname table_grob
 #' @export
-add_annotation <- function(tg, title = NULL, caption = NULL, fontsize = NULL, shrink = 1, space = grid::unit(
-                             2,
-                             "mm"
-                           )) {
+add_annotation <- function(tg, title = NULL, caption = NULL, fontsize = NULL, 
+                           shrink = 1, space = grid::unit(2, "mm")) {
   if (is.null(title) & is.null(caption)) {
     return(tg)
   }
@@ -111,5 +110,5 @@ add_annotation <- function(tg, title = NULL, caption = NULL, fontsize = NULL, sh
   if (!is.null(caption)) {
     caption <- grid::textGrob(label = caption, x = 0, hjust = 0, gp = grid::gpar(fontsize = fontsize))
   }
-  stack_grobs(title, tg, caption, space = space)
+  combine_image_grobs(title, tg, caption, direction = "vertical", unify = "width", space = space)
 }

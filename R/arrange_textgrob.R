@@ -52,10 +52,9 @@ arrange_txt <- function(..., x = 0, y = 0.5, hjust = 0, vjust = 0.5, widths = gr
 tg2layout <- function(tg, widths = grid::unit(841, "mm"), heights = NULL, row_margin = 1.5 # height = height * row_margin
 ) {
   nrow <- length(tg)
-  grid::grid.layout(nrow, 1, widths = widths, heights = grid::unit(
-    rep(1.5, nrow), "grobheight",
-    tg
-  ))
+  grid::grid.layout(nrow, 1, 
+    widths = widths, 
+    heights = grid::unit(rep(1.5, nrow), "grobheight", tg))
 }
 
 #' Arrange text grob with layout.
