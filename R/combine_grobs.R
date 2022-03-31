@@ -1,5 +1,6 @@
 #' Combine grobs horizontally or vertically in a line.
 #' 
+#' 
 #' @param ...            grobs.
 #' @param direction      A string. "horizontal" or "vertical".
 #' @param height,width   A grid unit.
@@ -16,7 +17,7 @@
 #' 
 #' @return  A combined grobs.
 #' @export
-combine_image_grobs <- function(..., direction = "horizontal", 
+combine_grobs <- function(..., direction = "horizontal", 
                                 width = NULL, height = NULL, 
                                 grow = TRUE, unify = "width", 
                                 space = grid::unit(0, "mm"), 
@@ -63,7 +64,7 @@ combine_image_grobs <- function(..., direction = "horizontal",
   combined_grobs
 }
 
-#' @rdname combine_image_grobs
+#' @rdname combine_grobs
 #' @export
 frame_place_grobs <- function(grobs, layout, 
                               widths = NULL, heights = NULL, 
@@ -86,9 +87,9 @@ frame_place_grobs <- function(grobs, layout,
 
 #' Compute ratio_rev and ratio_expantion.
 #'
-#' This function is used in combine_image_grobs().
+#' This function is used in combine_grobs().
 #' @name compute_ratio
-#' @inheritParams combine_image_grobs
+#' @inheritParams combine_grobs
 #' @return        Numerics.
 #' @examples
 #' heights <- grid::unit(c(10, 20, 40), "mm")

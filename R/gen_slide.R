@@ -171,5 +171,5 @@ appose_fig_text <- function(fig, text,
   }
   # combine
   #   appose_grobs(fig, text, space = space)
-  combine_image_grobs(fig, text, direction = "horizontal", unify="as_is", space = space)
+  combine_grobs(fig, text, direction = "horizontal", unify="as_is", space = space)
 }

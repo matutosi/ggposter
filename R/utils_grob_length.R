@@ -1,4 +1,4 @@
-#' @rdname combine_image_grobs
+#' @rdname combine_grobs
 #' @export
 grob_widths <- function(grobs, convert_to=NULL){
   n <- length(grobs)
@@ -7,7 +7,7 @@ grob_widths <- function(grobs, convert_to=NULL){
   return(widths)
 }
 
-#' @rdname combine_image_grobs
+#' @rdname combine_grobs
 #' @export
 grob_heights <- function(grobs, convert_to=NULL){
   n <- length(grobs)

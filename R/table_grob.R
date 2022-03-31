@@ -19,7 +19,7 @@
 #' font_size_table <- fix_table_unit(font_size_table)
 #' base_size_table <- fix_table_unit(base_size_table)
 #' apposed_fixed <- 
-#'      combine_image_grobs(font_size_table, base_size_table, 
+#'      combine_grobs(font_size_table, base_size_table, 
 #'      direction = "horizontal", unify = "as_is", space = grid::unit(2, "mm"))
 #' grid::grid.draw(apposed_fixed)
 #'
@@ -88,7 +88,7 @@ add_btw_line <- function(tg, lwd_in = 1) {
 add_tb_line <- function(tg, lwd_out = 2, space = grid::unit(0.1, "mm")) {
   rect_height <- grid::unit(0.1, "mm")
   rg <- grid::rectGrob(width = sum(tg$widths), height = rect_height, gp = grid::gpar(lwd = lwd_out))
-  sg <- combine_image_grobs(rg, tg, rg, direction = "vertical", unify = "width", space = space)
+  sg <- combine_grobs(rg, tg, rg, direction = "vertical", unify = "width", space = space)
 }
 
 #' Add annotation to table grob
@@ -110,5 +110,5 @@ add_annotation <- function(tg, title = NULL, caption = NULL, fontsize = NULL,
   if (!is.null(caption)) {
     caption <- grid::textGrob(label = caption, x = 0, hjust = 0, gp = grid::gpar(fontsize = fontsize))
   }
-  combine_image_grobs(title, tg, caption, direction = "vertical", unify = "width", space = space)
+  combine_grobs(title, tg, caption, direction = "vertical", unify = "width", space = space)
 }
