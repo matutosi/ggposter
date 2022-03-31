@@ -1,33 +1,42 @@
 Package: ggposter
-Title: Poster creation tool for conference presentations using ggplot2 in R
+Title: Poster Creation Tool for Conference Presentations Using grid and
+    ggplot2 in R
 Version: 0.5.0
-Authors@R: person("Toshikazu", "Matsumura", role = c("aut", "cre"), email = "matutosi@gmail.com")
-Description: ggposter makes it easy to create a poster for conference presentations using ggplot2 in R. 
+Authors@R: 
+    person("Toshikazu", "Matsumura", , "matutosi@gmail.com", role = c("aut", "cre"))
+Description: ggposter makes it easy to create a poster for conference
+    presentations using ggplot2 in R.
 License: MIT + file LICENSE
-Encoding: UTF-8
-LazyData: true
+Depends: 
+    R (>= 3.5.0)
 Imports: 
+    cli,
     dplyr,
     ggplot2,
+    glue,
     grid,
     gridExtra,
     gridtext,
     gtable,
-    jpeg,
-    knitr,
+    lifecycle,
     magrittr,
     purrr,
     rlang,
     stringr,
     tibble,
     tidyr,
-    tidyselect,
-    utils
-VignetteBuilder: knitr
-RoxygenNote: 7.1.2
-Roxygen: list(markdown = TRUE)
-Depends: 
-    R (>= 3.5.0)
+    utils,
+    withr
 Suggests: 
+    jpeg,
+    knitr,
     rmarkdown,
+    testthat (>= 3.0.0),
     tidyverse
+VignetteBuilder: 
+    knitr
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Config/testthat/edition: 3

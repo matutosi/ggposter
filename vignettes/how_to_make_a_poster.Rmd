@@ -6,7 +6,6 @@ output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{how_to_make_a_poster}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -32,31 +31,31 @@ library(ggposter)
 
 ## Design policy of ggposter
 
-ggposter supports making a poster for academic conferences. 
+ggposter supports making a poster and slides for academic conferences. 
 The design policy of ggposter is to create small grobs and then attach them together like building blocks to complete a poster or slides. 
 This may not bring a smart solution and is likely to be inferior to other ways in terms of speed. 
-Nevertheless, ggposter makes it easy to create a poster.
+Nevertheless, ggposter makes easy to create a poster.
 We can also use parts of a poster for other slides and other presentation parts, and vice versa. 
 
 In ggposter, the sizes of the globs are fixed to a simple unit such as "mm". 
-Therefore, it may not be possible to use their original forms in ggposter as it is. 
+Therefore, it may not be possible to use original forms of code as it is. 
 However, it can be possible to reused with a little effort.
 
 ## Comparison with other packages
 
 Some R packages related to grid and ggplot2 can arrange the plots and grobs. 
 gridExtra, patchwork, and cowplot are well designed packages for arrangement. 
-These packages, however, are not designed for arrangement of strings, 
-thus I think few people make a poster and slides by these packages. 
+These packages, however, are not designed for arrangement of strings (text), 
+thus few people may make a poster and slides by these packages. 
 
 In gridExtra, we should decide the layout of parts in a poster before making. 
 In most cases, the layout of a poster will be decided and changed while making, at least for me. 
-In ggposter we do not need to decide the layout before making, 
+In ggposter we do not need to decide the complete layout before making, 
 because the layout in ggposter will be adjusted with the size (width and height) of grobs. 
 
 In patchwork and cowplot also do not need to decided the layout. 
-The size of plot will be resized to fit the hole width and/or height of viewport, which is an advantage for making document. 
-It is desirable for making a poster to unify the size of plot, figure, and font size of body text in the point of appearance.
+The size of plot will be resized to fit the hole width or height of viewport, which is an advantage for making document. 
+But, it is desirable in the point of appearance for making a poster to unify the size of plot, figure, and font size of body text.
 
 # Functions and settings in ggposter
 
@@ -87,12 +86,12 @@ space <- grid::unit(2, "mm")
 
 In ggposter, as a series of font size `font_size_list` is already set, 
 which include `base_size`, `ratio`, `font_name` `font_use`, `size`. 
-If we do not specify `base_size` in particular, `base_size` of 26 pt will be used.
+If we do not specify `base_size`, 26 pt will be used.
 We can select 8, 10, 12, 14, 18, 22, 26, 32, and 38 pt as a `base_size`. 
 I recommend users to use 22, 26 or 32 pt for a poster in a general use. 
-`font_use` express size easy to understand in a use of poster. 
+`font_use` express size to easily understand in a use of poster. 
 Name of `font_name` is like LaTeX from scriptsize to Huge, and HUGE that is originally added. 
-As described above, we can choose specify `base_size` or omit it. 
+As described above, we can choose to specify `base_size` or to omit it. 
 `font_use` or `font_name` are given as string name. 
 Then the font `size` used exactly in a poster will be selected automatically. 
 
@@ -120,7 +119,6 @@ Is this TRUE ???
 TODO: 
   - `font_size_list` should be speciefied as an argument in `arrange_txt()` and `get_font_size()`.    
 -->
-
 
 ```{r}
 base  <- c(8, 10, 12, 14, 18, 22, 26, 32, 38)
@@ -150,8 +148,7 @@ font_size_list <-
 
 We can combine grobs with appose_grobs() and stack_grobs(). 
 These functions generate a layout of grob arrangement and place grobs. 
-In this process, widths and heights of the grobs will be fixed into abstract unit ("mm"). 
-These functions keep abstract size of grobs. 
+In this process, widths and heights of the grobs will be converted into abstract unit ("mm"), and keep them. 
 
 <!-- 
   while appose_image_grobs() and stack_image_grobs() can change the size. 
@@ -173,20 +170,24 @@ TODO:
 
 
 Argument `space` is vertical (`appose_grobs_conv()`) or horizontal (`stack_grobs_conv()`) space between grobs. 
-`gp` (grid::gpar()) and `name` (A string) can be also given. 
+`gp` (grid::gpar()) and `name` (a string) can be also given. 
 
 ```{r appose_grobs, fig.width=8.3, out.width="100%"}
-small <- grid::rectGrob(width=unit(1, "cm"), height=unit(1, "cm"), gp=gpar(fill="black"))
-tall  <- grid::rectGrob(width=unit(1, "cm"), height=unit(2, "cm"), gp=gpar(fill="red"))
-wide  <- grid::rectGrob(width=unit(2, "cm"), height=unit(1, "cm"), gp=gpar(fill="blue"))
-large <- grid::rectGrob(width=unit(2, "cm"), height=unit(2, "cm"), gp=gpar(fill="white"))
-apposed <- appose_grobs_conv(small, tall, wide, large, space=unit(2, "mm"))
-stacked <- stack_grobs_conv(small, tall, wide, large, space=unit(2, "mm"))
+small <- grid::rectGrob(width=grid::unit(10, "mm"), height=grid::unit(10, "mm"), gp=grid::gpar(fill="black"))
+tall  <- grid::rectGrob(width=grid::unit(10, "mm"), height=grid::unit(20, "mm"), gp=grid::gpar(fill="red"))
+wide  <- grid::rectGrob(width=grid::unit(20, "mm"), height=grid::unit(10, "mm"), gp=grid::gpar(fill="blue"))
+large <- grid::rectGrob(width=grid::unit(20, "mm"), height=grid::unit(20, "mm"), gp=grid::gpar(fill="white"))
+apposed <- combine_grobs(small, tall, wide, large, 
+                    direction = "horizontal", unify = "as_is", space = grid::unit(2, "mm"))
+stacked <- combine_grobs(small, tall, wide, large, 
+                    direction = "vertical", unify = "as_is", space = grid::unit(2, "mm"))
+
 grid::grid.show.layout(apposed$frame$layout)  # show layout
 grid::grid.draw(apposed)
 
 grid::grid.newpage()
-combined <- appose_grobs_conv(apposed, stacked, space=unit(2, "mm"))
+combined <- 
+  combine_grobs(apposed, stacked, direction = "horizontal", unify = "as_is", space=unit(2, "mm"))
 grid::grid.draw(combined)
 ```
 
@@ -206,9 +207,9 @@ txt_title    <- "This is a title."
 txt_subt     <- "subt is for subtitle and keyword. "
 txt_author   <- "author is for author and affiliation. "
 txt_ITEM     <- "ITEM text is larger than item text."
-txt_item     <- "This is a item text, too."
+txt_item     <- "This is a item text too, but smaller than ITEM."
 txt_BODY     <- "BODY text is larger than body text."
-txt_body     <- "This is a body text, too."
+txt_body     <- "This is a body text too, but smaller than BODY."
 txt_caption  <- "caption is more smaller. "
 txt_footnote <- "This is footnote. "
 txt_script   <- "This is script. "
@@ -230,7 +231,7 @@ grid::grid.draw(font_size_example)
 We can make some ways to create a wrapped text grob, 
 such as `splitTextGrob()`, `split_text_grob()`, `gridtext::richtext_grob()`, and `gridtext::textbox_grob()`. 
 
-`splitTextGrob()` is 
+`splitTextGrob()` is based on 
 ["R Graphics" (1st edition) by Paul Murell]( https://www.stat.Auckland.ac.nz/~paul/RGraphics/rgraphics.html ), 
 which can change the width of text according to the viewport. 
 
@@ -263,7 +264,7 @@ grid::grid.draw(s_t_g)
 
 
 `richtext_grob()` and `textbox_grob()` provided by gridtext package, 
-which create 
+which can provide sophisticated formatting by handling basic markdown and HTML. 
 
 ```{r richtext_grob}
 rtg <- gridtext::richtext_grob(text)
@@ -276,16 +277,17 @@ grid::grid.draw(rtg)
 
 ## Combine image grobs
 
-As is in the case with combining strings shown above, we can combine images. 
-Images with different widths or heights can be unified into the same width or height as well as using the original ratio. 
+As is in the case with combining strings above, we can combine images. 
+Images with different widths or heights can be unified into the same width, height, or using the original ratio. 
 Four types of images exist in ggposter package. 
 We can import the images by function `system.file()` and `jpeg::readJPEG()` and convert them into grobs by `grid::rasterGrob()`
 
 Then we can combine image grobs using `appose_image_grobs()`. 
-Image grobs of list given to the function will be expanded into including image grobs. 
-We can multiple number and various types of image grobs such as jpg and png can be given as arguments. 
+List of image grobs given to the function will be expanded into including image grobs. 
+We can combine multiple and various types of image grobs, 
+such as jpg and png given as arguments. 
 
-Argument width or height species the hole size of a combined grob as return value. 
+Argument width or height specifies the hole size of a combined grob as return value. 
 Argument `unify="height"` means that the height of each image grob will be unified, `unify="width" means will be unified width. 
 Aspect ratio of the image grobs keep in original.
 
@@ -299,12 +301,14 @@ jpg_grobs <-
   system.file("extdata", ., package="ggposter") %>%
   purrr::map(jpeg::readJPEG) %>%
   purrr::map(grid::rasterGrob)
-fix_width_height <- appose_image_grobs(jpg_grobs, width=half, unify="height", space=space)
-fix_width_width  <- appose_image_grobs(jpg_grobs, width=half, unify="width",  space=space)
+
+fix_width_height <- combine_grobs(jpg_grobs, direction = "horizontal", width=half, unify="height", space=space)
+fix_width_width  <- combine_grobs(jpg_grobs, direction = "horizontal", width=half, unify="width",  space=space)
   # Can specify multiple image grobs (not a list of grobs) as shown below
   # appose_image_grobs(jpg_grob_1, jpg_grob_2, png_grob_1, width=half)
 stacked_image_grob <- 
-  stack_image_grobs(fix_width_height, fix_width_width, width=half, unify="width",space=space)
+  combine_grobs(fix_width_height, fix_width_width, direction = "vertical", width=half, unify="width",space=space)
+
 grid.draw(stacked_image_grob)
 ```
 
@@ -321,7 +325,10 @@ txt_BODY_44   <- "- Fix hole width and/or height of combined grob (argument: wid
 txt_BODY_45   <- "- gridtext::textbox_grob() will wrap strings (insert line breaks) longer than specified widht automatically."
 txt <- str_c(txt_ITEM_40, txt_BODY_41, txt_BODY_42, txt_BODY_43, txt_BODY_44, txt_BODY_45)
 image_description <- gridtext::textbox_grob(txt, width=half, use_markdown=FALSE)
-image_and_description <- stack_grobs_conv(image_description, stacked_image_grob, space=space)
+  # image_and_description <- stack_grobs_conv(image_description, stacked_image_grob, space=space)
+image_and_description <- 
+  combine_grobs(image_description, stacked_image_grob, direction = "vertical", unify = "as_is", space=space)
+
 grid.draw(image_and_description)
   # convertUnit(grobHeight(image_and_description), "in")
 ```
@@ -340,59 +347,28 @@ TODO:
 https://github.com/baptiste/gridExtra/blob/master/R/tableGrob.r
 -->
 
-We can make a table grob using `tableGrob()` in gridExtra, and draw it. 
-
-```{r make_table, fig.width=8.3, out.width="100%", fig.height=4}
-font_size_table <- 
-  font_size_list %>%
-  dplyr::filter(base_size==26) %>%
-  gridExtra::tableGrob(rows=NULL)
-
-base_size_table <- 
-  font_size_list %>%
-  dplyr::filter(ratio==1) %>%
-  gridExtra::tableGrob(rows=NULL)
-
-grid::grid.draw(font_size_table)
-```
-
-
-Since the widths and heights given by these function might not be correct, 
-thus the apposed or stacked table grob will be overwra. 
-I can not exactly identify the cause, maybe bug of the function `row_heighst()` and `col_widths`. 
-Thus, I can not suggest fundamental solution to it. 
-
-
-```{r apposed_table, fig.width=8.3, out.width="100%", fig.height=4}
-convertUnit(grobWidth(font_size_table), "mm")  # wrong unit
-convertUnit(grobWidth(base_size_table), "mm")  # wrong unit
-apposed <- appose_grobs(font_size_table, base_size_table, space=space)
-grid::grid.draw(apposed)
-```
-
-Using `fix_table_unit` make it possible to arrange table grobs at correct position. 
-This function fix width and height of a table grob, 
-so I recommend users not to use under other situations because of a table grob returned does not fit resized viewpot. 
-
-```{r fixed_apposed_table, fig.width=8.3, out.width="100%", fig.height=4}
-font_size_table <- fix_table_unit(font_size_table)
-base_size_table <- fix_table_unit(base_size_table)
-convertUnit(grobWidth(font_size_table), "mm")  # correct unit
-convertUnit(grobWidth(base_size_table), "mm")  # correct unit
-apposed_fixed <- appose_grobs(font_size_table, base_size_table, space=space)
-grid::grid.draw(apposed_fixed)
-```
-
 When we want make a table like booktab in LaTeX or in a academic journal, 
-
 Function `booktab_table_grob()` generate a booktab like table grob in a step. 
+
 
 ```{r fig.width=8.3, out.width="100%", fig.height=4}
 grid::grid.newpage()
 head(iris) %>%
-  booktab_table_grob(title="title words", caption="caption words") %>%
+  booktab_table_grob(title="title words", caption="caption words", fontsize=20, shrink=0.5) %>%
   grid::grid.draw()
+```
 
+```{r fig.width=8.3, out.width="100%", fig.height=4}
+font_size_table <- 
+  font_size_list %>%
+  dplyr::filter(base_size==26) %>%
+  booktab_table_grob(title="Font size of ggposter", fontsize=20, shrink=0.5)
+base_size_table <- 
+  font_size_list %>%
+  dplyr::filter(ratio==1) %>%
+  booktab_table_grob(title="Base font size of ggposter", caption="Font size increases every 1.2 times approximately.", fontsize=20, shrink=0.5)
+
+grid::grid.draw(combine_grobs(font_size_table, base_size_table, direction="horizontal", unify="as_is", space=grid::unit(10, "mm")))
 ```
 
 All `booktab_table_grob()` does is call `gridExtra::tableGrob()`, `add_booktab()`, and `add_annotation()`. 
@@ -404,17 +380,11 @@ See in detail at [Displaying tables as grid graphics]
 ```{r example_table, fig.width=8.3, out.width="100%", fig.height=4}
 grid::grid.newpage()
 head(iris) %>%
-  gridExtra::tableGrob(rows=NULL, theme=gridExtra::ttheme_minimal())  %>%
+  gridExtra::tableGrob(rows=NULL, theme=gridExtra::ttheme_minimal()) %>%
   add_booktab(lwd_out=2, lwd_in=1) %>%
+  add_annotation(title="title words", caption="caption words") %>%
   grid::grid.draw()
 ```
-
-
-<!--
-  - https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html   
-  - https://gedevan-aleksizde.github.io/rmarkdown-cookbook/kableextra.html   
-  - https://cran.r-project.org/web/packages/gridExtra/vignettes/tableGrob.html   
--->
 
 
 ## With ggplot2 
@@ -424,10 +394,10 @@ head(iris) %>%
 
 library(grid)
  # fig
-text <- 
-  "abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc"
+text <- stringr::str_c(rep("abc", 40), collapse=" ")
 
-space=grid::unit(1, "mm"); widths=grid::unit(rep(50, 2), "mm")
+space <- grid::unit(1, "mm")
+widths <- grid::unit(rep(50, 2), "mm")
 
 fig <- 
   ggplot2::ggplot(mpg, aes(x=displ, y=hwy)) + 
@@ -460,9 +430,8 @@ description_1 <-
     txt_body_31, txt_body_32, 
     widths=half)
 grid.newpage()
-grid.draw(appose_image_grobs(ggplot2::ggplotGrob(fig), description_1, unify="width"))
+grid.draw(combine_grobs(ggplot2::ggplotGrob(fig), description_1, direction="horizontal", unify="width"))
 ```
-
 
 
 ## With gridtext
@@ -485,9 +454,9 @@ Data `font_size_list` include various range of base size and relative font size 
 We change base of font size, then a series of font size will be changed. 
 
 The first part of string name ( "txt" in "txt_title" ) is arbitrary, 
-and second part is important because it decide font size. 
+and second part decides font size. 
 We can add third part like "txt_ITEM_10", which is arbitrary as well (see "Objectives" and "Conclusions" part). 
-It is simply used to avoid duplication in string name. 
+This part is simply used to avoid duplication in string name. 
 
 ```{r title}
 txt_title  <- "How to Make a Poster with ggposter Package in R"
@@ -560,17 +529,19 @@ conclusions <- arrange_txt(
 
 Arranged text grob generated by `arrange_txt()` can be apposed and/or stacked by `stack_grobs_conv()` and `appose_grobs_conv()`. 
 
-Objectives and backgrounds are stacked, and then stacked grob are apposed besides `conclusions`. 
+Objectives and backgrounds are stacked, and then apposed besides `conclusions`. 
 At Last, title will be stacked above objectives and backgrounds. 
 We can draw combined grob (part_1). 
-In this case, the paper size is A4, so you can check printed small manuscript. 
+In this case, the paper size is A4, so you can check small manuscript on a paper or your pc screen. 
 
 ```{r combine_part_1, fig.width=8.3, out.width="100%"}
+grid::grid.newpage()
 part_1 <- 
-  stack_grobs_conv(title, 
-    appose_grobs_conv(
-      stack_grob(objectives, backgrounds, space=space),
-      conclusions), space=space)
+  combine_grobs(title, 
+    combine_grobs(
+      combine_grobs(objectives, backgrounds, direction = "vertical", unify="as_is", space=space),
+      conclusions, direction = "horizontal", unify="as_is", space=space), 
+  direction = "vertical", unify="as_is", space=space)
 grid.draw(part_1)
 ```
 
@@ -605,18 +576,10 @@ fig_description <-
 " %>%
   gridtext::textbox_grob(width=0.5*half, use_markdown=FALSE)
 
-
-fig_apposed <- appose_grobs_conv(fig_font_size_grob, fig_description)
+fig_apposed <- combine_grobs(fig_font_size_grob, fig_description, direction="horizontal", unify="as_is")
 grid::grid.draw(fig_apposed)
 
 ```
-
-
-
-
-
-
-
 
 
 
@@ -629,7 +592,6 @@ table_iris <-
   add_booktab(lwd_out=2, lwd_in=1) %>%
   grid::grid.draw()
 table_description <- ""
-
 
 ```
 
@@ -735,6 +697,56 @@ http://www.sthda.com/english/wiki/wiki.php?id_contents=7930
 -->
 
 
+## Table grob
+
+We can make a table grob using `tableGrob()` in gridExtra, and draw it. 
+
+```{r make_table, fig.width=8.3, out.width="100%", fig.height=4}
+font_size_table <- 
+  font_size_list %>%
+  dplyr::filter(base_size==26) %>%
+  gridExtra::tableGrob(rows=NULL)
+
+base_size_table <- 
+  font_size_list %>%
+  dplyr::filter(ratio==1) %>%
+  gridExtra::tableGrob(rows=NULL)
+
+grid::grid.draw(font_size_table)
+```
+
+Since the widths and heights given by these function might not be correct, 
+thus the apposed or stacked table grob will be overwrapped. 
+I can not exactly identify the code that causes this, I can not suggest fundamental solution to it. 
+<!-- maybe bug of the function `row_heighst()` and `col_widths`.  -->
+
+
+```{r apposed_table, fig.width=8.3, out.width="100%", fig.height=4}
+convertUnit(grobWidth(font_size_table), "mm")  # wrong unit
+convertUnit(grobWidth(base_size_table), "mm")  # wrong unit
+apposed <- combine_grobs(font_size_table, base_size_table, direction="horizontal", unify="as_is", space=space)
+grid::grid.draw(apposed)
+```
+
+Using `fix_table_unit` make it possible to arrange table grobs at correct position. 
+This function fix width and height of a table grob, 
+so I recommend users not to use under other situations because of a table grob returned does not fit resized viewpot. 
+
+```{r fixed_apposed_table, fig.width=8.3, out.width="100%", fig.height=4}
+font_size_table <- fix_table_unit(font_size_table)
+base_size_table <- fix_table_unit(base_size_table)
+convertUnit(grobWidth(font_size_table), "mm")  # correct unit
+convertUnit(grobWidth(base_size_table), "mm")  # correct unit
+
+apposed_fixed <- combine_grobs(font_size_table, base_size_table, direction="horizontal", unify="as_is", space=space)
+grid::grid.draw(apposed_fixed)
+```
+
+<!--
+  - https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html   
+  - https://gedevan-aleksizde.github.io/rmarkdown-cookbook/kableextra.html   
+  - https://cran.r-project.org/web/packages/gridExtra/vignettes/tableGrob.html   
+-->
 
 
 # References
@@ -775,10 +787,10 @@ rlogo <-
     system.file("extdata", "Rlogo.png", package = "gridtext") %>%
   png::readPNG() %>%
   grid::rasterGrob()
-grid::grid.draw(appose_image_grobs(rlogo, rlogo, rlogo, space=grid::unit(1, "mm"), unify="as_is"))
+grid::grid.draw(combine_grobs(rlogo, rlogo, rlogo, direction = "horizontal", space=grid::unit(1, "mm"), unify="as_is"))
 
 rlogo$width <- grid::unit(20, "mm")
-grid::grid.draw(appose_image_grobs(rlogo, rlogo, rlogo, space=grid::unit(1, "mm"), unify="as_is"))
+grid::grid.draw(combine_grobs(rlogo, rlogo, rlogo, direction = "horizontal", space=grid::unit(1, "mm"), unify="as_is"))
 
 
 
@@ -826,7 +838,7 @@ because grobHeight() and grobWidth() become 0 mm !!
 
   grid.draw(t1)
 
-  t2 <- appose_image_grobs(t1, t1)
+  t2 <- combine_grobs(t1, t1, direction="horizontal", unify="as_is")
   grid::grid.show.layout(t2$frame$layout)
   grid::grid.draw(t2)
 
