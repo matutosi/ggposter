@@ -420,7 +420,7 @@ fontsize <- 30
 lineheight <- 1.1
 gp_text <- grid::gpar(fontsize=fontsize, lineheight=lineheight)
  # generate slide and draw
-slide <- gen_slide(title, fig, description, gp_title, gp_text, width=half * shrink)
+slide <- gen_slide(title, fig, description, gp_title, gp_text, width=half)
 grid.newpage()
 grid::grid.draw(slide)
 
