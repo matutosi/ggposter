@@ -507,6 +507,13 @@ backgrounds <- arrange_txt(
   txt_ITEM_20, 
   txt_BODY_21, txt_BODY_22, txt_BODY_23, 
   widths=half, shrink=0.25)
+
+grid::grid.show.layout(objectives$frame$layout)
+grid::grid.show.layout(backgrounds$frame$layout)
+grid.draw(objectives)
+grid.newpage()
+grid.draw(objectives)
+
 ```
 
 ## Conclusions
