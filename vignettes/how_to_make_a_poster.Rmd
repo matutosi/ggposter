@@ -25,6 +25,12 @@ library(tidyverse)
 library(grid)
 library(gridExtra)
 library(ggposter)
+
+library(knitr)
+opts_template$set(
+  fig_small = list(out.width = 200, out.height = 200),
+  fig_large = list(out.width = 500, out.height = 500)
+)
 ```
 
 # Overview
@@ -268,9 +274,7 @@ which can provide sophisticated formatting by handling basic markdown and HTML.
 ```{r richtext_grob}
 rtg <- gridtext::richtext_grob(text)
 tbg <- gridtext::textbox_grob(text)
-grid::grid.draw(rtg)
-grid::grid.newpage()
-grid::grid.draw(rtg)
+grid::grid.draw(combine_grobs(rtg, tbg, direction = "vertical", unify = "as_is", space = space * 10))
 ```
 
 
@@ -339,6 +343,13 @@ TODO:
 
 -->
 
+```{r opts.label="fig_small"}
+grid.draw(stacked_image_grob)
+
+```{r opts.label="fig_large"}
+grid.draw(stacked_image_grob)
+```
+
 
 ## Use table
 
@@ -389,7 +400,7 @@ head(iris) %>%
 ## With ggplot2 
   # (and cowplot)
 
-```{r ggplot2}
+```{r ggplot2, fig.width=8.3, out.width="100%"}
 
 library(grid)
  # fig
