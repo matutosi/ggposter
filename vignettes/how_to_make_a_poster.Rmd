@@ -26,11 +26,7 @@ library(grid)
 library(gridExtra)
 library(ggposter)
 
-library(knitr)
-opts_template$set(
-  fig_small = list(out.width = 200, out.height = 200),
-  fig_large = list(out.width = 500, out.height = 500)
-)
+knitr::opts_chunk$set(out.width="25%")
 ```
 
 # Overview
@@ -342,14 +338,6 @@ TODO:
  - Usign `stack_image_grob()` make a solution???   
 
 -->
-
-```{r opts.label="fig_small"}
-grid.draw(stacked_image_grob)
-
-```{r opts.label="fig_large"}
-grid.draw(stacked_image_grob)
-```
-
 
 ## Use table
 
