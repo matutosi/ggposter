@@ -58,16 +58,30 @@ We can set chunk option to achieve this reduction.
 When we do not need to show or print A0 whole poster image, we can use `opts.label="part"` to print a part of poster. 
 
 ```{r setup_chunk_option}
+  # set fook
+prow = function(before, options, envir) {
+    if (before) {
+    } else { # run after a chunk
+        paste0(c("<p>length of this code: ", length(options$code), "and ", knitr::opts_chunk$get(fig.width), "</p>"))
+        knitr::opts_chunk$get(fig.width)
+    }
+}
+knitr::knit_hooks$set(prow = prow)
+
   # chunk option
 fig.width  <- full_w / 25.4
 out.width  <- "100%"
 fig.height <- 8
-knitr::opts_chunk$set(fig.width = fig.width, out.width = out.width, fig.height = fig.height)
+cache <- TRUE
+prow <- TRUE
+knitr::opts_chunk$set(fig.width = fig.width, out.width = out.width, fig.height = fig.height, cache = cache, prow = prow)
+
 
   # chunk template
-knitr::opts_template$set(
-  part = list(fig.width=8.3, out.width="100%")
-)
+fig.width <- 8.3
+out.width <- "100%"
+cache <- TRUE
+knitr::opts_template$set(part = list(fig.width = fig.width, out.width = out.width, cache = cache, prow = prow))
 ```
 
 # Overview
