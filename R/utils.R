@@ -13,7 +13,7 @@ dots2list <- function(...){
 #' @export
 same <- function(...){
   res <- stringr::str_c("list(", as_same(...), ")")
-  eval(parse(text=res))
+  parse(text=res)
 }
 
 #' @rdname same
@@ -26,6 +26,7 @@ as_same <- function(...){
 }
 
 #' @rdname same
+#' @parm x A string.
 #' @export
 rep_args <- function(x) stringr::str_c(x, " = ", x)
 
