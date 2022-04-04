@@ -8,28 +8,6 @@ dots2list <- function(...){
   return(res)
 }
 
-#' Same Argument Manipulation and Evaluation
-#' @param ... Vectors or a list.
-#' @export
-same <- function(...){
-  res <- stringr::str_c("list(", as_same(...), ")")
-  parse(text=res)
-}
-
-#' @rdname same
-#' @export
-as_same <- function(...){
-  rlang::exprs(...) %>%
-    purrr::map(rep_args) %>%
-    as.character() %>%
-    stringr::str_c(collapse = ", ")
-}
-
-#' @rdname same
-#' @parm x A string.
-#' @export
-rep_args <- function(x) stringr::str_c(x, " = ", x)
-
 #' @importFrom grid grobName
 #' @export
 grid:::grobName
