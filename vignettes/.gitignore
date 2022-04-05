@@ -1,2 +1,5 @@
 *.html
 *.R
+how_to_make_a_poster_cache/
+how_to_make_a_poster.Rmd
+how_to_make_a_poster.knit.md

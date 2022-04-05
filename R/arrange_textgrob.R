@@ -24,7 +24,9 @@
 #' grid::grid.draw(arranged_txt_2)
 #'
 #' @export
-arrange_txt <- function(..., x = 0, y = 0.5, hjust = 0, vjust = 0.5, widths = grid::unit(841, "mm"),
+arrange_txt <- function(..., x = 0, y = 0.5,
+                        hjust = 0, vjust = 0.5,
+                        widths = grid::unit(841, "mm"),
                         convert = FALSE, shrink = 1, silent = TRUE) {
   widths <- widths * shrink
   tbl <- txt2tibble(...)
@@ -52,8 +54,8 @@ arrange_txt <- function(..., x = 0, y = 0.5, hjust = 0, vjust = 0.5, widths = gr
 tg2layout <- function(tg, widths = grid::unit(841, "mm"), heights = NULL, row_margin = 1.5 # height = height * row_margin
 ) {
   nrow <- length(tg)
-  grid::grid.layout(nrow, 1, 
-    widths = widths, 
+  grid::grid.layout(nrow, 1,
+    widths = widths,
     heights = grid::unit(rep(1.5, nrow), "grobheight", tg))
 }
 

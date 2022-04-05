@@ -8,7 +8,6 @@ dots2list <- function(...){
   return(res)
 }
 
-
 #' @importFrom grid grobName
 #' @export
 grid:::grobName
