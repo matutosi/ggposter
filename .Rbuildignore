@@ -5,3 +5,4 @@
 ^LICENSE\.md$
 ^ggposter\.Rproj$
 /tools
+^README\.Rmd$
