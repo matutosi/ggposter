@@ -59,14 +59,18 @@ When we do not need to show or print A0 whole poster image, we can use `opts.lab
 
 ```{r setup_chunk_option}
   # set fook
+  #   https://bookdown.org/yihui/rmarkdown-cookbook/show-header.html
 prow = function(before, options, envir) {
-    if (before) {
-    } else { # run after a chunk
-        paste0(c("<p>length of this code: ", length(options$code), "and ", knitr::opts_chunk$get(fig.width), "</p>"))
-        knitr::opts_chunk$get(fig.width)
-    }
+  if (is.null(indent <- options$indent)) indent <- ''
+  opts <- gsub(', wrapper=TRUE', '', options$params.src)
+  if (before) {
+    sprintf('\n\n%s````\n```{r,%s}\n````\n', indent, opts)
+  } else {
+    sprintf('\n\n%s````\n```\n````\n', indent)
+  }
 }
 knitr::knit_hooks$set(prow = prow)
+
 
   # chunk option
 fig.width  <- full_w / 25.4
