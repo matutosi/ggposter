@@ -4,5 +4,7 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^ggposter\.Rproj$
-/tools
+tools
 ^README\.Rmd$
+^vignettes/.*\.html$
+vignettes/how_to_make_a_poster_cache
