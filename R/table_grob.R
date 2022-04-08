@@ -63,7 +63,7 @@ booktab_table_grob <- function(df, title = NULL, caption = NULL,
 #' @export
 add_booktab <- function(tg, lwd_out = 2, lwd_in = 1) {
   tg %>%
-    add_btw_line(lwd_in = lwd_in) %>%
+    add_btween_line(lwd_in = lwd_in) %>%
     fix_table_unit() %>%
     add_tb_line(lwd_out = lwd_out)
 }
@@ -72,7 +72,7 @@ add_booktab <- function(tg, lwd_out = 2, lwd_in = 1) {
 #'
 #' @rdname table_grob
 #' @export
-add_btw_line <- function(tg, lwd_in = 1) {
+add_btween_line <- function(tg, lwd_in = 1) {
   gtable::gtable_add_grob(tg,
     grobs = grid::segmentsGrob(
        x0 = grid::unit(0, "npc"), y0 = grid::unit(0, "npc"), 
@@ -95,8 +95,7 @@ add_tb_line <- function(tg, lwd_out = 2, space = grid::unit(0.1, "mm")) {
 #'
 #' @rdname table_grob
 #' @export
-add_annotation <- function(tg, title = NULL, caption = NULL, fontsize = NULL, 
-                           shrink = 1, space = grid::unit(2, "mm")) {
+add_annotation <- function(tg, title = NULL, caption = NULL, fontsize = NULL, shrink = 1, space = NULL) {
   if (is.null(title) & is.null(caption)) {
     return(tg)
   }
@@ -109,6 +108,9 @@ add_annotation <- function(tg, title = NULL, caption = NULL, fontsize = NULL,
   }
   if (!is.null(caption)) {
     caption <- grid::textGrob(label = caption, x = 0, hjust = 0, gp = grid::gpar(fontsize = fontsize))
+  }
+  if (is.null(space)) {
+    space <- grob_heights(caption, convert_to="mm") * 0.1
   }
   combine_grobs(title, tg, caption, direction = "vertical", unify = "width", space = space)
 }
