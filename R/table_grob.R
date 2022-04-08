@@ -63,16 +63,16 @@ booktab_table_grob <- function(df, title = NULL, caption = NULL,
 #' @export
 add_booktab <- function(tg, lwd_out = 2, lwd_in = 1) {
   tg %>%
-    add_btween_line(lwd_in = lwd_in) %>%
+    add_inner_line(lwd_in = lwd_in) %>%
     fix_table_unit() %>%
-    add_tb_line(lwd_out = lwd_out)
+    add_outer_line(lwd_out = lwd_out)
 }
 
 #' Add line between colnames and values to table grob
 #'
 #' @rdname table_grob
 #' @export
-add_btween_line <- function(tg, lwd_in = 1) {
+add_inner_line <- function(tg, lwd_in = 1) {
   gtable::gtable_add_grob(tg,
     grobs = grid::segmentsGrob(
        x0 = grid::unit(0, "npc"), y0 = grid::unit(0, "npc"), 
@@ -85,7 +85,7 @@ add_btween_line <- function(tg, lwd_in = 1) {
 #'
 #' @rdname table_grob
 #' @export
-add_tb_line <- function(tg, lwd_out = 2, space = grid::unit(0.1, "mm")) {
+add_outer_line <- function(tg, lwd_out = 2, space = grid::unit(0.1, "mm")) {
   rect_height <- grid::unit(0.1, "mm")
   rg <- grid::rectGrob(width = sum(tg$widths), height = rect_height, gp = grid::gpar(lwd = lwd_out))
   sg <- combine_grobs(rg, tg, rg, direction = "vertical", unify = "width", space = space)
@@ -110,7 +110,9 @@ add_annotation <- function(tg, title = NULL, caption = NULL, fontsize = NULL, sh
     caption <- grid::textGrob(label = caption, x = 0, hjust = 0, gp = grid::gpar(fontsize = fontsize))
   }
   if (is.null(space)) {
-    space <- grob_heights(caption, convert_to="mm") * 0.1
+    space_t <- if (is.null(title))   grid::unit(0, "mm") else grob_heights(title,   convert_to="mm")
+    space_c <- if (is.null(caption)) grid::unit(0, "mm") else grob_heights(caption, convert_to="mm")
+    space <- min(space_t, space_c) * 0.1
   }
   combine_grobs(title, tg, caption, direction = "vertical", unify = "width", space = space)
 }
