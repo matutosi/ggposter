@@ -77,6 +77,7 @@ fig.width  <- full_w / 25.4
 out.width  <- "100%"
 fig.height <- 8
 cache <- TRUE
+cache <- FALSE
 prow <- TRUE
 knitr::opts_chunk$set(fig.width = fig.width, out.width = out.width, fig.height = fig.height, cache = cache, prow = prow)
 
@@ -84,7 +85,6 @@ knitr::opts_chunk$set(fig.width = fig.width, out.width = out.width, fig.height =
   # chunk template
 fig.width <- 8.3
 out.width <- "100%"
-cache <- TRUE
 knitr::opts_template$set(part = list(fig.width = fig.width, out.width = out.width, cache = cache, prow = prow))
 
 fig.width <- 4
@@ -92,6 +92,12 @@ out.width <- "50%"
 fig.height <- 4
 out.height <- "50%"
 knitr::opts_template$set(small = list(fig.width = fig.width, out.width = out.width, fig.height = fig.height, out.height = out.height, cache = cache, prow = prow))
+
+fig.width <- 4
+out.width <- "50%"
+fig.height <- 2
+out.height <- "50%"
+knitr::opts_template$set(wide = list(fig.width = fig.width, out.width = out.width, fig.height = fig.height, out.height = out.height, cache = cache, prow = prow))
 ```
 
 # Overview
@@ -278,7 +284,7 @@ such as `splitTextGrob()`, `split_text_grob()`, `gridtext::richtext_grob()`, and
 ["R Graphics" (1st edition) by Paul Murell]( https://www.stat.Auckland.ac.nz/~paul/RGraphics/rgraphics.html ), 
 which can change the width of text according to the viewport. 
 
-```{r, opts.label="small"}
+```{r, opts.label="wide"}
 t_1 <- "This is a sample text. "
 t_2 <- "When longer than viewport width, "
 t_3 <- "text will be split and add a break. "
@@ -300,7 +306,7 @@ This advantage can be disadvantage when we want fixed size grob like making a po
 `split_text_grob()` is slightly modified based on `splitTextGrob()`, 
 which generate wrapped text grob with fixed text width. 
 
-```{r, opts.label="small"}
+```{r, opts.label="wide"}
 s_t_g <- split_text_grob(text, width=grid::unit(80, "mm"))
 grid::grid.draw(s_t_g)
 ```
@@ -309,7 +315,7 @@ grid::grid.draw(s_t_g)
 `richtext_grob()` and `textbox_grob()` provided by gridtext package, 
 which can provide sophisticated formatting by handling basic markdown and HTML. 
 
-```{r richtext_grob, opts.label="small"}
+```{r richtext_grob, opts.label="wide"}
 rtg <- gridtext::richtext_grob(text)
 tbg <- gridtext::textbox_grob(text)
 grid::grid.draw(combine_grobs(rtg, tbg, direction = "vertical", unify = "as_is", space = space * 10))
@@ -365,13 +371,11 @@ txt_BODY_43   <- "- Unify height or width of images (argument: unify).<br>"
 txt_BODY_44   <- "- Fix hole width and/or height of combined grob (argument: width, height).<br>"
 txt_BODY_45   <- "- gridtext::textbox_grob() will wrap strings (insert line breaks) longer than specified widht automatically."
 txt <- str_c(txt_ITEM_40, txt_BODY_41, txt_BODY_42, txt_BODY_43, txt_BODY_44, txt_BODY_45)
-image_description <- gridtext::textbox_grob(txt, width=half * shrink, use_markdown=FALSE)
-  # image_and_description <- stack_grobs_conv(image_description, stacked_image_grob, space=space)
+image_description <- gridtext::textbox_grob(txt, width=half * shrink, gp = gpar(fontsize = 30), use_markdown=FALSE)
 image_and_description <- 
-  combine_grobs(image_description, stacked_image_grob, direction = "vertical", unify = "as_is", space=space)
+  combine_grobs(image_description, fix_width_height, direction = "vertical", unify = "as_is", space=space)
 
 grid.draw(image_and_description)
-  # convertUnit(grobHeight(image_and_description), "in")
 ```
 
 <!--
@@ -394,11 +398,12 @@ Function `booktab_table_grob()` generate a booktab like table grob in a step.
 ```{r opts.label="small"}
 grid::grid.newpage()
 head(iris) %>%
-  booktab_table_grob(title="title words", caption="caption words", fontsize=20, shrink=0.5) %>%
+  booktab_table_grob(title="title words", caption="caption words", fontsize=12) %>%
   grid::grid.draw()
 ```
 
 ```{r opts.label="small"}
+
 font_size_table <- 
   font_size_list %>%
   dplyr::filter(base_size==26) %>%
