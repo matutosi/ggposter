@@ -393,13 +393,15 @@ https://github.com/baptiste/gridExtra/blob/master/R/tableGrob.r
 
 When we want make a table like booktab in LaTeX or in a academic journal, 
 Function `booktab_table_grob()` generate a booktab like table grob in a step. 
-
+We can add title and caption to a table. 
+Font size of title is larger than that of table body and caption. 
 
 ```{r}
-title <- str_c(rep("Title words. ", 10), collapse="")
-caption <- str_c(rep("caption words. ", 10), collapse="")
+fontsize <- 36
+title <- str_c(rep("Title words. ", 5), collapse="")
+caption <- str_c(rep("caption words. ", 5), collapse="")
 head(iris) %>%
-  booktab_table_grob(title = title, caption = caption, fontsize=26) %>%
+  booktab_table_grob(title = title, caption = caption, fontsize=fontsize) %>%
   grid::grid.draw()
 ```
 
@@ -407,18 +409,18 @@ head(iris) %>%
 font_size_table <- 
   font_size_list %>%
   dplyr::filter(base_size==26) %>%
-  booktab_table_grob(title="Font size of ggposter", fontsize=26)
+  booktab_table_grob(title="Font size of ggposter", fontsize=fontsize)
 base_size_table <- 
   font_size_list %>%
   dplyr::filter(ratio==1) %>%
   booktab_table_grob(title="Base font size of ggposter", 
     caption="Font size increases every 1.2 times approximately.", 
-    fontsize=26)
+    fontsize=fontsize)
 
 grid::grid.draw(
   combine_grobs(
     font_size_table, base_size_table, 
-    direction="horizontal", unify="as_is", space=grid::unit(10, "mm")))
+    direction="horizontal", unify="as_is", space=grid::unit(20, "mm")))
 ```
 
 All `booktab_table_grob()` does is call `gridExtra::tableGrob()`, `add_booktab()`, and `add_annotation()`. 
@@ -432,9 +434,9 @@ opts.label="small"
 -->
 ```{r example_table}
 head(iris) %>%
-  gridExtra::tableGrob(rows=NULL, theme=gridExtra::ttheme_minimal()) %>%
+  gridExtra::tableGrob(rows=NULL, theme=gridExtra::ttheme_minimal(base_size = fontsize)) %>%
   add_booktab(lwd_out=2, lwd_in=1) %>%
-  add_annotation(title="title words", caption="caption words", fontsize=26) %>%
+  add_annotation(title="title words", caption="caption words", fontsize=fontsize) %>%
   grid::grid.draw()
 ```
 
