@@ -95,24 +95,26 @@ add_outer_line <- function(tg, lwd_out = 2, space = grid::unit(0.1, "mm")) {
 #'
 #' @rdname table_grob
 #' @export
-add_annotation <- function(tg, title = NULL, caption = NULL, fontsize = NULL, shrink = 1, space = NULL) {
-  if (is.null(title) & is.null(caption)) {
-    return(tg)
-  }
-  if (is.null(fontsize)) {
-    fontsize <- grid::get.gpar()$fontsize
-  }
+add_annotation <- function(tg, title = NULL, caption = NULL, fontsize = NULL, space = NULL) {
+  if (is.null(title) & is.null(caption)) return(tg)
+  if (is.null(fontsize)) fontsize <- grid::get.gpar()$fontsize
   if (!is.null(title)) {
-    title <- grid::textGrob(label = title, x = 0, hjust = 0, gp = grid::gpar(fontsize = fontsize *
-      1.5))
+    title <- 
+      gridtext::textbox_grob(
+        text = title, width = grob_widths(tg), x = 0, hjust = 0, 
+        gp = grid::gpar(fontsize = fontsize * 1.5), use_markdown = FALSE)
   }
   if (!is.null(caption)) {
-    caption <- grid::textGrob(label = caption, x = 0, hjust = 0, gp = grid::gpar(fontsize = fontsize))
+    caption <- 
+      gridtext::textbox_grob(
+        text = caption, width = grob_widths(tg), x = 0, hjust = 0, 
+        gp = grid::gpar(fontsize = fontsize), use_markdown = FALSE)
   }
   if (is.null(space)) {
-    space_t <- if (is.null(title))   grid::unit(0, "mm") else grob_heights(title,   convert_to="mm")
-    space_c <- if (is.null(caption)) grid::unit(0, "mm") else grob_heights(caption, convert_to="mm")
-    space <- min(space_t, space_c) * 0.1
+    min_ratio <- 0.2 # 
+    space_t <- if (is.null(title))   grid::unit(0, "mm") else grob_heights(title,   convert_to="mm") * min_ratio
+    space_c <- if (is.null(caption)) grid::unit(0, "mm") else grob_heights(caption, convert_to="mm") * min_ratio
+    space <- min(space_t, space_c, grid::unit(1, "mm"))
   }
-  combine_grobs(title, tg, caption, direction = "vertical", unify = "width", space = space)
+  combine_grobs(title, tg, caption, direction = "vertical", unify = "as_is", space = space)
 }

@@ -396,7 +396,6 @@ Function `booktab_table_grob()` generate a booktab like table grob in a step.
 
 
 ```{r opts.label="small"}
-grid::grid.newpage()
 head(iris) %>%
   booktab_table_grob(title="title words", caption="caption words", fontsize=12) %>%
   grid::grid.draw()
@@ -423,7 +422,6 @@ See in detail at [Displaying tables as grid graphics]
 
 
 ```{r example_table, opts.label="small"}
-grid::grid.newpage()
 head(iris) %>%
   gridExtra::tableGrob(rows=NULL, theme=gridExtra::ttheme_minimal()) %>%
   add_booktab(lwd_out=2, lwd_in=1) %>%
