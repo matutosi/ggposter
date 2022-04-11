@@ -151,23 +151,23 @@ shrink_font <- function(gg, shrink) {
 #'
 #' @export
 appose_fig_text <- function(fig, text, 
-                            space = grid::unit(1, "mm"), 
-                            widths = grid::unit(rep(50, 2), "mm"), 
+                            space = grid::unit(2, "mm"), 
+                            widths = grid::unit(c(60, 180), "mm"), 
                             fontsize = NULL, shrink = 1) {
   # set font size
-  if (is.null(fontsize)) {
-    fontsize <- grid::get.gpar()$fontsize
-  }
-  # convert fig and fix size
-  if (!grid::is.grob(fig)) {
-    fig <- set_font_size(fig, fontsize)
+  if (is.null(fontsize))
+      fontsize <- grid::get.gpar()$fontsize
+  # convert fig
+  if (! grid::is.grob(fig)) {
+    fig <- set_font_size(fig, fontsize * 0.6)
     fig <- ggplot2::ggplotGrob(fig)
   }
+  # fix size
   fig <- fix_size(fig, width = widths[1], shrink = shrink)
   # convert text
   if (!grid::is.grob(text)) {
     gp <- grid::gpar(fontsize = fontsize * shrink)
-    text <- split_text_grob(text, width = widths[2], gp = gp)
+    text <- gridtext::textbox_grob(text, width = widths[2], gp = gp)
   }
   # combine
   #   appose_grobs(fig, text, space = space)
