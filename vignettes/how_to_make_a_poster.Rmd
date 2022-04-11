@@ -452,7 +452,7 @@ Using ggplot2::ggplotGrob(), we can convert ggplot2 objects into grobs and
 some functions in ggposter use this function (see inside ggposter). 
 appose_fig_text() can combine horizontally ggplot2 figure and text as shown below. 
 
-While default widths of fig and text is grid::unit(c(60, 240), "mm"), 
+While default widths of fig and text is grid::unit(c(80, 210), "mm"), 
 we can change it using argument widths. 
 
 ```{r ggplot2}
@@ -466,23 +466,44 @@ ftg <- appose_fig_text(fig, text, fontsize = 26)
 grid::grid.draw(ftg)
 
 grid::grid.newpage()
-ftg <- appose_fig_text(fig, text, widths = grid::unit(c(80, 160), "mm"), fontsize = 26)
+ftg <- appose_fig_text(fig, text, widths = grid::unit(c(120, 170), "mm"), fontsize = 26)
 grid::grid.draw(ftg)
 ```
 
+We can convert ggplot2 object using ggplot2grob() and combine them by combine_grobs as shown below. 
 
-ggplot2grob <- function(gg, fontsize){
-  
-}
 
+```{r ggplot2grob}
+  # create figures with ggplot2
+fig_mtcars <- 
+  ggplot2::ggplot(mpg, aes(x = displ, y = hwy)) + 
+  geom_point() + 
+  theme_bw()
+fig_iris <- 
+  ggplot2::ggplot(iris, aes(Sepal.Length, y = Petal.Length, shape = Species)) + 
+  geom_point() + 
+  theme_bw() + 
+  theme(legend.position = c(1, 0), legend.justification = c(1, 0)) + 
+  theme(legend.background = element_rect(colour = "black"))
+fig_diamonds <- 
+  ggplot2::ggplot(diamonds, aes(y = carat,x=cut)) + 
+  geom_boxplot() + 
+  theme_bw()
+
+  # comvert and combine figures
+combined_figs <- 
+  list(fig_mtcars, fig_iris, fig_diamonds) %>%
+  purrr::map(ggplot2grob, width = half / 3) %>%
+  combine_grobs(direction = "horizontal", unify = "as_is")
+
+grid::grid.draw(combined_figs)
+```
 
 ## With gridtext
 
-
-```{r gridtext}
-
-```
-
+ggposter use functions from gridtext package, which generate grob. 
+The package improve making poster more than using only ggposer, 
+so please use functions such as gridtext::textbox_grob() and gridtext::richtext_grob() (see https://wilkelab.org/gridtext/). 
 
 
 # Example: ggposter
