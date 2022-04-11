@@ -77,6 +77,7 @@ fig.width  <- full_w / 25.4
 out.width  <- "100%"
 fig.height <- 8
 cache <- TRUE
+cache <- FALSE
 prow <- TRUE
 knitr::opts_chunk$set(fig.width = fig.width, out.width = out.width, fig.height = fig.height, cache = cache, prow = prow)
 
@@ -84,7 +85,6 @@ knitr::opts_chunk$set(fig.width = fig.width, out.width = out.width, fig.height =
   # chunk template
 fig.width <- 8.3
 out.width <- "100%"
-cache <- TRUE
 knitr::opts_template$set(part = list(fig.width = fig.width, out.width = out.width, cache = cache, prow = prow))
 
 fig.width <- 4
@@ -92,6 +92,12 @@ out.width <- "50%"
 fig.height <- 4
 out.height <- "50%"
 knitr::opts_template$set(small = list(fig.width = fig.width, out.width = out.width, fig.height = fig.height, out.height = out.height, cache = cache, prow = prow))
+
+fig.width <- 4
+out.width <- "50%"
+fig.height <- 2
+out.height <- "50%"
+knitr::opts_template$set(wide = list(fig.width = fig.width, out.width = out.width, fig.height = fig.height, out.height = out.height, cache = cache, prow = prow))
 ```
 
 # Overview
@@ -278,7 +284,7 @@ such as `splitTextGrob()`, `split_text_grob()`, `gridtext::richtext_grob()`, and
 ["R Graphics" (1st edition) by Paul Murell]( https://www.stat.Auckland.ac.nz/~paul/RGraphics/rgraphics.html ), 
 which can change the width of text according to the viewport. 
 
-```{r, opts.label="small"}
+```{r, opts.label="wide"}
 t_1 <- "This is a sample text. "
 t_2 <- "When longer than viewport width, "
 t_3 <- "text will be split and add a break. "
@@ -300,7 +306,7 @@ This advantage can be disadvantage when we want fixed size grob like making a po
 `split_text_grob()` is slightly modified based on `splitTextGrob()`, 
 which generate wrapped text grob with fixed text width. 
 
-```{r, opts.label="small"}
+```{r, opts.label="wide"}
 s_t_g <- split_text_grob(text, width=grid::unit(80, "mm"))
 grid::grid.draw(s_t_g)
 ```
@@ -309,7 +315,7 @@ grid::grid.draw(s_t_g)
 `richtext_grob()` and `textbox_grob()` provided by gridtext package, 
 which can provide sophisticated formatting by handling basic markdown and HTML. 
 
-```{r richtext_grob, opts.label="small"}
+```{r richtext_grob, opts.label="wide"}
 rtg <- gridtext::richtext_grob(text)
 tbg <- gridtext::textbox_grob(text)
 grid::grid.draw(combine_grobs(rtg, tbg, direction = "vertical", unify = "as_is", space = space * 10))
@@ -343,12 +349,14 @@ jpg_grobs <-
   purrr::map(jpeg::readJPEG) %>%
   purrr::map(grid::rasterGrob)
 
-fix_width_height <- combine_grobs(jpg_grobs, direction = "horizontal", width=half * shrink, unify="height", space=space)
-fix_width_width  <- combine_grobs(jpg_grobs, direction = "horizontal", width=half * shrink, unify="width",  space=space)
-  # Can specify multiple image grobs (not a list of grobs) as shown below
+fix_width_height <- 
+  combine_grobs(jpg_grobs, direction = "horizontal", width = half, unify = "height", space = space)
+fix_width_width  <- 
+  combine_grobs(jpg_grobs, direction = "horizontal", width = half, unify = "width",  space = space)
+  # Input multiple image grobs (not a list of grobs) as shown below
   # appose_image_grobs(jpg_grob_1, jpg_grob_2, png_grob_1, width=half)
 stacked_image_grob <- 
-  combine_grobs(fix_width_height, fix_width_width, direction = "vertical", unify="width",space=space)
+  combine_grobs(fix_width_height, fix_width_width, direction = "vertical", unify = "width",space = space)
 
 grid.draw(stacked_image_grob)
 ```
@@ -363,15 +371,15 @@ txt_BODY_41   <- "- appose_image_grobs() and stack_image_grobs().<br>"
 txt_BODY_42   <- "- Import images and arrange them in a line (row or col).<br>"
 txt_BODY_43   <- "- Unify height or width of images (argument: unify).<br>"
 txt_BODY_44   <- "- Fix hole width and/or height of combined grob (argument: width, height).<br>"
-txt_BODY_45   <- "- gridtext::textbox_grob() will wrap strings (insert line breaks) longer than specified widht automatically."
+txt_BODY_45   <- "- textbox_grob() will wrap strings (insert line breaks) longer than specified width."
 txt <- str_c(txt_ITEM_40, txt_BODY_41, txt_BODY_42, txt_BODY_43, txt_BODY_44, txt_BODY_45)
-image_description <- gridtext::textbox_grob(txt, width=half * shrink, use_markdown=FALSE)
-  # image_and_description <- stack_grobs_conv(image_description, stacked_image_grob, space=space)
+image_description <- 
+  gridtext::textbox_grob(txt, width=half, gp = gpar(fontsize = 30), use_markdown = FALSE)
 image_and_description <- 
-  combine_grobs(image_description, stacked_image_grob, direction = "vertical", unify = "as_is", space=space)
+  combine_grobs(image_description, fix_width_height, 
+                direction = "vertical", unify = "as_is", space = space)
 
 grid.draw(image_and_description)
-  # convertUnit(grobHeight(image_and_description), "in")
 ```
 
 <!--
@@ -389,26 +397,34 @@ https://github.com/baptiste/gridExtra/blob/master/R/tableGrob.r
 
 When we want make a table like booktab in LaTeX or in a academic journal, 
 Function `booktab_table_grob()` generate a booktab like table grob in a step. 
+We can add title and caption to a table. 
+Font size of title is larger than that of table body and caption. 
 
-
-```{r opts.label="small"}
-grid::grid.newpage()
+```{r}
+fontsize <- 36
+title <- str_c(rep("Title words. ", 5), collapse="")
+caption <- str_c(rep("caption words. ", 5), collapse="")
 head(iris) %>%
-  booktab_table_grob(title="title words", caption="caption words", fontsize=20, shrink=0.5) %>%
+  booktab_table_grob(title = title, caption = caption, fontsize=fontsize) %>%
   grid::grid.draw()
 ```
 
-```{r opts.label="small"}
+```{r}
 font_size_table <- 
   font_size_list %>%
   dplyr::filter(base_size==26) %>%
-  booktab_table_grob(title="Font size of ggposter", fontsize=20, shrink=0.5)
+  booktab_table_grob(title="Font size of ggposter", fontsize=fontsize)
 base_size_table <- 
   font_size_list %>%
   dplyr::filter(ratio==1) %>%
-  booktab_table_grob(title="Base font size of ggposter", caption="Font size increases every 1.2 times approximately.", fontsize=20, shrink=0.5)
+  booktab_table_grob(title="Base font size of ggposter", 
+    caption="Font size increases every 1.2 times approximately.", 
+    fontsize=fontsize)
 
-grid::grid.draw(combine_grobs(font_size_table, base_size_table, direction="horizontal", unify="as_is", space=grid::unit(10, "mm")))
+grid::grid.draw(
+  combine_grobs(
+    font_size_table, base_size_table, 
+    direction="horizontal", unify="as_is", space=grid::unit(20, "mm")))
 ```
 
 All `booktab_table_grob()` does is call `gridExtra::tableGrob()`, `add_booktab()`, and `add_annotation()`. 
@@ -416,71 +432,78 @@ We can change appearance of table grob by customizing gridExtra::tableGrob().
 See in detail at [Displaying tables as grid graphics]
 ( https://cran.r-project.org/web/packages/gridExtra/vignettes/tableGrob.html ) by Baptiste Auguie. 
 
-
-```{r example_table, opts.label="small"}
-grid::grid.newpage()
+```{r example_table}
+title <- "Header of iris data."
+caption <- "With 150 cases and 5 variables. Three species: setosa, versicolor, and virginica."
 head(iris) %>%
-  gridExtra::tableGrob(rows=NULL, theme=gridExtra::ttheme_minimal()) %>%
+  gridExtra::tableGrob(rows=NULL, theme=gridExtra::ttheme_minimal(base_size = fontsize)) %>%
   add_booktab(lwd_out=2, lwd_in=1) %>%
-  add_annotation(title="title words", caption="caption words") %>%
+  add_annotation(title = title, caption = caption, fontsize=fontsize) %>%
   grid::grid.draw()
 ```
 
 
 ## With ggplot2 
-  # (and cowplot)
 
-```{r ggplot2, opts.label="small"}
+We can use ggplot2 object in ggposter. 
+A ggplot2 object is based on grid, but it is not a grob. 
+Function combine_grobs() can recieve only grobs, thus we can not combine ggplot2 objects. 
+Using ggplot2::ggplotGrob(), we can convert ggplot2 objects into grobs and 
+some functions in ggposter use this function (see inside ggposter). 
+appose_fig_text() can combine horizontally ggplot2 figure and text as shown below. 
 
-library(grid)
- # fig
-text <- stringr::str_c(rep("abc", 40), collapse=" ")
+While default widths of fig and text is grid::unit(c(80, 210), "mm"), 
+we can change it using argument widths. 
 
-space <- grid::unit(1, "mm")
-widths <- grid::unit(rep(50, 2), "mm")
-
+```{r ggplot2}
+text <- stringr::str_c(rep("A sample text of ggposter for combining fig and text. ", 5), collapse="")
 fig <- 
-  ggplot2::ggplot(mpg, aes(x=displ, y=hwy)) + 
+  ggplot2::ggplot(mpg, aes(x = displ, y = hwy)) + 
   geom_point() + 
   theme_bw()
-fontsize <- 8
-shrink <- 1
 
-grid::grid.draw(appose_fig_text(fig, text, fontsize=26, shrink=0.5))
+ftg <- appose_fig_text(fig, text, fontsize = 26)
+grid::grid.draw(ftg)
 
-
-   # title
-title <- "Colab with ggplot2 and gridtext"
-fontsize <- 60
-gp_title <- grid::gpar(fontsize=fontsize)
- # text
-txt_body_31 <- "As shown in this example, we can use ggplot object in ggposter. "
-txt_body_32 <- "We can write description aroud it."
-description <- stringr::str_c(txt_body_31, txt_body_32)
-fontsize <- 30
-lineheight <- 1.1
-gp_text <- grid::gpar(fontsize=fontsize, lineheight=lineheight)
- # generate slide and draw
-slide <- gen_slide(title, fig, description, gp_title, gp_text, width=half)
-grid.newpage()
-grid::grid.draw(slide)
-
-description_1 <- 
-  arrange_txt(
-    txt_body_31, txt_body_32, 
-    widths=half * shrink)
-grid.newpage()
-grid.draw(combine_grobs(ggplot2::ggplotGrob(fig), description_1, direction="horizontal", unify="width"))
+grid::grid.newpage()
+ftg <- appose_fig_text(fig, text, widths = grid::unit(c(120, 170), "mm"), fontsize = 26)
+grid::grid.draw(ftg)
 ```
 
+We can convert ggplot2 object using ggplot2grob() and combine them by combine_grobs as shown below. 
+
+
+```{r ggplot2grob}
+  # create figures with ggplot2
+fig_mtcars <- 
+  ggplot2::ggplot(mpg, aes(x = displ, y = hwy)) + 
+  geom_point() + 
+  theme_bw()
+fig_iris <- 
+  ggplot2::ggplot(iris, aes(Sepal.Length, y = Petal.Length, shape = Species)) + 
+  geom_point() + 
+  theme_bw() + 
+  theme(legend.position = c(1, 0), legend.justification = c(1, 0)) + 
+  theme(legend.background = element_rect(colour = "black"))
+fig_diamonds <- 
+  ggplot2::ggplot(diamonds, aes(y = carat,x=cut)) + 
+  geom_boxplot() + 
+  theme_bw()
+
+  # comvert and combine figures
+combined_figs <- 
+  list(fig_mtcars, fig_iris, fig_diamonds) %>%
+  purrr::map(ggplot2grob, width = half / 3) %>%
+  combine_grobs(direction = "horizontal", unify = "as_is")
+
+grid::grid.draw(combined_figs)
+```
 
 ## With gridtext
 
-
-```{r gridtext}
-
-```
-
+ggposter use functions from gridtext package, which generate grob. 
+The package improve making poster more than using only ggposer, 
+so please use functions such as gridtext::textbox_grob() and gridtext::richtext_grob() (see https://wilkelab.org/gridtext/). 
 
 
 # Example: ggposter
@@ -657,6 +680,35 @@ grid.newpage()
 # Make a Slide
 
 
+
+```{r}
+  # title
+title <- "Colab with ggplot2 and gridtext"
+fontsize <- 32
+gp_title <- grid::gpar(fontsize=fontsize)
+
+  # text
+txt_body_31 <- "As shown in this example, we can use ggplot object in ggposter. "
+txt_body_32 <- "We can write description aroud it."
+description <- stringr::str_c(txt_body_31, txt_body_32)
+fontsize <- 26
+lineheight <- 1.1
+gp_text <- grid::gpar(fontsize=fontsize, lineheight=lineheight)
+
+  # generate slide and draw
+slide <- gen_slide(title, fig, description, gp_title, gp_text, width=half)
+grid.newpage()
+grid::grid.draw(slide)
+
+description_1 <- 
+  arrange_txt(
+    txt_body_31, txt_body_32, 
+    widths=half * shrink)
+grid.newpage()
+grid.draw(combine_grobs(ggplot2::ggplotGrob(fig), description_1, direction="horizontal", unify="width"))
+```
+
+
 ```{r slide, opts.label="part"}
 library(grid)
 
@@ -697,6 +749,42 @@ ggposter is designed for making a poster and rendering speed is slow,
 because the 
 
 ## Combine ggobject and text grob 
+
+We can also use ggplot2 figure. 
+Before combining ggplot2 object with grobs, 
+ggplot2 object should be converted into grob by ggplot2::ggplotGrob(). 
+To fix font size of figure, we can use set_font_size(), which is helper function of ggplot2::theme() and ggplot2::element_text(). 
+
+
+```{r inside_ggplot2}
+  # description text
+text <- stringr::str_c(rep("A sample text of ggposter for combining fig and text. ", 5), collapse="")
+width <- half * 2 / 3
+fontsize <- 26
+gp <- gpar(fontsize = fontsize)
+tg <- gridtext::textbox_grob(text, width = width, gp = gp)
+  # grid::grid.draw(tg)
+
+  # figure
+width <- half * 1 / 3
+fontsize <- 26
+fig <- 
+  ggplot2::ggplot(mpg, aes(x=displ, y=hwy)) + 
+  geom_point() + 
+  theme_bw()
+  # convert and fix font size
+fig  <- 
+  fig %>%
+  set_font_size(fontsize) %>%
+  ggplot2::ggplotGrob() %>%
+  fix_size(width = width)
+
+combined_grobs <- combine_grobs(fig, tg, unify="as_is")
+
+  # grid::grid.show.layout(combined_grobs$frame$layout)
+grid::grid.draw(combined_grobs)
+```
+
 
 We can combine ggplot object and text grob using gridExtra package. 
 

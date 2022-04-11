@@ -81,9 +81,9 @@ gen_slide <- function(title, fig, text, gp_title, gp_text, paper = "", width = g
 
 #' Fix grob size and shrink cex
 #'
-#' @param grb          A grob.
-#' @param width,height A grid unit.
-#' @param shrink   A numeric.
+#' @param grob          A grob.
+#' @param width,height  A grid unit.
+#' @param shrink        A numeric.
 #' @return Grob.
 #'
 #' @examples
@@ -92,22 +92,22 @@ gen_slide <- function(title, fig, text, gp_title, gp_text, paper = "", width = g
 #'   ggplot2::ggplot(mpg) +
 #'   ggplot2::geom_point(ggplot2::aes(x = .data[["displ"]], y = .data[["hwy"]])) +
 #'   ggplot2::theme_bw()
-#' grb <- ggplot2::ggplotGrob(fig)
-#' grb %>%
+#' grob <- ggplot2::ggplotGrob(fig)
+#' grob %>%
 #'   fix_size(width = grid::unit(80, "mm")) %>%
 #'   grid::grid.draw()
 #' grid::grid.newpage()
-#' grb %>%
+#' grob %>%
 #'   fix_size(width = grid::unit(40, "mm"), height = grid::unit(80, "mm")) %>%
 #'   grid::grid.draw()
 #'
 #' @export
-fix_size <- function(grb, width = grid::unit(50, "mm"), height = width, shrink = 1) {
+fix_size <- function(grob, width = grid::unit(50, "mm"), height = width, shrink = 1) {
   n <- 1
   layout <- grid::grid.layout(n, n, width = width, height = height)
   gp <- grid::gpar(cex = shrink)
   res <- grid::frameGrob(layout = layout, gp = gp)
-  grid::placeGrob(res, grb, row = n, col = n)
+  grid::placeGrob(res, grob, row = n, col = n)
 }
 
 #' Set or shrink font size for ggplot.
@@ -151,25 +151,41 @@ shrink_font <- function(gg, shrink) {
 #'
 #' @export
 appose_fig_text <- function(fig, text, 
-                            space = grid::unit(1, "mm"), 
-                            widths = grid::unit(rep(50, 2), "mm"), 
+                            space = grid::unit(2, "mm"), 
+                            widths = grid::unit(c(80, 210), "mm"), 
                             fontsize = NULL, shrink = 1) {
   # set font size
-  if (is.null(fontsize)) {
-    fontsize <- grid::get.gpar()$fontsize
-  }
-  # convert fig and fix size
-  if (!grid::is.grob(fig)) {
-    fig <- set_font_size(fig, fontsize)
+  if (is.null(fontsize))
+      fontsize <- grid::get.gpar()$fontsize
+  # convert fig
+  if (! grid::is.grob(fig)) {
+    fig <- set_font_size(fig, fontsize * 0.6)
     fig <- ggplot2::ggplotGrob(fig)
   }
+  # fix size
   fig <- fix_size(fig, width = widths[1], shrink = shrink)
   # convert text
   if (!grid::is.grob(text)) {
     gp <- grid::gpar(fontsize = fontsize * shrink)
-    text <- split_text_grob(text, width = widths[2], gp = gp)
+    text <- gridtext::textbox_grob(text, width = widths[2], gp = gp)
   }
   # combine
   #   appose_grobs(fig, text, space = space)
   combine_grobs(fig, text, direction = "horizontal", unify="as_is", space = space)
+}
+
+
+#' Convert ggplot2 object into grob
+#' 
+#' @@inheritParams set_font_size,fix_size
+#' @return A combined grob.
+#' @export
+ggplot2grob <- function(gg, fontsize=NULL, width=grid::unit(1, "npc"), height = NULL){
+  if (is.null(fontsize))
+      fontsize <- grid::get.gpar()$fontsize
+  if(is.null(height)) height <- width
+  gg %>%
+    set_font_size(fontsize = fontsize) %>%
+    ggplot2::ggplotGrob() %>%
+    fix_size(width = width, height = height)
 }

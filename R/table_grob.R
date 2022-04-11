@@ -63,16 +63,16 @@ booktab_table_grob <- function(df, title = NULL, caption = NULL,
 #' @export
 add_booktab <- function(tg, lwd_out = 2, lwd_in = 1) {
   tg %>%
-    add_btw_line(lwd_in = lwd_in) %>%
+    add_inner_line(lwd_in = lwd_in) %>%
     fix_table_unit() %>%
-    add_tb_line(lwd_out = lwd_out)
+    add_outer_line(lwd_out = lwd_out)
 }
 
 #' Add line between colnames and values to table grob
 #'
 #' @rdname table_grob
 #' @export
-add_btw_line <- function(tg, lwd_in = 1) {
+add_inner_line <- function(tg, lwd_in = 1) {
   gtable::gtable_add_grob(tg,
     grobs = grid::segmentsGrob(
        x0 = grid::unit(0, "npc"), y0 = grid::unit(0, "npc"), 
@@ -85,7 +85,7 @@ add_btw_line <- function(tg, lwd_in = 1) {
 #'
 #' @rdname table_grob
 #' @export
-add_tb_line <- function(tg, lwd_out = 2, space = grid::unit(0.1, "mm")) {
+add_outer_line <- function(tg, lwd_out = 2, space = grid::unit(0.1, "mm")) {
   rect_height <- grid::unit(0.1, "mm")
   rg <- grid::rectGrob(width = sum(tg$widths), height = rect_height, gp = grid::gpar(lwd = lwd_out))
   sg <- combine_grobs(rg, tg, rg, direction = "vertical", unify = "width", space = space)
@@ -95,20 +95,26 @@ add_tb_line <- function(tg, lwd_out = 2, space = grid::unit(0.1, "mm")) {
 #'
 #' @rdname table_grob
 #' @export
-add_annotation <- function(tg, title = NULL, caption = NULL, fontsize = NULL, 
-                           shrink = 1, space = grid::unit(2, "mm")) {
-  if (is.null(title) & is.null(caption)) {
-    return(tg)
-  }
-  if (is.null(fontsize)) {
-    fontsize <- grid::get.gpar()$fontsize
-  }
+add_annotation <- function(tg, title = NULL, caption = NULL, fontsize = NULL, space = NULL) {
+  if (is.null(title) & is.null(caption)) return(tg)
+  if (is.null(fontsize)) fontsize <- grid::get.gpar()$fontsize
   if (!is.null(title)) {
-    title <- grid::textGrob(label = title, x = 0, hjust = 0, gp = grid::gpar(fontsize = fontsize *
-      1.5))
+    title <- 
+      gridtext::textbox_grob(
+        text = title, width = grob_widths(tg), x = 0, hjust = 0, 
+        gp = grid::gpar(fontsize = fontsize * 1.5), use_markdown = FALSE)
   }
   if (!is.null(caption)) {
-    caption <- grid::textGrob(label = caption, x = 0, hjust = 0, gp = grid::gpar(fontsize = fontsize))
+    caption <- 
+      gridtext::textbox_grob(
+        text = caption, width = grob_widths(tg), x = 0, hjust = 0, 
+        gp = grid::gpar(fontsize = fontsize), use_markdown = FALSE)
   }
-  combine_grobs(title, tg, caption, direction = "vertical", unify = "width", space = space)
+  if (is.null(space)) {
+    min_ratio <- 0.2 # 
+    space_t <- if (is.null(title))   grid::unit(0, "mm") else grob_heights(title,   convert_to="mm") * min_ratio
+    space_c <- if (is.null(caption)) grid::unit(0, "mm") else grob_heights(caption, convert_to="mm") * min_ratio
+    space <- min(space_t, space_c, grid::unit(1, "mm"))
+  }
+  combine_grobs(title, tg, caption, direction = "vertical", unify = "as_is", space = space)
 }
