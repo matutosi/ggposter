@@ -152,7 +152,7 @@ shrink_font <- function(gg, shrink) {
 #' @export
 appose_fig_text <- function(fig, text, 
                             space = grid::unit(2, "mm"), 
-                            widths = grid::unit(c(60, 180), "mm"), 
+                            widths = grid::unit(c(80, 210), "mm"), 
                             fontsize = NULL, shrink = 1) {
   # set font size
   if (is.null(fontsize))
@@ -172,4 +172,20 @@ appose_fig_text <- function(fig, text,
   # combine
   #   appose_grobs(fig, text, space = space)
   combine_grobs(fig, text, direction = "horizontal", unify="as_is", space = space)
+}
+
+
+#' Convert ggplot2 object into grob
+#' 
+#' @@inheritParams set_font_size,fix_size
+#' @return A combined grob.
+#' @export
+ggplot2grob <- function(gg, fontsize=NULL, width=grid::unit(1, "npc"), height = NULL){
+  if (is.null(fontsize))
+      fontsize <- grid::get.gpar()$fontsize
+  if(is.null(height)) height <- width
+  gg %>%
+    set_font_size(fontsize = fontsize) %>%
+    ggplot2::ggplotGrob() %>%
+    fix_size(width = width, height = height)
 }
