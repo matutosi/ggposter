@@ -79,25 +79,24 @@ fig.height <- 8
 cache <- TRUE
 cache <- FALSE
 prow <- TRUE
-knitr::opts_chunk$set(fig.width = fig.width, out.width = out.width, fig.height = fig.height, cache = cache, prow = prow)
-
+shoot(knitr::opts_chunk$set, fig.width, out.width, fig.height, cache, prow)
 
   # chunk template
 fig.width <- 8.3
 out.width <- "100%"
-knitr::opts_template$set(part = list(fig.width = fig.width, out.width = out.width, cache = cache, prow = prow))
+knitr::opts_template$set(part = shoot(list, fig.width, out.width, cache, prow))
 
 fig.width <- 4
 out.width <- "50%"
 fig.height <- 4
 out.height <- "50%"
-knitr::opts_template$set(small = list(fig.width = fig.width, out.width = out.width, fig.height = fig.height, out.height = out.height, cache = cache, prow = prow))
+knitr::opts_template$set(small = shoot(list, fig.width, out.width, fig.height, out.height, cache, prow))
 
 fig.width <- 4
 out.width <- "50%"
 fig.height <- 2
 out.height <- "50%"
-knitr::opts_template$set(wide = list(fig.width = fig.width, out.width = out.width, fig.height = fig.height, out.height = out.height, cache = cache, prow = prow))
+knitr::opts_template$set(wide = shoot(list, fig.width, out.width, fig.height, out.height, cache, prow))
 ```
 
 # Figures
@@ -161,8 +160,7 @@ countries %>%
   # https://github.com/wch/rgcookbook/blob/master/ch13.Rmd
 library(gcookbook) # For the isabel data set
 library(grid)
-isabel
-
+head(isabel)
 islice <- filter(isabel, z == min(z))
 
 every_n <- function(x, by = 2) {
@@ -210,7 +208,7 @@ fig_heatmap <-
 
 ```
 
-```{r ggrepel}
+```{r pairs}
 library(gcookbook)
 c2009 <- 
   countries %>%
