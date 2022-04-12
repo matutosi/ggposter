@@ -177,7 +177,8 @@ appose_fig_text <- function(fig, text,
 
 #' Convert ggplot2 object into grob
 #' 
-#' @@inheritParams set_font_size,fix_size
+#' @inheritParams set_font_size
+#' @inheritParams fix_size
 #' @return A combined grob.
 #' @export
 ggplot2grob <- function(gg, fontsize=NULL, width=grid::unit(1, "npc"), height = NULL){
