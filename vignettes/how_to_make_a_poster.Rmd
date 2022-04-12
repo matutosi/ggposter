@@ -103,7 +103,7 @@ knitr::opts_template$set(wide = shoot(list, fig.width, out.width, fig.height, ou
 
 To prepare figures we use some data and packages. 
 
-```{r mpg2}
+```{r fig_mpg2}
   # https://ggplot2-book.org/facet.html#controlling-scales
 mpg2 <- 
   mpg %>%
@@ -120,10 +120,11 @@ fig_mpg2 <-
       theme_bw() + 
       theme(strip.text.y = element_text(angle = 0))
   } %>%
-  ggplot2grob(fontsize = 16, width = half / 2, height = half)
+  ggplot2grob(fontsize = 16, width = half / 2, height = half) %>%
+  grid::grid.draw()
 ```
 
-```{r facet}
+```{r fig_facet}
   # https://ggplot2-book.org/facet.html#group-vs-facet
 df <- data.frame(
   x = rnorm(120, c(0, 2, 4)),
@@ -139,24 +140,29 @@ fig_facet <-
       theme_bw() + 
       theme(legend.position = "none")
   } %>%
-  ggplot2grob(fontsize = 16, width = half, height = half / 3)
+  ggplot2grob(fontsize = 16, width = half, height = half / 3) %>%
+  grid::grid.draw()
 ```
 
-```{r ggrepel}
+```{r fig_ggrepel}
   # https://github.com/wch/rgcookbook/blob/master/ch05.Rmd
 library(gcookbook)
 library(ggrepel)
 
-countries %>%
+gg_ggrepel <- 
+  countries %>%
   dplyr::filter(Year == 2009 & healthexp > 2000) %>%
   ggplot(aes(x = healthexp, y = infmortality)) + 
-  geom_point() + 
-  theme_bw() + 
-  geom_label_repel(aes(label = Name), size = 3)
+      geom_point() + 
+      theme_bw() + 
+      geom_label_repel(aes(label = Name), size = 3)
+fig_ggrepel <- 
+  ggplot2grob(gg_ggrepel, fontsize = 16, width = half / 2) %>%
+  grid::grid.draw()
 ```
 
 
-```{r }
+```{r fig_map}
   # https://github.com/wch/rgcookbook/blob/master/ch13.Rmd
 library(gcookbook) # For the isabel data set
 library(grid)
@@ -172,7 +178,8 @@ keepy <- every_n(unique(isabel$y), by = 2)
 islicesub <- filter(islice, x %in% keepx  &  y %in% keepy)
 
 usa <- map_data("usa")
-ggplot(islicesub, aes(x = x, y = y)) +
+fig_map <- 
+  {ggplot(islicesub, aes(x = x, y = y)) +
     geom_segment(aes(xend = x+vx/50, yend = y+vy/50, colour = speed),
                  arrow = arrow(length = unit(0.1,"cm")), size = 0.6) +
     scale_colour_continuous(low = "grey80", high = "darkred") +
@@ -180,9 +187,12 @@ ggplot(islicesub, aes(x = x, y = y)) +
     coord_cartesian(xlim = range(islicesub$x), ylim = range(islicesub$y)) + 
     theme_bw() + 
     theme(legend.position = "none")
+  } %>%
+  ggplot2grob(fontsize = 16, width = half / 2) %>%
+  grid::grid.draw()
 ```
 
-```{r corrplot}
+```{r fig_corrplot}
   # https://github.com/wch/rgcookbook/blob/master/ch13.Rmd
 library(corrplot)
 data_cor <- 
@@ -191,30 +201,28 @@ data_cor <-
   round(digits = 2)
 
 fig_cor <-
-  ggplotify::as.ggplot(~corrplot(data_cor)) %>%
-  ggplot2grob(fontsize = 16, width = half / 2)
-
-grid::grid.draw(fig_cor)
-  # fig_cor <-
-  #   ggplotify::as.grob(~corrplot(fig_cor)) %>%
+  plot2grob(~corrplot(data_cor), fontsize = 16, width = half / 2) %>%
+  grid::grid.draw()
 ```
 
-```{r heatmap}
+```{r fig_heatmap}
 library(gplots)
 data(Boston, package = "MASS")
 fig_heatmap <- 
-  ggplotify::as.ggplot(~heatmap.2(as.matrix(Boston), scale = "column", trace = "none")) %>%
-  ggplot2grob(fontsize = 16, width = half / 2, height = half)
-
+  plot2grob(~heatmap.2(as.matrix(Boston), scale = "column", trace = "none"), 
+            fontsize = 16, width = half / 2, height = half) %>%
+  grid::grid.draw()
 ```
 
-```{r pairs}
+```{r fig_pairs}
 library(gcookbook)
-c2009 <- 
+data_c2009 <- 
   countries %>%
   dplyr::filter(Year == 2009) %>%
-  dplyr::select(GDP, laborrate, healthexp, infmortality) %>%
-  pairs()
+  dplyr::select(GDP, laborrate, healthexp, infmortality)
+fig_pairs <- 
+  plot2grob(~pairs(data_c2009), fontsize = 16, width = half / 2) %>%
+  grid::grid.draw()
 ```
 
 # Example: ggposter
