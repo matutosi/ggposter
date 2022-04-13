@@ -377,28 +377,9 @@ tbl_arrange_text <-
 
 
 pkg <- "ggposter"
-functions <- 
+funs <- 
   stringr::str_c("package:", pkg) %>%
   ls()
-
-  # c("combine_grobs", "frame_place_grobs", "appose_grobs", "stack_grobs") %>%
-  #    purrr::map(help, package = {{pkg}}) %>%
-  #    purrr::map(`$`, `path`) %>%
-  #    purrr::map(tools:::Rd2txt) %>%
-  #    purrr::map(str)
-
-
-  # utils
-  # c("grob_heights", "grob_widths")
-
-  # "appose_fig_text"
-  # "gen_slide"
-
-  # packageDescription("ggposter")
-  # formals(ggposter::combine_grobs)
-  # helptext <- help("combine_grobs", package = ggposter)
-  # tools:::Rd2txt(helptext$path)
-
 ```
 
 
@@ -1210,6 +1191,28 @@ gg_pairs <-
     theme_bw() 
 fig_pairs <- 
   ggplot2grob(gg_pairs, fontsize = 16, width = half)
+
+
+
+  # 
+
+  # c("combine_grobs", "frame_place_grobs", "appose_grobs", "stack_grobs") %>%
+  #    purrr::map(help, package = {{pkg}}) %>%
+  #    purrr::map(`$`, `path`) %>%
+  #    purrr::map(tools:::Rd2txt) %>%
+  #    purrr::map(str)
+
+
+  # utils
+  # c("grob_heights", "grob_widths")
+
+  # "appose_fig_text"
+  # "gen_slide"
+
+  # packageDescription("ggposter")
+  # formals(ggposter::combine_grobs)
+  # helptext <- help("combine_grobs", package = ggposter)
+  # tools:::Rd2txt(helptext$path)
 
 -->
 
