@@ -337,6 +337,8 @@ tbl_fun_combine_grobs <-
     booktab_table_grob(title = title, fontsize = fontsize) %>%
     grid::grid.draw()
 
+grid::grid.newpage()
+
   # tbl_table_grob
 fun <- 
     c("booktab_table_grob", "add_annotation", "add_booktab")
@@ -352,16 +354,20 @@ tbl_tbl_table_grob <-
     booktab_table_grob(title = title, fontsize = fontsize) %>%
     grid::grid.draw()
 
+grid::grid.newpage()
+
   # tbl_convert
 c("ggplot2grob", "plot2grob")
 c("Convert ggplot object into grob",
-  "Convert base plot into grob",)
+  "Convert base plot into grob")
 title <- "Functions for converting figure into grob"
 fontsize <- 26
 tbl_convert <- 
   tibble::tibble(name = fun, descrintion = descrintion) %>%
     booktab_table_grob(title = title, fontsize = fontsize) %>%
     grid::grid.draw()
+
+grid::grid.newpage()
 
   # arrange_text
 c("arrange_txt", "font_size_list", "get_font_size")
@@ -374,7 +380,6 @@ tbl_arrange_text <-
   tibble::tibble(name = fun, descrintion = descrintion) %>%
     booktab_table_grob(title = title, fontsize = fontsize) %>%
     grid::grid.draw()
-
 
 pkg <- "ggposter"
 funs <- 
