@@ -36,6 +36,7 @@ fix_table_unit <- function(tg) {
 #' @param df             A data frame.
 #' @param title,caption  A string.
 #' @param title_size     A numeric.
+#' @param padding        Length-2 grid unit vector. Horizontal and vertical space within each cell.
 #' @param fontsize       A numeric specified by pt.
 #' @param shrink         A numeric.
 #' @param lwd_out,lwd_in A numeric. Line width.
@@ -45,7 +46,7 @@ fix_table_unit <- function(tg) {
 #' @name table_grob
 #' @export
 booktab_table_grob <- function(df, title = NULL, caption = NULL, 
-                               title_size = 1.2, 
+                               title_size = 1.2, padding = grid::unit(c(8, 8), "mm"),
                                fontsize = NULL, shrink = 1, lwd_out = 2, lwd_in = 1) {
   if (is.null(fontsize)) {
     fontsize <- grid::get.gpar()$fontsize
@@ -55,7 +56,8 @@ booktab_table_grob <- function(df, title = NULL, caption = NULL,
   lwd_in <- lwd_in * shrink
   tg <- 
     df %>%
-    gridExtra::tableGrob(rows = NULL, theme = gridExtra::ttheme_minimal(base_size = fontsize)) %>%
+    gridExtra::tableGrob(rows = NULL, 
+        theme = gridExtra::ttheme_minimal(base_size = fontsize, padding = padding)) %>%
     add_booktab(lwd_out = lwd_out, lwd_in = lwd_in)
   shoot(add_annotation, tg, title, caption, fontsize, title_size)
 }
