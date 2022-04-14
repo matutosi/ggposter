@@ -35,7 +35,8 @@ fix_table_unit <- function(tg) {
 #' @param tg             A table grob.
 #' @param df             A data frame.
 #' @param title,caption  A string.
-#' @param fontsize       A numeric.
+#' @param title_size     A numeric.
+#' @param fontsize       A numeric specified by pt.
 #' @param shrink         A numeric.
 #' @param lwd_out,lwd_in A numeric. Line width.
 #' @param space          grid unit. Space between grobs.
