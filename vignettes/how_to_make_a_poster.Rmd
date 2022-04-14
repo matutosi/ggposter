@@ -103,7 +103,6 @@ knitr::opts_template$set(wide = shoot(list, fig.width, out.width, fig.height, ou
 
 To prepare figures we use some data and packages. 
 
-
 ```{r fig_facet}
   # https://ggplot2-book.org/facet.html#group-vs-facet
 df <- data.frame(
@@ -319,6 +318,27 @@ table_description <- ""
 
 ```
 
+## Table
+
+```{r}
+tbl_font_size <- 
+  font_size_list %>%
+  dplyr::filter(base_size==26) %>%
+  booktab_table_grob(title="Font size of ggposter", fontsize=fontsize)
+tlb_base_size <- 
+  font_size_list %>%
+  dplyr::filter(ratio==1) %>%
+  booktab_table_grob(title="Base font size of ggposter", 
+    caption="Font size increases every 1.2 times approximately.", 
+    fontsize=fontsize)
+
+tbl_fonts <- 
+  combine_grobs(tbl_font_size, tlb_base_size, 
+    direction="vertical", unify="as_is", space=grid::unit(10, "mm"))
+
+grid::grid.draw(tbl_fonts)
+```
+
 
 ## List of main functions
 
@@ -376,14 +396,14 @@ tbl_convert <-
   tibble::tibble(name = fun, descrintion = descrintion) %>%
     booktab_table_grob(title = title, fontsize = fontsize)
 
-list_1 <- 
+tbl_list_1 <- 
     combine_grobs(tbl_fun_combine_grobs, tbl_arrange_text, 
                   direction = "vertical", unify = "as_is", space = grid::unit(10, "mm"))
-list_2 <- 
+tbl_list_2 <- 
     combine_grobs(tbl_tbl_table_grob, tbl_convert, 
                   direction = "vertical", unify = "as_is", space = grid::unit(10, "mm"))
-list_all <- 
-    combine_grobs(list_1, list_2, 
+tbl_list_all <- 
+    combine_grobs(tbl_list_1, tbl_list_2, 
                   direction = "horizontal", unify = "as_is", space = grid::unit(10, "mm"))
 
 grid::grid.draw(list_all)
@@ -716,11 +736,11 @@ head(iris) %>%
 ```
 
 ```{r}
-font_size_table <- 
+tbl_font_size <- 
   font_size_list %>%
   dplyr::filter(base_size==26) %>%
   booktab_table_grob(title="Font size of ggposter", fontsize=fontsize)
-base_size_table <- 
+tlb_base_size <- 
   font_size_list %>%
   dplyr::filter(ratio==1) %>%
   booktab_table_grob(title="Base font size of ggposter", 
@@ -729,7 +749,7 @@ base_size_table <-
 
 grid::grid.draw(
   combine_grobs(
-    font_size_table, base_size_table, 
+    tbl_font_size, tlb_base_size, 
     direction="horizontal", unify="as_is", space=grid::unit(20, "mm")))
 ```
 
@@ -823,7 +843,7 @@ fig_base <- combine_grobs(base_plot, base_hist, base_boxplot, unify = "height")
 grid::grid.draw(fig_base)
 ```
 
-## With gridtext
+## With gridtext package
 
 ggposter use functions from gridtext package, which generate grob. 
 The package improve making poster more than using only ggposter, 
@@ -924,17 +944,17 @@ http://www.sthda.com/english/wiki/wiki.php?id_contents=7930
 We can make a table grob using `tableGrob()` in gridExtra, and draw it. 
 
 ```{r make_table, opts.label="small"}
-font_size_table <- 
+tbl_font_size <- 
   font_size_list %>%
   dplyr::filter(base_size==26) %>%
   gridExtra::tableGrob(rows=NULL)
 
-base_size_table <- 
+tlb_base_size <- 
   font_size_list %>%
   dplyr::filter(ratio==1) %>%
   gridExtra::tableGrob(rows=NULL)
 
-grid::grid.draw(font_size_table)
+grid::grid.draw(tbl_font_size)
 ```
 
 Since the widths and heights given by these function might not be correct, 
@@ -944,9 +964,9 @@ I can not exactly identify the code that causes this, I can not suggest fundamen
 
 
 ```{r apposed_table, opts.label="small"}
-convertUnit(grobWidth(font_size_table), "mm")  # wrong unit
-convertUnit(grobWidth(base_size_table), "mm")  # wrong unit
-apposed <- combine_grobs(font_size_table, base_size_table, direction="horizontal", unify="as_is", space=space)
+convertUnit(grobWidth(tbl_font_size), "mm")  # wrong unit
+convertUnit(grobWidth(tlb_base_size), "mm")  # wrong unit
+apposed <- combine_grobs(tbl_font_size, tlb_base_size, direction="horizontal", unify="as_is", space=space)
 grid::grid.draw(apposed)
 ```
 
@@ -955,12 +975,12 @@ This function fix width and height of a table grob,
 so I recommend users not to use under other situations because of a table grob returned does not fit resized viewpot. 
 
 ```{r fixed_apposed_table, opts.label="small"}
-font_size_table <- fix_table_unit(font_size_table)
-base_size_table <- fix_table_unit(base_size_table)
-convertUnit(grobWidth(font_size_table), "mm")  # correct unit
-convertUnit(grobWidth(base_size_table), "mm")  # correct unit
+tbl_font_size <- fix_table_unit(tbl_font_size)
+tlb_base_size <- fix_table_unit(tlb_base_size)
+convertUnit(grobWidth(tbl_font_size), "mm")  # correct unit
+convertUnit(grobWidth(tlb_base_size), "mm")  # correct unit
 
-apposed_fixed <- combine_grobs(font_size_table, base_size_table, direction="horizontal", unify="as_is", space=space)
+apposed_fixed <- combine_grobs(tbl_font_size, tlb_base_size, direction="horizontal", unify="as_is", space=space)
 grid::grid.draw(apposed_fixed)
 ```
 
