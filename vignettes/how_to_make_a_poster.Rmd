@@ -79,25 +79,331 @@ fig.height <- 8
 cache <- TRUE
 cache <- FALSE
 prow <- TRUE
-knitr::opts_chunk$set(fig.width = fig.width, out.width = out.width, fig.height = fig.height, cache = cache, prow = prow)
-
+shoot(knitr::opts_chunk$set, fig.width, out.width, fig.height, cache, prow)
 
   # chunk template
 fig.width <- 8.3
 out.width <- "100%"
-knitr::opts_template$set(part = list(fig.width = fig.width, out.width = out.width, cache = cache, prow = prow))
+knitr::opts_template$set(part = shoot(list, fig.width, out.width, cache, prow))
 
 fig.width <- 4
 out.width <- "50%"
 fig.height <- 4
 out.height <- "50%"
-knitr::opts_template$set(small = list(fig.width = fig.width, out.width = out.width, fig.height = fig.height, out.height = out.height, cache = cache, prow = prow))
+knitr::opts_template$set(small = shoot(list, fig.width, out.width, fig.height, out.height, cache, prow))
 
 fig.width <- 4
 out.width <- "50%"
 fig.height <- 2
 out.height <- "50%"
-knitr::opts_template$set(wide = list(fig.width = fig.width, out.width = out.width, fig.height = fig.height, out.height = out.height, cache = cache, prow = prow))
+knitr::opts_template$set(wide = shoot(list, fig.width, out.width, fig.height, out.height, cache, prow))
+```
+
+# Figures
+
+To prepare figures we use some data and packages. 
+
+
+```{r fig_facet}
+  # https://ggplot2-book.org/facet.html#group-vs-facet
+df <- data.frame(
+  x = rnorm(120, c(0, 2, 4)),
+  y = rnorm(120, c(1, 2, 1)),
+  z = letters[1:3]
+)
+df2 <- dplyr::select(df, -z)
+fig_facet <- 
+  {ggplot(df, aes(x, y)) + 
+      geom_point(data = df2, colour = "grey70") +
+      geom_point(aes(colour = z), cex=2.5) + 
+      facet_wrap(~z) + 
+      theme_bw() + 
+      theme(legend.position = "none")
+  } %>%
+  ggplot2grob(fontsize = 16, width = half, height = half / 3) %>%
+  grid::grid.draw()
+```
+
+```{r fig_corrplot}
+  # https://github.com/wch/rgcookbook/blob/master/ch13.Rmd
+library(corrplot)
+data_cor <- 
+  mtcars %>%
+  cor() %>%
+  round(digits = 2)
+
+fig_cor <-
+  plot2grob(~corrplot(data_cor), fontsize = 16, width = half / 2) %>%
+  grid::grid.draw()
+```
+
+```{r fig_heatmap}
+library(gplots)
+data(Boston, package = "MASS")
+fig_heatmap <- 
+  plot2grob(~heatmap.2(as.matrix(Boston), scale = "column", trace = "none"), 
+            fontsize = 16, width = half / 2, height = half) %>%
+  grid::grid.draw()
+```
+
+```{r fig_pairs}
+library(gcookbook)
+data_c2009 <- 
+  countries %>%
+  dplyr::filter(Year == 2009) %>%
+  dplyr::select(GDP, laborrate, healthexp, infmortality)
+fig_pairs <- 
+  plot2grob(~pairs(data_c2009), fontsize = 16, width = half) %>%
+  grid::grid.draw()
+```
+
+
+
+# Example: ggposter
+
+As an example, this vignette shows how to make a poster. 
+
+## Title
+
+A string name "txt_title" means that the font size of this string (value) will be selected for title. 
+Data `font_size_list` include various range of base size and relative font size (see "font size" part).
+We change base of font size, then a series of font size will be changed. 
+
+The first part of string name ( "txt" in "txt_title" ) is arbitrary, 
+and second part decides font size. 
+We can add third part like "txt_ITEM_10", which is arbitrary as well (see "Objectives" and "Conclusions" part). 
+This part is simply used to avoid duplication in string name. 
+
+```{r title}
+txt_title  <- "How to Make a Poster with ggposter Package in R"
+txt_subt   <- "For comfortable and tidy work"
+txt_kw     <- "Key words: ggplot2, grid, gridtext, R"
+txt_author <- "Toshikazu Matsumura, matutosi@gmail.com"
+txt_affil <- "Konan Women's Univ., Japan"
+```
+
+We can combine strings into an arranged grob.
+Arguments `x=0.5` and `y=0.5` indicate that the position of each string in each viewport will be centered, 
+while argument hjust specify the horizontal adjustment of the each string. 
+`width=full` means grob width will be 210 mm in this case (cf. "Poster size"), 
+and `shrink=0.25` make the font size as 0.25 times as the original size. 
+We can draw a generated grob by `grid.draw`, as shown bellow. 
+
+```{r arrange_text}
+title <- arrange_txt(
+    txt_title, txt_subt, txt_kw, txt_author, txt_affil,
+    x=0.5, y=0.5, hjust=c(rep(0.5, 3), rep(0, 2)), widths=full)
+grid::grid.draw(title)
+  # show layout
+    # grid::grid.show.layout(title$frame$layout)
+    # grid::grid.draw(title)
+```
+
+## Objectives
+
+Like title and other string, we can combine some items and sentences, as shown bellow. 
+
+```{r objectives}
+txt_ITEM_10  <- "OBJECTIVES"
+txt_BODY_11   <- "- Want to use R throughout making a poster."
+txt_BODY_12   <- "- To use grid and ggplot2 system."
+txt_BODY_13   <- "- Not to make similar poster from scratch."
+
+txt_ITEM_20  <- "BACKGROUNDS"
+txt_BODY_21   <- "- No R packages or tools for making a poster."
+txt_BODY_22  <- "- PowerPoint needs many manual procedures to uniform a style."
+txt_BODY_23  <- "- If we can make a poster with R, no need to save and load plots."
+
+objectives <- arrange_txt(
+  txt_ITEM_10, 
+  txt_BODY_11, txt_BODY_12, txt_BODY_13, widths=half)
+
+backgrounds <- arrange_txt(
+  txt_ITEM_20, 
+  txt_BODY_21, txt_BODY_22, txt_BODY_23, widths=half)
+  # show layout
+  #   grid::grid.show.layout(objectives$frame$layout)
+  #   grid::grid.show.layout(backgrounds$frame$layout)
+  #   grid.draw(objectives)
+  #   grid.newpage()
+  #   grid.draw(objectives)
+```
+
+## Conclusions
+
+This is a simple sample, too. 
+
+```{r conclusions}
+txt_ITEM_30  <- "CONCLUSIONS"
+txt_BODY_31   <- "- Please install from CRAN or GitHub."
+txt_BODY_32   <- "- ggposter package can might be a alternative tool for making a poster and slides."
+txt_BODY_33   <- "- Colaboration with ggplot2, gridtext or other package may produce more effects."
+txt_BODY_34   <- "- Still in the development stage and can have bugs."
+txt_BODY_35   <- "- Welcome your requests."
+txt_BODY_36   <- "- ENJOY!"
+
+conclusions <- arrange_txt(
+  txt_ITEM_30, 
+  txt_BODY_31, txt_BODY_32, txt_BODY_33, txt_BODY_34, txt_BODY_35, txt_BODY_36, 
+  widths=half)
+```
+
+
+## Combine text 
+
+Arranged text grob generated by `arrange_txt()` can be apposed and/or stacked by `stack_grobs_conv()` and `appose_grobs_conv()`. 
+
+Objectives and backgrounds are stacked, and then apposed besides `conclusions`. 
+At Last, title will be stacked above objectives and backgrounds. 
+We can draw combined grob (part_1). 
+In this case, the paper size is A4, so you can check small manuscript on a paper or your pc screen. 
+
+```{r combine_part_1, fig.height = 12}
+grid::grid.newpage()
+part_1 <- 
+  combine_grobs(title, 
+    combine_grobs(
+      combine_grobs(objectives, backgrounds, direction = "vertical", unify="as_is", space=space),
+      conclusions, direction = "horizontal", unify="as_is", space=space), 
+  direction = "vertical", unify="as_is", space=space)
+grid.draw(part_1)
+```
+
+
+## Combine fig and table
+
+
+```{r fig_font_size, opts.label="small"}
+fig_font_size <- 
+  font_size_list %>%
+  ggplot2::ggplot(ggplot2::aes(x=base_size, y=size)) + 
+    ggplot2::geom_point() + 
+    ggplot2::theme_bw()
+
+
+fig_font_size_grob <-
+  fig_font_size %>%
+  ggplotGrob() %>%
+  fix_size(width=grid::unit(80, "mm"), shrink=shrink * 26 / 12)
+
+grid.draw(fig_font_size_grob)
+
+
+
+fig_description <- 
+"
+- ggposter include a series of font size.<br>
+- Base font size for a poster is 22, 26 or 32 pt.<br>
+- Font `size` used exactly in a poster will be selected automatically.<br>
+  - eg. text name: txt_ITEM_05 font size for ITEM.<br>
+- We can change font size according to preference.<br>
+" %>%
+  gridtext::textbox_grob(width=0.5*half, use_markdown=FALSE)
+
+fig_apposed <- combine_grobs(fig_font_size_grob, fig_description, direction="horizontal", unify="as_is")
+grid::grid.draw(fig_apposed)
+
+```
+
+
+
+
+
+```{r table_iris, opts.label="small"}
+table_iris <- 
+  head(iris) %>%
+  gridExtra::tableGrob(rows=NULL, theme=gridExtra::ttheme_minimal())  %>%
+  add_booktab(lwd_out=2, lwd_in=1) %>%
+  grid::grid.draw()
+table_description <- ""
+
+```
+
+
+## List of main functions
+
+```{r function_list}
+  # tbl_fun_combine_grobs
+fun <- 
+    c("combine_grobs", "frame_place_grobs", "appose_grobs", "stack_grobs")
+descrintion <- 
+    c("Combine grobs horizontally or vertically", 
+    "Make frame and place grobs in combine_grobs", 
+    "Shortcut for combining horizontally", 
+    "Shortcut for combining vertically")
+title <- "Combining grobs"
+fontsize <- 26
+tbl_fun_combine_grobs <- 
+  tibble::tibble(name = fun, descrintion = descrintion) %>%
+    booktab_table_grob(title = title, fontsize = fontsize)
+
+  # arrange_text
+fun <- 
+    c("arrange_txt", "font_size_list", "get_font_size")
+descrintion <- 
+    c("Arrange text and select font size according to variable names",
+      "Data including various range of base size and relative font size",
+      "Select font size according to variable names and base font size")
+title <- "Arranging text"
+fontsize <- 26
+tbl_arrange_text <- 
+  tibble::tibble(name = fun, descrintion = descrintion) %>%
+    booktab_table_grob(title = title, fontsize = fontsize)
+
+  # tbl_table_grob
+fun <- 
+    c("booktab_table_grob", "add_annotation", "add_booktab")
+    # , "add_inner_line", "add_outer_line")
+descrintion <- 
+    c("Generate a booktab like table grob",
+      "Add title and caption in booktab_table_grob",
+      "Add lines like booktab in booktab_table_grob")
+title <- "Generating table grob"
+fontsize <- 26
+tbl_tbl_table_grob <- 
+  tibble::tibble(name = fun, descrintion = descrintion) %>%
+    booktab_table_grob(title = title, fontsize = fontsize)
+
+  # tbl_convert
+fun <- 
+    c("ggplot2grob", "plot2grob")
+descrintion <- 
+    c("Convert ggplot object into grob",
+      "Convert base plot into grob")
+title <- "Converting figure into grob"
+fontsize <- 26
+tbl_convert <- 
+  tibble::tibble(name = fun, descrintion = descrintion) %>%
+    booktab_table_grob(title = title, fontsize = fontsize)
+
+list_1 <- 
+    combine_grobs(tbl_fun_combine_grobs, tbl_arrange_text, 
+                  direction = "vertical", unify = "as_is", space = grid::unit(10, "mm"))
+list_2 <- 
+    combine_grobs(tbl_tbl_table_grob, tbl_convert, 
+                  direction = "vertical", unify = "as_is", space = grid::unit(10, "mm"))
+list_all <- 
+    combine_grobs(list_1, list_2, 
+                  direction = "horizontal", unify = "as_is", space = grid::unit(10, "mm"))
+
+grid::grid.draw(list_all)
+
+  # all objects in ggposter
+  # pkg <- "ggposter"
+  # funs <- 
+  #   stringr::str_c("package:", pkg) %>%
+  #   ls()
+```
+
+
+## Rendering a poster
+
+```{r rendering_and_save}
+grid.newpage()
+
+
+  # ggplot2::ggsave("d:/tmp.pdf", poster)
+  # ggplot2::ggsave("d:/tmp.png", poster)
 ```
 
 # Overview
@@ -443,7 +749,7 @@ head(iris) %>%
 ```
 
 
-## With ggplot2 
+## With ggplot2
 
 We can use ggplot2 object in ggposter. 
 A ggplot2 object is based on grid, but it is not a grob. 
@@ -469,6 +775,7 @@ grid::grid.newpage()
 ftg <- appose_fig_text(fig, text, widths = grid::unit(c(120, 170), "mm"), fontsize = 26)
 grid::grid.draw(ftg)
 ```
+
 
 We can convert ggplot2 object using ggplot2grob() and combine them by combine_grobs as shown below. 
 
@@ -499,248 +806,28 @@ combined_figs <-
 grid::grid.draw(combined_figs)
 ```
 
+## With base plot
+
+We can create many kinds of plots and figures with ggplot2 and its extension packages. 
+Sometimes, however, we want to reuse figures that was made with base plot at past and it is tiresome to write code again. 
+We can convert base plot using plot2grob() and combine them by combine_grobs as shown below. 
+
+```{r plot2grob}
+n <- 100
+rn <- rnorm(n)
+base_plot    <- plot2grob(~plot(rn, 1:n, xlim=c(-3, 3)), width = half / 2)
+base_hist    <- plot2grob(~hist(rn, xlim=c(-3, 3)), width = half / 2)
+base_boxplot <- plot2grob(~boxplot(rn, horizontal = TRUE, ylim=c(-3, 3)), width = half / 2)
+
+fig_base <- combine_grobs(base_plot, base_hist, base_boxplot, unify = "height")
+grid::grid.draw(fig_base)
+```
+
 ## With gridtext
 
 ggposter use functions from gridtext package, which generate grob. 
-The package improve making poster more than using only ggposer, 
+The package improve making poster more than using only ggposter, 
 so please use functions such as gridtext::textbox_grob() and gridtext::richtext_grob() (see https://wilkelab.org/gridtext/). 
-
-
-# Example: ggposter
-
-As an example, this vignette shows how to make a poster. 
-
-## Title
-
-A string name "txt_title" means that the font size of this string (value) will be selected for title. 
-Data `font_size_list` include various range of base size and relative font size (see "font size" part).
-We change base of font size, then a series of font size will be changed. 
-
-The first part of string name ( "txt" in "txt_title" ) is arbitrary, 
-and second part decides font size. 
-We can add third part like "txt_ITEM_10", which is arbitrary as well (see "Objectives" and "Conclusions" part). 
-This part is simply used to avoid duplication in string name. 
-
-```{r title}
-txt_title  <- "How to Make a Poster with ggposter Package in R"
-txt_subt   <- "For comfortable and tidy work"
-txt_kw     <- "Key words: ggplot2, grid, gridtext, R"
-txt_author <- "Toshikazu Matsumura, matutosi@gmail.com"
-txt_affil <- "Konan Women's Univ., Japan"
-```
-
-We can combine strings into an arranged grob.
-Arguments `x=0.5` and `y=0.5` indicate that the position of each string in each viewport will be centered, 
-while argument hjust specify the horizontal adjustment of the each string. 
-`width=full` means grob width will be 210 mm in this case (cf. "Poster size"), 
-and `shrink=0.25` make the font size as 0.25 times as the original size. 
-We can draw a generated grob by `grid.draw`, as shown bellow. 
-
-```{r arrange_text}
-title <- arrange_txt(
-    txt_title, txt_subt, txt_kw, txt_author, txt_affil,
-    x=0.5, y=0.5, hjust=c(rep(0.5, 3), rep(0, 2)), widths=full)
-grid::grid.draw(title)
-  # show layout
-    # grid::grid.show.layout(title$frame$layout)
-    # grid::grid.draw(title)
-```
-
-## Objectives
-
-Like title and other string, we can combine some items and sentences, as shown bellow. 
-
-```{r objectives}
-txt_ITEM_10  <- "OBJECTIVES"
-txt_BODY_11   <- "- Want to use R throughout making a poster."
-txt_BODY_12   <- "- To use grid and ggplot2 system."
-txt_BODY_13   <- "- Not to make similar poster from scratch."
-
-txt_ITEM_20  <- "BACKGROUNDS"
-txt_BODY_21   <- "- No R packages or tools for making a poster."
-txt_BODY_22  <- "- PowerPoint needs many manual procedures to uniform a style."
-txt_BODY_23  <- "- If we can make a poster with R, no need to save and load plots."
-
-objectives <- arrange_txt(
-  txt_ITEM_10, 
-  txt_BODY_11, txt_BODY_12, txt_BODY_13, widths=half)
-
-backgrounds <- arrange_txt(
-  txt_ITEM_20, 
-  txt_BODY_21, txt_BODY_22, txt_BODY_23, widths=half)
-  # show layout
-  #   grid::grid.show.layout(objectives$frame$layout)
-  #   grid::grid.show.layout(backgrounds$frame$layout)
-  #   grid.draw(objectives)
-  #   grid.newpage()
-  #   grid.draw(objectives)
-```
-
-## Conclusions
-
-This is a simple sample, too. 
-
-```{r conclusions}
-txt_ITEM_30  <- "CONCLUSIONS"
-txt_BODY_31   <- "- Please install from CRAN or GitHub."
-txt_BODY_32   <- "- ggposter package can might be a alternative tool for making a poster and slides."
-txt_BODY_33   <- "- Colaboration with ggplot2, gridtext or other package may produce more effects."
-txt_BODY_34   <- "- Still in the development stage and can have bugs."
-txt_BODY_35   <- "- Welcome your requests."
-txt_BODY_36   <- "- ENJOY!"
-
-conclusions <- arrange_txt(
-  txt_ITEM_30, 
-  txt_BODY_31, txt_BODY_32, txt_BODY_33, txt_BODY_34, txt_BODY_35, txt_BODY_36, 
-  widths=half)
-```
-
-## Combine text 
-
-Arranged text grob generated by `arrange_txt()` can be apposed and/or stacked by `stack_grobs_conv()` and `appose_grobs_conv()`. 
-
-Objectives and backgrounds are stacked, and then apposed besides `conclusions`. 
-At Last, title will be stacked above objectives and backgrounds. 
-We can draw combined grob (part_1). 
-In this case, the paper size is A4, so you can check small manuscript on a paper or your pc screen. 
-
-```{r combine_part_1, fig.height = 12}
-grid::grid.newpage()
-part_1 <- 
-  combine_grobs(title, 
-    combine_grobs(
-      combine_grobs(objectives, backgrounds, direction = "vertical", unify="as_is", space=space),
-      conclusions, direction = "horizontal", unify="as_is", space=space), 
-  direction = "vertical", unify="as_is", space=space)
-grid.draw(part_1)
-```
-
-
-## Combine fig and table
-
-
-```{r fig_font_size, opts.label="small"}
-fig_font_size <- 
-  font_size_list %>%
-  ggplot2::ggplot(ggplot2::aes(x=base_size, y=size)) + 
-    ggplot2::geom_point() + 
-    ggplot2::theme_bw()
-
-
-fig_font_size_grob <-
-  fig_font_size %>%
-  ggplotGrob() %>%
-  fix_size(width=grid::unit(80, "mm"), shrink=shrink * 26 / 12)
-
-grid.draw(fig_font_size_grob)
-
-
-
-fig_description <- 
-"
-- ggposter include a series of font size.<br>
-- Base font size for a poster is 22, 26 or 32 pt.<br>
-- Font `size` used exactly in a poster will be selected automatically.<br>
-  - eg. text name: txt_ITEM_05 font size for ITEM.<br>
-- We can change font size according to preference.<br>
-" %>%
-  gridtext::textbox_grob(width=0.5*half, use_markdown=FALSE)
-
-fig_apposed <- combine_grobs(fig_font_size_grob, fig_description, direction="horizontal", unify="as_is")
-grid::grid.draw(fig_apposed)
-
-```
-
-
-
-
-
-```{r table_iris, opts.label="small"}
-table_iris <- 
-  head(iris) %>%
-  gridExtra::tableGrob(rows=NULL, theme=gridExtra::ttheme_minimal())  %>%
-  add_booktab(lwd_out=2, lwd_in=1) %>%
-  grid::grid.draw()
-table_description <- ""
-
-```
-
-
-
-## Rendering a poster
-
-```{r rendering_and_save}
-grid.newpage()
-
-
-  # ggplot2::ggsave("d:/tmp.pdf", poster)
-  # ggplot2::ggsave("d:/tmp.png", poster)
-```
-
-# Make a Slide
-
-
-
-```{r}
-  # title
-title <- "Colab with ggplot2 and gridtext"
-fontsize <- 32
-gp_title <- grid::gpar(fontsize=fontsize)
-
-  # text
-txt_body_31 <- "As shown in this example, we can use ggplot object in ggposter. "
-txt_body_32 <- "We can write description aroud it."
-description <- stringr::str_c(txt_body_31, txt_body_32)
-fontsize <- 26
-lineheight <- 1.1
-gp_text <- grid::gpar(fontsize=fontsize, lineheight=lineheight)
-
-  # generate slide and draw
-slide <- gen_slide(title, fig, description, gp_title, gp_text, width=half)
-grid.newpage()
-grid::grid.draw(slide)
-
-description_1 <- 
-  arrange_txt(
-    txt_body_31, txt_body_32, 
-    widths=half * shrink)
-grid.newpage()
-grid.draw(combine_grobs(ggplot2::ggplotGrob(fig), description_1, direction="horizontal", unify="width"))
-```
-
-
-```{r slide, opts.label="part"}
-library(grid)
-
-fig <- 
-  ggplot2::ggplot(mpg, aes(x=displ, y=hwy)) + 
-  geom_point() +
-  theme_bw()
-
-  # text
-t_1 <- "This is a sample text. "
-t_2 <- "When longer than width, "
-t_3 <- "text will be split and add breaks. "
-t_4 <- "This text is separated into 5 objects, "
-t_5 <- "because of R document specification."
-text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
-  # gp_text
-fontsize <- 20
-lineheight <- 1.1
-gp_text <- gpar(fontsize=fontsize, lineheight=lineheight)
-
-  # title
-title_1 <- "THIS IS TITLE WORDS"
-  # gp_text
-fontsize <- 40
-gp_title <- gpar(fontsize=fontsize)
-
-slide <- gen_slide(title_1, fig, text, gp_title, gp_text)
-grid.draw(slide)
-  # ggplot2::ggsave("d:/slide.pdf", slide, height=210, width=297, units="mm")
-
-```
-
 
 
 # Inside ggposter
@@ -884,6 +971,68 @@ grid::grid.draw(apposed_fixed)
 -->
 
 
+# Make a Slide
+
+
+```{r}
+  # title
+title <- "Colab with ggplot2 and gridtext"
+fontsize <- 32
+gp_title <- grid::gpar(fontsize=fontsize)
+
+  # text
+txt_body_31 <- "As shown in this example, we can use ggplot object in ggposter. "
+txt_body_32 <- "We can write description aroud it."
+description <- stringr::str_c(txt_body_31, txt_body_32)
+fontsize <- 26
+lineheight <- 1.1
+gp_text <- grid::gpar(fontsize=fontsize, lineheight=lineheight)
+
+  # figure
+fig <- 
+  ggplot2::ggplot(mpg, aes(x=displ, y=hwy)) + 
+  geom_point() +
+  theme_bw()
+
+  # generate slide and draw
+slide <- gen_slide(title, fig, description, gp_title, gp_text, width=half)
+grid::grid.draw(slide)
+
+description_1 <- 
+  arrange_txt(
+    txt_body_31, txt_body_32, 
+    widths=half * shrink)
+grid.newpage()
+grid.draw(combine_grobs(ggplot2::ggplotGrob(fig), description_1, direction="horizontal", unify="width"))
+```
+
+
+```{r slide, opts.label="part"}
+  # text
+t_1 <- "This is a sample text. "
+t_2 <- "When longer than width, "
+t_3 <- "text will be split and add breaks. "
+t_4 <- "This text is separated into 5 objects, "
+t_5 <- "because of R document specification."
+text <- stringr::str_c(t_1, t_2, t_3, t_4, t_5)
+  # gp_text
+fontsize <- 20
+lineheight <- 1.1
+gp_text <- gpar(fontsize=fontsize, lineheight=lineheight)
+
+  # title
+title_1 <- "THIS IS TITLE WORDS"
+  # gp_text
+fontsize <- 40
+gp_title <- gpar(fontsize=fontsize)
+
+slide <- gen_slide(title_1, fig, text, gp_title, gp_text)
+grid.draw(slide)
+  # ggplot2::ggsave("d:/slide.pdf", slide, height=210, width=297, units="mm")
+
+```
+
+
 # References
 
 - Code in "R graphic" by Paul Murell
@@ -983,8 +1132,106 @@ because grobHeight() and grobWidth() become 0 mm !!
   convertUnit(grobWidth(t2), "mm")
 
 
--->
-<!--
+## Figures
+  # fig_mpg2
+  # https://ggplot2-book.org/facet.html#controlling-scales
+mpg2 <- 
+  mpg %>%
+  dplyr::filter(cyl != 5) %>%
+  dplyr::filter(drv %in% c("4", "f")) %>%
+  dplyr::filter(class != "2seater")
+mpg2$model <- reorder(mpg2$model, mpg2$cty)
+mpg2$manufacturer <- reorder(mpg2$manufacturer, -mpg2$cty)
+
+fig_mpg2 <- 
+  {ggplot(mpg2, aes(cty, model)) + 
+      geom_point() + 
+      facet_grid(manufacturer ~ ., scales = "free", space = "free") +
+      theme_bw() + 
+      theme(strip.text.y = element_text(angle = 0))
+  } %>%
+  ggplot2grob(fontsize = 16, width = half / 2, height = half) %>%
+  grid::grid.draw()
+
+  # fig_ggrepel
+  # https://github.com/wch/rgcookbook/blob/master/ch05.Rmd
+library(gcookbook)
+library(ggrepel)
+
+gg_ggrepel <- 
+  countries %>%
+  dplyr::filter(Year == 2009 & healthexp > 2000) %>%
+  ggplot(aes(x = healthexp, y = infmortality)) + 
+      geom_point() + 
+      theme_bw() + 
+      geom_label_repel(aes(label = Name), size = 3)
+fig_ggrepel <- 
+  ggplot2grob(gg_ggrepel, fontsize = 16, width = half / 2) %>%
+  grid::grid.draw()
+
+  # fig_map
+  # https://github.com/wch/rgcookbook/blob/master/ch13.Rmd
+library(gcookbook) # For the isabel data set
+library(grid)
+head(isabel)
+islice <- filter(isabel, z == min(z))
+
+every_n <- function(x, by = 2) {
+  x <- sort(x)
+  x[seq(1, length(x), by = by)]
+}
+keepx <- every_n(unique(isabel$x), by = 2)
+keepy <- every_n(unique(isabel$y), by = 2)
+islicesub <- filter(islice, x %in% keepx  &  y %in% keepy)
+
+usa <- map_data("usa")
+fig_map <- 
+  {ggplot(islicesub, aes(x = x, y = y)) +
+    geom_segment(aes(xend = x+vx/50, yend = y+vy/50, colour = speed),
+                 arrow = arrow(length = unit(0.1,"cm")), size = 0.6) +
+    scale_colour_continuous(low = "grey80", high = "darkred") +
+    geom_path(aes(x = long, y = lat, group = group), data = usa) +
+    coord_cartesian(xlim = range(islicesub$x), ylim = range(islicesub$y)) + 
+    theme_bw() + 
+    theme(legend.position = "none")
+  } %>%
+  ggplot2grob(fontsize = 16, width = half / 2) %>%
+  grid::grid.draw()
+
+library(GGally) 
+gg_pairs <- 
+  ggpairs(iris, aes_string(colour = "Species")) + 
+    theme_bw() 
+fig_pairs <- 
+  ggplot2grob(gg_pairs, fontsize = 16, width = half)
+
+
+
+  # 
+
+  # c("combine_grobs", "frame_place_grobs", "appose_grobs", "stack_grobs") %>%
+  #    purrr::map(help, package = {{pkg}}) %>%
+  #    purrr::map(`$`, `path`) %>%
+  #    purrr::map(tools:::Rd2txt) %>%
+  #    purrr::map(str)
+
+
+  # utils
+  # c("grob_heights", "grob_widths")
+
+  # "appose_fig_text"
+  # "gen_slide"
+
+  # packageDescription("ggposter")
+  # formals(ggposter::combine_grobs)
+  # helptext <- help("combine_grobs", package = ggposter)
+  # tools:::Rd2txt(helptext$path)
 
 -->
+
+
+<!--
+-->
 <!-- -->
+
+

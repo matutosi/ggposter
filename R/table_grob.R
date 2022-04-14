@@ -35,7 +35,8 @@ fix_table_unit <- function(tg) {
 #' @param tg             A table grob.
 #' @param df             A data frame.
 #' @param title,caption  A string.
-#' @param fontsize       A numeric.
+#' @param title_size     A numeric.
+#' @param fontsize       A numeric specified by pt.
 #' @param shrink         A numeric.
 #' @param lwd_out,lwd_in A numeric. Line width.
 #' @param space          grid unit. Space between grobs.
@@ -44,6 +45,7 @@ fix_table_unit <- function(tg) {
 #' @name table_grob
 #' @export
 booktab_table_grob <- function(df, title = NULL, caption = NULL, 
+                               title_size = 1.2, 
                                fontsize = NULL, shrink = 1, lwd_out = 2, lwd_in = 1) {
   if (is.null(fontsize)) {
     fontsize <- grid::get.gpar()$fontsize
@@ -51,10 +53,11 @@ booktab_table_grob <- function(df, title = NULL, caption = NULL,
   fontsize <- fontsize * shrink
   lwd_out <- lwd_out * shrink
   lwd_in <- lwd_in * shrink
-  df %>%
+  tg <- 
+    df %>%
     gridExtra::tableGrob(rows = NULL, theme = gridExtra::ttheme_minimal(base_size = fontsize)) %>%
-    add_booktab(lwd_out = lwd_out, lwd_in = lwd_in) %>%
-    add_annotation(title = title, caption = caption, fontsize = fontsize)
+    add_booktab(lwd_out = lwd_out, lwd_in = lwd_in)
+  shoot(add_annotation, tg, title, caption, fontsize, title_size)
 }
 
 #' Add book tab to table grob
@@ -85,7 +88,7 @@ add_inner_line <- function(tg, lwd_in = 1) {
 #'
 #' @rdname table_grob
 #' @export
-add_outer_line <- function(tg, lwd_out = 2, space = grid::unit(0.1, "mm")) {
+add_outer_line <- function(tg, lwd_out = 2, space = grid::unit(1, "mm")) {
   rect_height <- grid::unit(0.1, "mm")
   rg <- grid::rectGrob(width = sum(tg$widths), height = rect_height, gp = grid::gpar(lwd = lwd_out))
   sg <- combine_grobs(rg, tg, rg, direction = "vertical", unify = "width", space = space)
@@ -95,14 +98,16 @@ add_outer_line <- function(tg, lwd_out = 2, space = grid::unit(0.1, "mm")) {
 #'
 #' @rdname table_grob
 #' @export
-add_annotation <- function(tg, title = NULL, caption = NULL, fontsize = NULL, space = NULL) {
+add_annotation <- function(tg, title = NULL, caption = NULL, 
+                           title_size = 1.2, 
+                           fontsize = NULL, space = NULL) {
   if (is.null(title) & is.null(caption)) return(tg)
   if (is.null(fontsize)) fontsize <- grid::get.gpar()$fontsize
   if (!is.null(title)) {
     title <- 
       gridtext::textbox_grob(
         text = title, width = grob_widths(tg), x = 0, hjust = 0, 
-        gp = grid::gpar(fontsize = fontsize * 1.5), use_markdown = FALSE)
+        gp = grid::gpar(fontsize = fontsize * title_size), use_markdown = FALSE)
   }
   if (!is.null(caption)) {
     caption <- 

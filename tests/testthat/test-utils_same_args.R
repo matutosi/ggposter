@@ -1,8 +1,8 @@
-test_that("do_same create the same result", {
+test_that("shoot create the same result", {
   x <- "a"
   times <- 10
-  expect_equal(rep.int(x = x, times = times), do_same(rep.int, x, times))
-  expect_equal(rep.int(x = x, times = times), do_same(rep.int, times, x))
+  expect_equal(rep.int(x = x, times = times), shoot(rep.int, x, times))
+  expect_equal(rep.int(x = x, times = times), shoot(rep.int, times, x))
 })
 
 test_that("same create the same result", {

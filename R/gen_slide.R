@@ -177,8 +177,9 @@ appose_fig_text <- function(fig, text,
 
 #' Convert ggplot2 object into grob
 #' 
-#' @@inheritParams set_font_size,fix_size
-#' @return A combined grob.
+#' @inheritParams set_font_size
+#' @inheritParams fix_size
+#' @return A grob.
 #' @export
 ggplot2grob <- function(gg, fontsize=NULL, width=grid::unit(1, "npc"), height = NULL){
   if (is.null(fontsize))
@@ -188,4 +189,15 @@ ggplot2grob <- function(gg, fontsize=NULL, width=grid::unit(1, "npc"), height = 
     set_font_size(fontsize = fontsize) %>%
     ggplot2::ggplotGrob() %>%
     fix_size(width = width, height = height)
+}
+
+#' Convert base plot into grob
+#' @param  plot A base plot. Input like "~plot(1:10)".
+#' @inheritParams set_font_size
+#' @inheritParams fix_size
+#' @return A grob.
+#' @export
+plot2grob <- function(plot, fontsize = NULL, width = grid::unit(1, "npc"), height = NULL){
+  ggplotify::as.ggplot(plot) %>%
+    ggplot2grob(fontsize = fontsize, width = width, height = height)
 }

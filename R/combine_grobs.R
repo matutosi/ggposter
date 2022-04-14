@@ -174,4 +174,3 @@ ratio_expantion <- function(height = NULL, width = NULL,
 
   return(expantion)
 }
-
