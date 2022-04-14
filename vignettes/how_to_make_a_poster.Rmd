@@ -319,7 +319,8 @@ table_description <- ""
 
 ```
 
-## List of main functions in ggposter
+
+## List of main functions
 
 ```{r function_list}
   # tbl_fun_combine_grobs
@@ -330,14 +331,24 @@ descrintion <-
     "Make frame and place grobs in combine_grobs", 
     "Shortcut for combining horizontally", 
     "Shortcut for combining vertically")
-title <- "Functions for combining grobs"
+title <- "Combining grobs"
 fontsize <- 26
 tbl_fun_combine_grobs <- 
   tibble::tibble(name = fun, descrintion = descrintion) %>%
-    booktab_table_grob(title = title, fontsize = fontsize) %>%
-    grid::grid.draw()
+    booktab_table_grob(title = title, fontsize = fontsize)
 
-grid::grid.newpage()
+  # arrange_text
+fun <- 
+    c("arrange_txt", "font_size_list", "get_font_size")
+descrintion <- 
+    c("Arrange text and select font size according to variable names",
+      "Data including various range of base size and relative font size",
+      "Select font size according to variable names and base font size")
+title <- "Arranging text"
+fontsize <- 26
+tbl_arrange_text <- 
+  tibble::tibble(name = fun, descrintion = descrintion) %>%
+    booktab_table_grob(title = title, fontsize = fontsize)
 
   # tbl_table_grob
 fun <- 
@@ -347,44 +358,41 @@ descrintion <-
     c("Generate a booktab like table grob",
       "Add title and caption in booktab_table_grob",
       "Add lines like booktab in booktab_table_grob")
-title <- "Functions for generating table grob"
+title <- "Generating table grob"
 fontsize <- 26
 tbl_tbl_table_grob <- 
   tibble::tibble(name = fun, descrintion = descrintion) %>%
-    booktab_table_grob(title = title, fontsize = fontsize) %>%
-    grid::grid.draw()
-
-grid::grid.newpage()
+    booktab_table_grob(title = title, fontsize = fontsize)
 
   # tbl_convert
-c("ggplot2grob", "plot2grob")
-c("Convert ggplot object into grob",
-  "Convert base plot into grob")
-title <- "Functions for converting figure into grob"
+fun <- 
+    c("ggplot2grob", "plot2grob")
+descrintion <- 
+    c("Convert ggplot object into grob",
+      "Convert base plot into grob")
+title <- "Converting figure into grob"
 fontsize <- 26
 tbl_convert <- 
   tibble::tibble(name = fun, descrintion = descrintion) %>%
-    booktab_table_grob(title = title, fontsize = fontsize) %>%
-    grid::grid.draw()
+    booktab_table_grob(title = title, fontsize = fontsize)
 
-grid::grid.newpage()
+list_1 <- 
+    combine_grobs(tbl_fun_combine_grobs, tbl_arrange_text, 
+                  direction = "vertical", unify = "as_is", space = grid::unit(10, "mm"))
+list_2 <- 
+    combine_grobs(tbl_tbl_table_grob, tbl_convert, 
+                  direction = "vertical", unify = "as_is", space = grid::unit(10, "mm"))
+list_all <- 
+    combine_grobs(list_1, list_2, 
+                  direction = "horizontal", unify = "as_is", space = grid::unit(10, "mm"))
 
-  # arrange_text
-c("arrange_txt", "font_size_list", "get_font_size")
-c("Arrange text and select font size according to variable names",
-  "Data including various range of base size and relative font size",
-  "Select font size according to variable names and base font size")
-title <- "Functions for arranging text"
-fontsize <- 26
-tbl_arrange_text <- 
-  tibble::tibble(name = fun, descrintion = descrintion) %>%
-    booktab_table_grob(title = title, fontsize = fontsize) %>%
-    grid::grid.draw()
+grid::grid.draw(list_all)
 
-pkg <- "ggposter"
-funs <- 
-  stringr::str_c("package:", pkg) %>%
-  ls()
+  # all objects in ggposter
+  # pkg <- "ggposter"
+  # funs <- 
+  #   stringr::str_c("package:", pkg) %>%
+  #   ls()
 ```
 
 
