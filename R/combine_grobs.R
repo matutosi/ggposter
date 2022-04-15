@@ -24,6 +24,7 @@ combine_grobs <- function(..., direction = "horizontal",
                                 space = grid::unit(0, "mm"), 
                                 gp = grid::gpar(), shrink = 1, name = NULL) {
   grobs <- dots2list(...)
+print(grobs)
   widths  <- grob_widths(grobs,  convert_to = "mm")
   heights <- grob_heights(grobs, convert_to = "mm")
 
@@ -71,9 +72,9 @@ appose_grobs <- function(...,  width = NULL, height = NULL,
                                 grow = TRUE, unify = "as_is", 
                                 space = grid::unit(0, "mm"), 
                                 gp = grid::gpar(), shrink = 1, name = NULL) {
-  combine_grobs(
-    ..., direction = "horizontal", 
-    width, height, grow, unify, space, gp, shrink, name)
+  direction <- "horizontal"
+  shoot(combine_grobs, 
+        ..., direction, width, height, grow, unify, space, gp, shrink, name)
 }
 
 #' @rdname combine_grobs
@@ -82,9 +83,9 @@ stack_grobs <- function(...,  width = NULL, height = NULL,
                                 grow = TRUE, unify = "as_is", 
                                 space = grid::unit(0, "mm"), 
                                 gp = grid::gpar(), shrink = 1, name = NULL) {
-  combine_grobs(
-    ..., direction = "vertical", 
-    width, height, grow, unify, space, gp, shrink, name)
+  direction <- "vertical"
+  shoot(combine_grobs, 
+        ..., direction, width, height, grow, unify, space, gp, shrink, name)
 }
 
 #' @rdname combine_grobs
