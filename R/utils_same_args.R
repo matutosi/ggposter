@@ -14,7 +14,7 @@ shoot <- function(fun, ...){
 #' @export
 same <- function(...){
   res <- stringr::str_c("list(", as_same(...), ")")
-  parse(text=res)
+  parse(text = res)
 }
 
 #' @rdname shoot
