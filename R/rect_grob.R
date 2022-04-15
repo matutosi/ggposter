@@ -2,6 +2,7 @@
 #'
 #' @param grob                A grid grob.
 #' @param width,height,space  A grid unit.
+#' @param ...                 Other arguments for rectGrob().
 #' @return grob
 #'
 #' @export
@@ -11,8 +12,6 @@ add_rect <- function(grob,
   space <- grid::convertUnit(space, unitTo = "mm")
   if(is.null(width))  width  <- grob_widths(grob,  convert_to = "mm") + space
   if(is.null(height)) height <- grob_heights(grob, convert_to = "mm") + space
-print(width)
-print(height)
   rect <- shoot(grid::rectGrob, width, height, ...)
-  gTree(children = gList(rect, grob))
+  grid::gTree(children = grid::gList(rect, grob))
 }
