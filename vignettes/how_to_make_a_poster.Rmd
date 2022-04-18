@@ -106,6 +106,110 @@ out.heignt <- "100%"
 knitr::opts_template$set(full = shoot(list, fig.width, out.width, fig.height, out.height, cache, prow))
 ```
 
+## 
+
+```{r}
+  # https://ggplot2-book.org/facet.html#group-vs-facet
+df <- data.frame(
+  x = rnorm(120, c(0, 2, 4)),
+  y = rnorm(120, c(1, 2, 1)),
+  z = letters[1:3]
+)
+df2 <- dplyr::select(df, -z)
+fig_facet <- 
+  {ggplot(df, aes(x, y)) + 
+      geom_point(data = df2, colour = "grey70") +
+      geom_point(aes(colour = z), cex=2.5) + 
+      facet_wrap(~z) + 
+      theme_bw() + 
+      theme(legend.position = "none")
+  } %>%
+  ggplot2grob(fontsize = 16, width = half, height = half / 3)
+
+  # https://github.com/wch/rgcookbook/blob/master/ch13.Rmd
+library(corrplot)
+data_cor <- 
+  mtcars %>%
+  cor() %>%
+  round(digits = 2)
+
+fig_cor <-
+  plot2grob(~corrplot(data_cor), fontsize = 16, width = half / 2)
+
+library(gplots)
+data(Boston, package = "MASS")
+fig_heatmap <- 
+  plot2grob(~heatmap.2(as.matrix(Boston), scale = "column", trace = "none"), 
+            fontsize = 16, width = half / 2, height = half)
+
+library(gcookbook)
+data_c2009 <- 
+  countries %>%
+  dplyr::filter(Year == 2009) %>%
+  dplyr::select(GDP, laborrate, healthexp, infmortality)
+fig_pairs <- 
+  plot2grob(~pairs(data_c2009), fontsize = 16, width = half / 2)
+
+txt_ITEM_10  <- "USE FIGURES"
+txt_BODY_11   <- "- Can use ggplot2 object and base plot."
+txt_BODY_12   <- "- ggplot2grob() and plot2grob() convert figures into grobs."
+txt_BODY_13   <- "- Can combine figures (grob) using combine_grobs()."
+
+figs_description <- 
+  arrange_txt(
+    txt_ITEM_10, 
+    txt_BODY_11, txt_BODY_12, txt_BODY_13, widths=half)
+
+figs <- 
+  stack_grobs(fig_cor, fig_pairs) %>%
+  appose_grobs(fig_heatmap) %>%
+  stack_grobs(figs_description, .) %>%
+  stack_grobs(fig_facet) %>%
+  add_rect(width = half - space_20)
+
+
+fontsize <- 36
+
+tbl_font_size <- 
+  font_size_list %>%
+  dplyr::filter(base_size == 26) %>%
+  booktab_table_grob(title="Font size of ggposter", fontsize = fontsize)
+
+tlb_base_size <- 
+  font_size_list %>%
+  dplyr::filter(ratio==1) %>%
+  booktab_table_grob(title="Base font size of ggposter", 
+    caption="Font size increases every 1.2 times approximately.", 
+    fontsize = fontsize)
+
+tbls <- 
+  combine_grobs(tbl_font_size, tlb_base_size, 
+    direction="vertical", unify="as_is", space = space_20) %>%
+  add_rect(width = half - space_20)
+
+grob_heights(fig_cor, convert_to="mm")
+grob_heights(fig_pairs, convert_to="mm")
+
+grob_heights(tbls, convert_to="mm")
+grob_widths(tbls, convert_to="mm")
+
+  # is.grtree <- function (x) inherits(x, "gTree")
+  # grobs <- figs
+  # if(is.grtree(grob)) grobs <- grobs$children
+  # convert_to = "mm"
+  #   n <- if(grid::is.grob(grobs)) 1 else length(grobs)
+  #   heights <- grid::unit(rep(1, n), rep("grobheight", n), grobs)
+  #   if(!is.null(convert_to)) heights <- grid::convertUnit(heights, convert_to)
+  #   return(heights)
+
+  # grob_heights(figs$children, convert_to="mm")
+  # children_name <- grid::childNames(grob)
+  # grid::getGrob(children[1])
+  # path <- grid::gPath(parent_name, children_name[1])
+  # grid::getGrob(path)
+
+```
+
 
 # Basics
 
