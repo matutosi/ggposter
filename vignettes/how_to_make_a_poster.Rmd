@@ -136,11 +136,11 @@ data_cor <-
 fig_cor <-
   plot2grob(~corrplot(data_cor), fontsize = 16, width = half / 2)
 
-library(gplots)
-data(Boston, package = "MASS")
-fig_heatmap <- 
-  plot2grob(~heatmap.2(as.matrix(Boston), scale = "column", trace = "none"), 
-            fontsize = 16, width = half / 2, height = half)
+  # library(gplots)
+  # data(Boston, package = "MASS")
+  # fig_heatmap <- 
+  #   plot2grob(~heatmap.2(as.matrix(Boston), scale = "column", trace = "none"), 
+  #             fontsize = 16, width = half / 2, height = half)
 
 library(gcookbook)
 data_c2009 <- 
@@ -162,11 +162,10 @@ figs_description <-
 
 figs <- 
   stack_grobs(fig_cor, fig_pairs) %>%
-  appose_grobs(fig_heatmap) %>%
+  #   appose_grobs(fig_heatmap) %>%
   stack_grobs(figs_description, .) %>%
   stack_grobs(fig_facet) %>%
   add_rect(width = half - space_20)
-
 
 fontsize <- 36
 
@@ -187,26 +186,6 @@ tbls <-
     direction="vertical", unify="as_is", space = space_20) %>%
   add_rect(width = half - space_20)
 
-grob_heights(fig_cor, convert_to="mm")
-grob_heights(fig_pairs, convert_to="mm")
-
-grob_heights(tbls, convert_to="mm")
-grob_widths(tbls, convert_to="mm")
-
-  # is.grtree <- function (x) inherits(x, "gTree")
-  # grobs <- figs
-  # if(is.grtree(grob)) grobs <- grobs$children
-  # convert_to = "mm"
-  #   n <- if(grid::is.grob(grobs)) 1 else length(grobs)
-  #   heights <- grid::unit(rep(1, n), rep("grobheight", n), grobs)
-  #   if(!is.null(convert_to)) heights <- grid::convertUnit(heights, convert_to)
-  #   return(heights)
-
-  # grob_heights(figs$children, convert_to="mm")
-  # children_name <- grid::childNames(grob)
-  # grid::getGrob(children[1])
-  # path <- grid::gPath(parent_name, children_name[1])
-  # grid::getGrob(path)
 
 ```
 
