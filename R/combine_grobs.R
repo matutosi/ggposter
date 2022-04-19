@@ -3,6 +3,7 @@
 #' appose_grobs() and stack_grobs() are helper function that set arguments 
 #' direction ("horizontal" and "vertical") and unify ("as_is").
 #' @param ...            grobs.
+#' @param grobs          A list of grobs.
 #' @param direction      A string. "horizontal" or "vertical".
 #' @param height,width   A grid unit.
 #' @param grow           A logical. Not work yet.
@@ -11,19 +12,20 @@
 #' @param gp             A gpar() object.
 #' @param shrink         A numeric.
 #' @param name           A string. grob name.
-#' @param grobs           A list of grobs to be combined
-#' @param layout          grid layout.
-#' @param widths,heights  grid units.
-#' @param convert_to      A grid unit.
+#' @param grobs          A list of grobs to be combined
+#' @param layout         grid layout.
+#' @param widths,heights grid units.
+#' @param convert_to     A grid unit.
 #' 
 #' @return  A combined grobs.
 #' @export
-combine_grobs <- function(..., direction = "horizontal", 
-                                width = NULL, height = NULL, 
-                                grow = TRUE, unify = "width", 
-                                space = grid::unit(0, "mm"), 
-                                gp = grid::gpar(), shrink = 1, name = NULL) {
-  grobs <- dots2list(...)
+combine_grobs <- function(..., grobs = NULL, 
+                          direction = "horizontal", 
+                          width = NULL, height = NULL, 
+                          grow = TRUE, unify = "width", 
+                          space = grid::unit(0, "mm"), 
+                          gp = grid::gpar(), shrink = 1, name = NULL) {
+  grobs   <- c(dots2list(...), grobs)
   widths  <- grob_widths(grobs,  convert_to = "mm")
   heights <- grob_heights(grobs, convert_to = "mm")
 
@@ -61,30 +63,34 @@ combine_grobs <- function(..., direction = "horizontal",
   layout <- 
     grid::grid.layout(nrow = nrow, ncol = ncol, heights = layout_heights, widths = layout_widths)
   combined_grobs <- 
-    frame_place_grobs(grobs, layout, widths, heights, direction = direction, gp, name)
+    frame_place_grobs(grobs, layout, widths, heights, direction, gp, name)
   combined_grobs
 }
 
 #' @rdname combine_grobs
 #' @export
-appose_grobs <- function(...,  width = NULL, height = NULL, 
-                                grow = TRUE, unify = "as_is", 
-                                space = grid::unit(0, "mm"), 
-                                gp = grid::gpar(), shrink = 1, name = NULL) {
-  combine_grobs(
-    ..., direction = "horizontal", 
-    width, height, grow, unify, space, gp, shrink, name)
+appose_grobs <- function(..., grobs = NULL, 
+                          width = NULL, height = NULL, 
+                          grow = TRUE, unify = "as_is", 
+                          space = grid::unit(0, "mm"), 
+                          gp = grid::gpar(), shrink = 1, name = NULL) {
+  grobs <- c(dots2list(...), grobs)
+  direction <- "horizontal"
+  shoot(combine_grobs, 
+        grobs, direction, width, height, grow, unify, space, gp, shrink, name)
 }
 
 #' @rdname combine_grobs
 #' @export
-stack_grobs <- function(...,  width = NULL, height = NULL, 
-                                grow = TRUE, unify = "as_is", 
-                                space = grid::unit(0, "mm"), 
-                                gp = grid::gpar(), shrink = 1, name = NULL) {
-  combine_grobs(
-    ..., direction = "vertical", 
-    width, height, grow, unify, space, gp, shrink, name)
+stack_grobs <- function(..., grobs = NULL, 
+                        width = NULL, height = NULL, 
+                        grow = TRUE, unify = "as_is", 
+                        space = grid::unit(0, "mm"), 
+                        gp = grid::gpar(), shrink = 1, name = NULL) {
+  grobs <- c(dots2list(...), grobs)
+  direction <- "vertical"
+  shoot(combine_grobs, 
+        grobs, direction, width, height, grow, unify, space, gp, shrink, name)
 }
 
 #' @rdname combine_grobs

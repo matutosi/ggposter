@@ -15,3 +15,5 @@ grob_heights <- function(grobs, convert_to=NULL){
   if(!is.null(convert_to)) heights <- grid::convertUnit(heights, convert_to)
   return(heights)
 }
+
+is.grtree <- function (x) inherits(x, "gTree")
