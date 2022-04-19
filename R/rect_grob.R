@@ -14,5 +14,9 @@ add_rect <- function(grob,
     if(is.null(width))  width  <- grob_widths(grob,  convert_to = "mm") + space
     if(is.null(height)) height <- grob_heights(grob, convert_to = "mm") + space
     rect <- grid::rectGrob(width = width, height = height, ...)
-    grid::gTree(children = grid::gList(rect, grob))
+      # To get width and height, set frame and place grob
+    layout <- grid::grid.layout(nrow = 1, ncol = 1, heights = height, widths = width)
+    frame <- grid::frameGrob(layout = layout)
+    grob <- grid::gTree(children = grid::gList(rect, grob))
+    grid::placeGrob(frame, grob, col = 1, row = 1)
 }
