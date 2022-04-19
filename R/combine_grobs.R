@@ -63,7 +63,7 @@ combine_grobs <- function(..., grobs = NULL,
   layout <- 
     grid::grid.layout(nrow = nrow, ncol = ncol, heights = layout_heights, widths = layout_widths)
   combined_grobs <- 
-    frame_place_grobs(grobs, layout, widths, heights, direction = direction, gp, name)
+    frame_place_grobs(grobs, layout, widths, heights, direction, gp, name)
   combined_grobs
 }
 
