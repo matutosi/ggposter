@@ -30,7 +30,8 @@ arrange_txt <- function(..., x = 0, y = 0.5,
                         convert = FALSE, shrink = 1, silent = TRUE) {
   widths <- widths * shrink
   tbl <- txt2tibble(...)
-  tg <- tbl %>%
+  tg <- 
+    tbl %>%
     dplyr::mutate(font_size = purrr::pmap_dbl(tbl, get_font_size, shrink = shrink, silent = silent)) %>%
     dplyr::mutate(x = x) %>%
     dplyr::mutate(y = y) %>%
