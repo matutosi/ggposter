@@ -29,7 +29,7 @@ You can install the development version of ggposter from [GitHub](https://github
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("matutosi/ggposter")
+remotes::install_github("matutosi/ggposter")
 ```
 
 ## Example
