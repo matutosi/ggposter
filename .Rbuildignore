@@ -4,6 +4,6 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^ggposter\.Rproj$
-tools
+^tools$
 ^README\.Rmd$
-vignettes
+^vignettes$
