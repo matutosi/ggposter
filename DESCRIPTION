@@ -1,6 +1,6 @@
 Package: ggposter
 Title: Build A1 Conference Posters from ggplot2 with YAML and patchwork
-Version: 0.5.0
+Version: 0.6.0
 Authors@R:
     person("Toshikazu", "Matsumura", , "matutosi@gmail.com", role = c("aut", "cre"))
 Description: ggposter declares a poster as a title band plus columns of
