@@ -7,3 +7,9 @@
 ^tools$
 ^README\.Rmd$
 ^vignettes$
+^\.claude$
+^poster\.pdf$
+^Rplots\.pdf$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

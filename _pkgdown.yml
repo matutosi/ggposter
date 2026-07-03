@@ -1,0 +1,32 @@
+url: https://matutosi.github.io/ggposter/
+template:
+  bootstrap: 5
+
+reference:
+- title: Build a poster
+  desc: Assemble and render a poster from a spec.
+  contents:
+  - poster
+  - read_poster_yaml
+  - render_poster
+
+- title: Theming
+  desc: Colours, fonts, and spacing.
+  contents:
+  - poster_theme
+  - theme_green
+  - poster_font
+  - poster_register_font
+
+- title: Content builders
+  desc: Build the body of a section card.
+  contents:
+  - card_text
+  - card_table
+  - card_figure
+  - card_image
+
+- title: Cards and titles
+  contents:
+  - poster_card
+  - poster_title

@@ -1,49 +1,44 @@
 Package: ggposter
-Title: Poster Creation Tool for Conference Presentations Using grid and
-    ggplot2 in R
+Title: Build A1 Conference Posters from ggplot2 with YAML and patchwork
 Version: 0.5.0
-Authors@R: 
+Authors@R:
     person("Toshikazu", "Matsumura", , "matutosi@gmail.com", role = c("aut", "cre"))
-Description: ggposter makes it easy to create a poster for conference
-    presentations using ggplot2 in R.
+Description: ggposter declares a poster as a title band plus columns of
+    rounded, tab-headed cards (text, tables, ggplot2 figures, or photo
+    strips), assembled with patchwork and rendered at true size (e.g. A1)
+    with embedded fonts, including CJK. Content and layout can be described
+    as an R list or a YAML file, while figures, tables, and photos are
+    supplied as R objects.
 License: MIT + file LICENSE
-Depends: 
+URL: https://matutosi.github.io/ggposter/, https://github.com/matutosi/ggposter
+BugReports: https://github.com/matutosi/ggposter/issues
+Depends:
     R (>= 3.5.0)
-Imports: 
+Imports:
     cli,
-    dplyr,
     ggplot2,
-    ggplotify,
-    glue,
+    grDevices,
     grid,
     gridExtra,
     gridtext,
     gtable,
-    lifecycle,
-    magrittr,
-    purrr,
-    rlang,
-    stringr,
-    tibble,
-    tidyr,
-    utils,
-    withr
-Suggests: 
-    MASS,
-    corrplot,
-    gcookbook,
-    ggrepel,
-    gplots,
-    jpeg,
+    magick,
+    patchwork,
+    ragg,
+    stats,
+    systemfonts,
+    tools,
+    yaml
+Suggests:
     knitr,
+    purrr,
     rmarkdown,
     testthat (>= 3.0.0),
-    tidyverse
-VignetteBuilder: 
+    tibble,
+    withr
+VignetteBuilder:
     knitr
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.3.3
 Config/testthat/edition: 3
-

@@ -1,0 +1,105 @@
+poster:
+  size: A1
+  orientation: portrait
+
+theme:
+  accent: "#2E7D32"
+  base_size: 24
+
+title:
+  title: "The relationship between grassland species richness and the management in long-established golf courses in Japan"
+  authors: "*Toshikazu Matsumura (Konan Women's Univ.), Yoshinobu Hashimoto (Museum of Nature and Human activities, Hyogo), Yoshihiro Sawada (Awaji Landscape Planning & Horticulture Academy / Univ. of Hyogo)"
+  funding: "This study was supported by JSPS KAKENHI Grant Number 15K07833. We wish to thank the golf courses for field investigations."
+
+layout:
+  left:  [objectives, backgrounds, methods, course_summary, dominant_species]
+  right: [conclusions, community_table, community_figure, ordination, other_species]
+
+sections:
+  objectives:
+    header: "OBJECTIVES"
+    height: 0.6
+    body:
+      type: text
+      md:
+        - "For conservation of grassland plants."
+        - "To clarify the management methods and the availability of long-established golf courses."
+
+  backgrounds:
+    header: "BACKGROUNDS"
+    height: 1.1
+    body:
+      type: text
+      md:
+        - "Semi-natural grassland is one of the most important habitats."
+        - "Area and species diversity of semi-natural grasslands declined by lifestyle change and abandonment."
+        - "Remaining semi-natural grasslands are confined to agricultural margins and commercial grasslands (long-established pastures, ski slopes, golf courses)."
+        - "Agricultural margins, long-established pastures and ski slopes are reported as seed source and refugia for grassland species."
+
+  methods:
+    header: "METHODS"
+    height: 0.9
+    body:
+      type: text
+      md:
+        - "Field investigations: 4 golf courses (established in 1903-1956)."
+        - "50 plots (1m x 1m) at rough or OB in each course; flora lists of grassland species in each golf course."
+        - "Greenkeeper interviews of management methods: frequency and height of mowing, application of fertilizer and chemical herbicides."
+
+  course_summary:
+    header: "SUMMARY OF GOLF COURSE"
+    height: 1.0
+    body:
+      type: table
+      object: tbl_courses
+      title: "Summary of each golf course"
+
+  dominant_species:
+    header: "Dominant species"
+    height: 0.7
+    body:
+      type: image
+      files: ["small.JPG", "tall.jpg", "wide.jpg", "large.JPG"]
+      labels: ["(1) P. chino var. viridis*", "(2) M. sinensis*", "(3) I. cylindrica var. koenigii*", "(4) Z. japonica*"]
+      height: 45
+
+  conclusions:
+    header: "CONCLUSIONS"
+    height: 0.75
+    body:
+      type: text
+      md:
+        - "Grassland species exist in long-established golf courses."
+        - "Management of low frequency and height cutting resulted in species-rich grasslands."
+        - "Golf courses under appropriate management can be seed sources and refugia."
+
+  community_table:
+    header: "RESULTS: Species richness of each community"
+    height: 1.1
+    body:
+      type: table
+      object: tbl_community
+      title: "Species richness of each community"
+
+  community_figure:
+    header: "Cutting regime by community*"
+    height: 1.3
+    body:
+      type: figure
+      object: fig_cutting
+
+  ordination:
+    header: "Community ordination*"
+    height: 1.1
+    body:
+      type: figure
+      object: fig_ordination
+
+  other_species:
+    header: "Other species (photo band demo)*"
+    height: 0.6
+    body:
+      type: image
+      files: ["small.JPG", "wide.jpg"]
+      labels: ["sample photo A*", "sample photo B*"]
+      height: 40
