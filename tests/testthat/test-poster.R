@@ -11,6 +11,35 @@ simple_spec <- function() {
   )
 }
 
+test_that("poster() measures 'auto' card heights against a real device, so long wrapped text doesn't overlap the next card", {
+  # Regression test: build_column()'s "auto" height needs a concrete
+  # numeric mm value, measured against whatever device is current. Without
+  # a real device already open (as in a plain script before
+  # render_poster() opens one, or in this test environment), that
+  # measurement used to fall back to a device-less generic font
+  # substitute -- narrower on average than the real font -- which wrapped
+  # a long paragraph into fewer lines than it actually needs and
+  # underestimated the card's height enough for the next "auto" card to
+  # overlap it.
+  long_text <- paste(rep("word", 40), collapse = " ")
+  spec <- list(
+    layout = list(left = c("a", "b")),
+    sections = list(
+      a = list(header = "A", height = "auto", body = list(type = "text", md = long_text)),
+      b = list(header = "B", height = "auto", body = list(type = "text", md = long_text))
+    )
+  )
+  n_dev_before <- length(grDevices::dev.list())
+  p <- poster(spec)
+  expect_equal(length(grDevices::dev.list()), n_dev_before)  # no leaked device
+
+  col <- p$patchwork$grobs[[which(p$patchwork$layout$name == "left")]]
+  heights_mm <- grid::convertHeight(col$heights, "mm", valueOnly = TRUE)
+  # both cards must report a real, substantial height (many wrapped
+  # lines' worth), not a near-zero/underestimated one
+  expect_true(all(heights_mm[1:2] > 30))
+})
+
 test_that("poster() assembles a spec into a ggposter object", {
   p <- poster(simple_spec())
   expect_s3_class(p, "ggposter")

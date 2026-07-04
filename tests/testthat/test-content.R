@@ -57,6 +57,23 @@ test_that("card_image(width=) solves a height that fits the target total width",
   expect_true(grid::is.grob(g))
 })
 
+test_that("card_image() wraps a caption to its own (possibly narrow) photo's width instead of overflowing it", {
+  # Regression test: a caption longer than a narrow (e.g. portrait) photo's
+  # own width used to be a single-line, centred textGrob that overflowed
+  # evenly on both sides and got clipped -- chopping text off both its
+  # start and end. It must now be a wrapping textbox sized to that photo's
+  # own width.
+  f <- system.file("extdata", "tall.jpg", package = "ggposter")
+  skip_if(!nzchar(f), "sample image not found")
+  g <- card_image(f, labels = "a very long caption that will not fit on one line",
+                   theme = poster_theme(), height = 60)
+  cell  <- g$children[[1]]$grobs[[1]]
+  label <- cell$grobs[[which(cell$layout$t == 3)]]
+  expect_s3_class(label, "textbox_grob")
+  photo_width_mm <- 60 * (100 / 150)  # tall.jpg's aspect ratio
+  expect_equal(grid::convertWidth(label$width, "mm", valueOnly = TRUE), photo_width_mm, tolerance = 0.5)
+})
+
 test_that("card_image(label_position='inside') overlays labels on the photo", {
   files <- rep(system.file("extdata", "small.JPG", package = "ggposter"), 2)
   skip_if(!nzchar(files[[1]]), "sample image not found")
@@ -72,6 +89,23 @@ test_that("with_notes() places main content and a bullet list side by side", {
   expect_true(grid::is.grob(g))
   w_mm <- grid::convertWidth(ggposter:::measure_width(g), "mm", valueOnly = TRUE)
   expect_equal(w_mm, 150, tolerance = 0.5)
+})
+
+test_that("with_notes() gives main's unused width to notes instead of leaving a gap", {
+  # Regression test: main_width_mm used to be a flat fraction of
+  # total_width_mm regardless of what main actually needed, so a table
+  # narrower than its allocation left dead space between it and the notes
+  # column. The notes column must now start right after main's own actual
+  # width (plus the small fixed gap), not at the old fractional boundary.
+  th <- poster_theme()
+  main <- grid::rectGrob(width = grid::unit(20, "mm"), height = grid::unit(30, "mm"))
+  attr(main, "measured_size") <- list(width = grid::unit(20, "mm"), height = grid::unit(30, "mm"))
+  g <- with_notes(main, c("- a note"), th, total_width_mm = 150, notes_width = 0.35)
+  row <- g$children[[1]]
+
+  widths_mm <- grid::convertWidth(row$widths, "mm", valueOnly = TRUE)
+  expect_equal(widths_mm[[1]], 20, tolerance = 0.01)          # main: its own width, not the ~95mm fractional cap
+  expect_equal(widths_mm[[3]], 150 - 20 - 5 / 3, tolerance = 0.01)  # notes: everything else
 })
 
 test_that("with_notes() top-aligns the notes column when it is shorter than main", {
@@ -103,4 +137,18 @@ test_that("with_notes(show_plot_area=TRUE) draws separate borders for main and n
   area_notes <- row$layout[row$layout$name == "plot_area_notes", ]
   expect_equal(area_main$l, main_cell$l)
   expect_equal(area_notes$l, notes_cell$l)
+})
+
+test_that("with_notes(show_plot_area=TRUE) sizes the main border to its own content, not the wider allocated column", {
+  # Regression test: card_table() only shrinks a table that's too wide for
+  # its column, it never stretches a narrower one to fill it, so a border
+  # spanning the full allocated column showed a large, misleading "empty"
+  # margin that was never really part of the table's own area.
+  th <- poster_theme()
+  narrow_main <- grid::rectGrob(width = grid::unit(20, "mm"), height = grid::unit(30, "mm"))
+  attr(narrow_main, "measured_size") <- list(width = grid::unit(20, "mm"), height = grid::unit(30, "mm"))
+  g <- with_notes(narrow_main, c("- a note"), th, total_width_mm = 150, show_plot_area = TRUE)
+  row <- g$children[[1]]
+  area_main <- row$grobs[[which(row$layout$name == "plot_area_main")]]
+  expect_equal(grid::convertWidth(area_main$width, "mm", valueOnly = TRUE), 20)
 })

@@ -47,6 +47,26 @@
 #' p <- poster(spec)
 poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL,
                    show_plot_area = FALSE) {
+  # "auto"-height cards (build_column()) and the title band both need a
+  # concrete numeric mm height at this point, resolved by measuring text
+  # against whatever device is current right now. render_poster() doesn't
+  # open its real output device until later, so without a device already
+  # open, that measurement falls back to R's generic default (e.g. a bare
+  # postscript font substitute) -- narrower on average than the real font,
+  # which can wrap a paragraph into fewer lines than it actually needs and
+  # underestimate the card's height enough for the next card to overlap
+  # it. Measuring against a real ragg device (the same backend
+  # render_poster() uses for PNG output) keeps this consistent regardless
+  # of whether the caller already has a device open.
+  old_dev <- grDevices::dev.cur()
+  measuring_file <- tempfile(fileext = ".png")
+  ragg::agg_png(measuring_file, width = 100, height = 100, units = "mm")
+  on.exit({
+    grDevices::dev.off()
+    if (old_dev > 1) grDevices::dev.set(old_dev)
+    unlink(measuring_file)
+  }, add = TRUE)
+
   if (is.character(spec)) {
     if (is.null(base_dir)) base_dir <- dirname(spec)
     spec <- read_poster_yaml(spec)

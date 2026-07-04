@@ -65,9 +65,14 @@ card_text <- function(md, theme = poster_theme(), width = NULL) {
 #' section body has a `notes` field.
 #'
 #' @param main The main content grob (e.g. from [card_table()] or
-#'   [card_figure()]), already built to fit in `total_width_mm * (1 -
+#'   [card_figure()]), already built to fit within `total_width_mm * (1 -
 #'   notes_width)` (minus the gap) -- `with_notes()` only lays it out
-#'   alongside the notes, it does not resize it.
+#'   alongside the notes, it does not resize it. `card_table()` only
+#'   shrinks a table that's too wide for that budget, it never stretches a
+#'   narrower one to fill it, so `main`'s *actual* measured width (not the
+#'   full budget) is used for the column, and the gap column sits right
+#'   after it -- the notes column gets whatever space that frees up,
+#'   instead of leaving a dead gap between the two.
 #' @param notes_md Character vector of markdown bullet lines for
 #'   [card_text()].
 #' @param theme A [poster_theme()] object.
@@ -76,8 +81,9 @@ card_text <- function(md, theme = poster_theme(), width = NULL) {
 #'   because relative (`"null"`) gtable units can't be measured outside of a
 #'   full layout render, and this whole grob's height must be measurable so
 #'   a `height = "auto"` card can size itself to it (see [build_column()]).
-#' @param notes_width Fraction (0-1) of `total_width_mm` given to the notes
-#'   column; `main` gets the remainder minus a small gap.
+#' @param notes_width Fraction (0-1) of `total_width_mm` given to `main` as
+#'   an upper bound; the notes column gets the rest, expanding to take up
+#'   whatever `main` doesn't actually use (see `main` above).
 #' @param show_plot_area If `TRUE`, draw a dashed border around `main` and
 #'   another around the notes column, separately, on top of the content --
 #'   see [poster_card()]. When this draws its own borders, the caller must
@@ -88,9 +94,12 @@ card_text <- function(md, theme = poster_theme(), width = NULL) {
 #' @noRd
 with_notes <- function(main, notes_md, theme, total_width_mm, notes_width = 0.35,
                        show_plot_area = FALSE) {
-  gap_mm         <- 5 / 3
-  notes_width_mm <- total_width_mm * notes_width
-  main_width_mm  <- total_width_mm - notes_width_mm - gap_mm
+  gap_mm             <- 5 / 3
+  max_notes_width_mm <- total_width_mm * notes_width
+  max_main_width_mm  <- total_width_mm - max_notes_width_mm - gap_mm
+  main_width_mm  <- min(grid::convertWidth(measure_width(main), "mm", valueOnly = TRUE),
+                        max_main_width_mm)
+  notes_width_mm <- total_width_mm - main_width_mm - gap_mm
   notes_grob <- card_text(notes_md, theme, width = notes_width_mm)
   row_height <- max(measure_height(main), measure_height(notes_grob))
   row <- gtable::gtable(
@@ -104,11 +113,19 @@ with_notes <- function(main, notes_md, theme, total_width_mm, notes_width = 0.35
   # not centred in the row.
   row <- gtable::gtable_add_grob(row, anchor_top_left(notes_grob), t = 1, l = 3, name = "notes")
   if (show_plot_area) {
+    # Sized to each grob's own measured width/height, not the full column it
+    # sits in: card_table() only shrinks a table that's too wide for its
+    # column, it never stretches a narrower one to fill it, so a border
+    # drawn at the column's full width would show a misleadingly large
+    # "empty" margin that was never really part of the table's own area.
     plot_area_gp <- grid::gpar(fill = NA, col = "#FF00FF", lty = "dashed", lwd = 1.2)
-    row <- gtable::gtable_add_grob(row, grid::rectGrob(gp = plot_area_gp),
-                                   t = 1, l = 1, z = Inf, name = "plot_area_main")
-    row <- gtable::gtable_add_grob(row, grid::rectGrob(gp = plot_area_gp),
-                                   t = 1, l = 3, z = Inf, name = "plot_area_notes")
+    plot_area_for <- function(g) {
+      grid::rectGrob(x = 0, y = 1, just = c("left", "top"),
+                     width = measure_width(g), height = measure_height(g),
+                     gp = plot_area_gp)
+    }
+    row <- gtable::gtable_add_grob(row, plot_area_for(main), t = 1, l = 1, z = Inf, name = "plot_area_main")
+    row <- gtable::gtable_add_grob(row, plot_area_for(notes_grob), t = 1, l = 3, z = Inf, name = "plot_area_notes")
   }
   out <- anchor_top_left(row)
   # Tells poster_card() this body already has its own (two, separate)
@@ -331,24 +348,31 @@ card_image <- function(files, labels = NULL, theme = poster_theme(),
   } else {
     height <- as_mm_unit(height %||% 60)
   }
+  photo_widths <- lapply(ars, function(ar) height * ar)
 
+  # Wrapped to each photo's own width, rather than a single-line centred
+  # textGrob: a caption longer than a narrow (e.g. portrait) photo used to
+  # overflow evenly on both sides and get clipped, chopping text off both
+  # its start and end.
   inside <- !is.null(labels) && label_position == "inside"
-  labs <- if (is.null(labels)) {
-    NULL
-  } else if (inside) {
-    lapply(labels, function(l) {
-      grid::textGrob(l, x = grid::unit(0.5, "npc"), y = grid::unit(2, "mm"),
-                     just = c("center", "bottom"),
-                     gp = grid::gpar(fontsize = theme$base_size * 0.6,
-                                     fontfamily = theme$base_family, col = "#FFFFFF"))
-    })
-  } else {
-    lapply(labels, function(l) {
-      grid::textGrob(l, gp = grid::gpar(fontsize = theme$base_size * 0.6,
-                                        fontfamily = theme$base_family,
-                                        col = theme$body_text))
-    })
+  make_label <- function(l, w) {
+    if (inside) {
+      gridtext::textbox_grob(l, x = grid::unit(0.5, "npc"), y = grid::unit(2, "mm"),
+                             hjust = 0.5, vjust = 0, halign = 0.5, width = w,
+                             gp = grid::gpar(fontsize = theme$base_size * 0.6,
+                                             fontfamily = theme$base_family, col = "#FFFFFF"),
+                             box_gp = grid::gpar(col = NA),
+                             padding = grid::unit(c(0, 0, 0, 0), "mm"))
+    } else {
+      gridtext::textbox_grob(l, x = grid::unit(0.5, "npc"), y = grid::unit(1, "npc"),
+                             hjust = 0.5, vjust = 1, halign = 0.5, width = w,
+                             gp = grid::gpar(fontsize = theme$base_size * 0.6,
+                                             fontfamily = theme$base_family, col = theme$body_text),
+                             box_gp = grid::gpar(col = NA),
+                             padding = grid::unit(c(0, 0, 0, 0), "mm"))
+    }
   }
+  labs <- if (is.null(labels)) NULL else Map(make_label, labels, photo_widths)
   label_gap <- grid::unit(1, "mm")
   row_height <- if (is.null(labs) || inside) {
     height
@@ -359,8 +383,7 @@ card_image <- function(files, labels = NULL, theme = poster_theme(),
 
   built <- lapply(seq_len(n), function(i) {
     img <- magick::image_read(files[[i]])
-    ar <- ars[[i]]
-    photo_width <- height * ar
+    photo_width <- photo_widths[[i]]
     rg <- grid::rasterGrob(grDevices::as.raster(img), width = grid::unit(1, "npc"),
                            height = grid::unit(1, "npc"))
     photo_vp <- grid::viewport(width = photo_width, height = height)

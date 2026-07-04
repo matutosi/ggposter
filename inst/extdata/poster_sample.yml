@@ -18,7 +18,7 @@ layout:
 sections:
   objectives:
     header: "OBJECTIVES"
-    height: 0.6
+    height: "auto"
     body:
       type: text
       md:
@@ -27,7 +27,7 @@ sections:
 
   backgrounds:
     header: "BACKGROUNDS"
-    height: 1.1
+    height: "auto"
     body:
       type: text
       md:
@@ -38,7 +38,7 @@ sections:
 
   methods:
     header: "METHODS"
-    height: 0.9
+    height: "auto"
     body:
       type: text
       md:
@@ -48,7 +48,7 @@ sections:
 
   course_summary:
     header: "SUMMARY OF GOLF COURSE"
-    height: 1.0
+    height: "auto"
     body:
       type: table
       object: tbl_courses
@@ -56,16 +56,16 @@ sections:
 
   dominant_species:
     header: "Dominant species"
-    height: 0.7
+    height: "auto"
     body:
       type: image
       files: ["small.JPG", "tall.jpg", "wide.jpg", "large.JPG"]
       labels: ["(1) P. chino var. viridis*", "(2) M. sinensis*", "(3) I. cylindrica var. koenigii*", "(4) Z. japonica*"]
-      height: 45
+      width: 230
 
   conclusions:
     header: "CONCLUSIONS"
-    height: 0.75
+    height: "auto"
     body:
       type: text
       md:
@@ -75,7 +75,7 @@ sections:
 
   community_table:
     header: "RESULTS: Species richness of each community"
-    height: 1.1
+    height: "auto"
     body:
       type: table
       object: tbl_community
@@ -97,9 +97,9 @@ sections:
 
   other_species:
     header: "Other species (photo band demo)*"
-    height: 0.6
+    height: "auto"
     body:
       type: image
-      files: ["small.JPG", "wide.jpg"]
-      labels: ["sample photo A*", "sample photo B*"]
-      height: 40
+      files: ["small.JPG", "tall.jpg", "wide.jpg", "large.JPG"]
+      labels: ["sample photo A*", "sample photo B*", "sample photo C*", "sample photo D*"]
+      width: 230
