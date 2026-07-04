@@ -26,6 +26,10 @@
 #' @param base_dir Directory used to resolve relative image paths in the spec.
 #'   Defaults to the YAML file's directory, or the working directory for a
 #'   list spec.
+#' @param show_plot_area If `TRUE`, draw a dashed border around every
+#'   section's body cell -- the area its figure/table/text/image content
+#'   actually occupies -- on top of the content, without hiding it. See
+#'   [poster_card()].
 #'
 #' @return An object of class `ggposter`, a thin wrapper around a
 #'   [gtable::gtable]. Print it to preview, or pass it to
@@ -41,7 +45,8 @@
 #'   )
 #' )
 #' p <- poster(spec)
-poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL) {
+poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL,
+                   show_plot_area = FALSE) {
   if (is.character(spec)) {
     if (is.null(base_dir)) base_dir <- dirname(spec)
     spec <- read_poster_yaml(spec)
@@ -70,7 +75,8 @@ poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL) {
   col_width_mm <- size_mm[["width"]] / max(length(columns), 1)
 
   col_grobs <- lapply(columns, function(section_names) {
-    build_column(section_names, spec$sections, theme, objects, base_dir, col_width_mm, col_height_mm)
+    build_column(section_names, spec$sections, theme, objects, base_dir, col_width_mm, col_height_mm,
+                 show_plot_area = show_plot_area)
   })
 
   # Stitching the title and columns together via patchwork's `/` and `|`
@@ -99,7 +105,7 @@ poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL) {
 
   structure(
     list(patchwork = full, theme = theme, size_mm = size_mm, spec = spec,
-        objects = objects, base_dir = base_dir),
+        objects = objects, base_dir = base_dir, show_plot_area = show_plot_area),
     class = "ggposter"
   )
 }
@@ -124,13 +130,16 @@ poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL) {
 #' @param col_height_mm Total height available to the column, in
 #'   millimetres. Sections with a numeric `height` share out whatever is
 #'   left after the `"auto"` sections take the space their content needs.
+#' @param show_plot_area Passed through to [poster_card()] for every card in
+#'   the column.
 #' @return A [gtable::gtable()] stacking the column's cards.
 #' @keywords internal
 #' @noRd
 build_column <- function(section_names, sections, theme, objects, base_dir,
-                          col_width_mm, col_height_mm) {
+                          col_width_mm, col_height_mm, show_plot_area = FALSE) {
   cards <- lapply(section_names, function(nm) {
-    build_section(nm, sections[[nm]], theme, objects, base_dir, col_width_mm)
+    build_section(nm, sections[[nm]], theme, objects, base_dir, col_width_mm,
+                  show_plot_area = show_plot_area)
   })
   raw_heights <- lapply(section_names, function(nm) sections[[nm]]$height %||% 1)
   is_auto <- vapply(raw_heights, identical, logical(1), "auto")
@@ -184,13 +193,16 @@ build_column <- function(section_names, sections, theme, objects, base_dir,
 #' @return A [poster_card()] grob.
 #' @keywords internal
 #' @noRd
-build_section <- function(name, section, theme, objects, base_dir, col_width_mm) {
+build_section <- function(name, section, theme, objects, base_dir, col_width_mm,
+                          show_plot_area = FALSE) {
   if (is.null(section)) {
     cli::cli_abort("Section {.val {name}} is referenced in {.field layout} but missing from {.field sections}.")
   }
-  body <- build_body(section$body, theme, objects, base_dir, col_width_mm)
+  body <- build_body(section$body, theme, objects, base_dir, col_width_mm,
+                     show_plot_area = show_plot_area)
   fit_content <- identical(section$height %||% 1, "auto")
-  poster_card(body, header = section$header, theme = theme, fit_content = fit_content)
+  poster_card(body, header = section$header, theme = theme, fit_content = fit_content,
+             show_plot_area = show_plot_area)
 }
 
 #' Dispatch a section's `body` spec to the matching content builder
@@ -205,7 +217,7 @@ build_section <- function(name, section, theme, objects, base_dir, col_width_mm)
 #' @return A grob (or ggplot, for `"figure"`) ready for [poster_card()].
 #' @keywords internal
 #' @noRd
-build_body <- function(body, theme, objects, base_dir, col_width_mm) {
+build_body <- function(body, theme, objects, base_dir, col_width_mm, show_plot_area = FALSE) {
   type <- body$type %||% "text"
   has_notes <- type %in% c("table", "figure") && !is.null(body$notes)
   notes_width <- body$notes_width %||% 0.35
@@ -241,7 +253,8 @@ build_body <- function(body, theme, objects, base_dir, col_width_mm) {
     cli::cli_abort("Unknown body type {.val {type}}.")
   )
   if (has_notes) {
-    content <- with_notes(content, body$notes, theme, total_width_mm, notes_width = notes_width)
+    content <- with_notes(content, body$notes, theme, total_width_mm, notes_width = notes_width,
+                          show_plot_area = show_plot_area)
   }
   content
 }
@@ -307,5 +320,6 @@ rescale_poster <- function(x, scale) {
     section
   })
 
-  poster(spec, objects = x$objects, theme = theme, base_dir = x$base_dir)
+  poster(spec, objects = x$objects, theme = theme, base_dir = x$base_dir,
+        show_plot_area = x$show_plot_area %||% FALSE)
 }

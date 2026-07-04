@@ -83,3 +83,24 @@ test_that("with_notes() top-aligns the notes column when it is shorter than main
   expect_equal(notes_cell$vp$justification, c(0, 1))
   expect_equal(grid::convertY(notes_cell$vp$y, "npc", valueOnly = TRUE), 1)
 })
+
+test_that("with_notes(show_plot_area=TRUE) draws separate borders for main and notes", {
+  th <- poster_theme()
+  main <- grid::rectGrob(height = grid::unit(80, "mm"))
+  g_off <- with_notes(main, c("- a note"), th, total_width_mm = 150, show_plot_area = FALSE)
+  g_on  <- with_notes(main, c("- a note"), th, total_width_mm = 150, show_plot_area = TRUE)
+
+  expect_null(attr(g_off, "plot_area_drawn"))
+  expect_true(attr(g_on, "plot_area_drawn"))
+
+  row <- g_on$children[[1]]
+  expect_true("plot_area_main"  %in% row$layout$name)
+  expect_true("plot_area_notes" %in% row$layout$name)
+
+  main_cell  <- row$layout[row$layout$name == "main", ]
+  notes_cell <- row$layout[row$layout$name == "notes", ]
+  area_main  <- row$layout[row$layout$name == "plot_area_main", ]
+  area_notes <- row$layout[row$layout$name == "plot_area_notes", ]
+  expect_equal(area_main$l, main_cell$l)
+  expect_equal(area_notes$l, notes_cell$l)
+})

@@ -17,6 +17,19 @@ test_that("poster() assembles a spec into a ggposter object", {
   expect_equal(unname(p$size_mm), c(594, 841))
 })
 
+test_that("poster(show_plot_area=TRUE) builds and renders without error", {
+  p <- poster(simple_spec(), show_plot_area = TRUE)
+  expect_true(p$show_plot_area)
+  out <- tempfile(fileext = ".png")
+  expect_no_error(render_poster(p, out, scale = 0.1, dpi = 50))
+})
+
+test_that("rescale_poster() preserves show_plot_area", {
+  p <- poster(simple_spec(), show_plot_area = TRUE)
+  scaled <- rescale_poster(p, 0.5)
+  expect_true(scaled$show_plot_area)
+})
+
 test_that("poster() errors when a layout entry has no matching section", {
   spec <- simple_spec()
   spec$layout$left <- c("intro", "missing_section")

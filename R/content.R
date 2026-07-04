@@ -78,10 +78,16 @@ card_text <- function(md, theme = poster_theme(), width = NULL) {
 #'   a `height = "auto"` card can size itself to it (see [build_column()]).
 #' @param notes_width Fraction (0-1) of `total_width_mm` given to the notes
 #'   column; `main` gets the remainder minus a small gap.
+#' @param show_plot_area If `TRUE`, draw a dashed border around `main` and
+#'   another around the notes column, separately, on top of the content --
+#'   see [poster_card()]. When this draws its own borders, the caller must
+#'   not also draw one around the whole combined body (see the
+#'   `"plot_area_drawn"` attribute set on the return value).
 #' @return A grob suitable as the `body` argument of [poster_card()].
 #' @keywords internal
 #' @noRd
-with_notes <- function(main, notes_md, theme, total_width_mm, notes_width = 0.35) {
+with_notes <- function(main, notes_md, theme, total_width_mm, notes_width = 0.35,
+                       show_plot_area = FALSE) {
   gap_mm         <- 5 / 3
   notes_width_mm <- total_width_mm * notes_width
   main_width_mm  <- total_width_mm - notes_width_mm - gap_mm
@@ -97,7 +103,19 @@ with_notes <- function(main, notes_md, theme, total_width_mm, notes_width = 0.35
   # than main (the common case), it must sit level with the top of main,
   # not centred in the row.
   row <- gtable::gtable_add_grob(row, anchor_top_left(notes_grob), t = 1, l = 3, name = "notes")
-  anchor_top_left(row)
+  if (show_plot_area) {
+    plot_area_gp <- grid::gpar(fill = NA, col = "#FF00FF", lty = "dashed", lwd = 1.2)
+    row <- gtable::gtable_add_grob(row, grid::rectGrob(gp = plot_area_gp),
+                                   t = 1, l = 1, z = Inf, name = "plot_area_main")
+    row <- gtable::gtable_add_grob(row, grid::rectGrob(gp = plot_area_gp),
+                                   t = 1, l = 3, z = Inf, name = "plot_area_notes")
+  }
+  out <- anchor_top_left(row)
+  # Tells poster_card() this body already has its own (two, separate)
+  # plot-area borders, so it should not also draw one around the whole
+  # combined body -- see poster_card()'s show_plot_area handling.
+  if (show_plot_area) attr(out, "plot_area_drawn") <- TRUE
+  out
 }
 
 #' Table card content: a booktab-style table grob

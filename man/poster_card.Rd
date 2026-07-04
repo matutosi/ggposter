@@ -9,7 +9,8 @@ poster_card(
   header = NULL,
   theme = poster_theme(),
   header_size = NULL,
-  fit_content = FALSE
+  fit_content = FALSE,
+  show_plot_area = FALSE
 )
 }
 \arguments{
@@ -29,6 +30,14 @@ much vertical space the card is given (the latter is what you want when
 the card's height is a relative share of the column, e.g. from
 \code{\link[=poster]{poster()}}'s numeric \code{section$height}; the former is what
 \code{section$height = "auto"} uses).}
+
+\item{show_plot_area}{If \code{TRUE}, draw a dashed border around the header
+tab and around the body content, separately, on top of the content
+without hiding it. When the body is a table/figure paired with a
+bullet-list description (see \code{with_notes()} in \code{R/content.R}), the
+main content and the notes column each get
+their own border instead of one around the combined pair. Useful for
+seeing exactly how much of a card each of its parts fills.}
 }
 \value{
 A \link[gtable:gtable]{gtable::gtable} grob of class \code{poster_card}.

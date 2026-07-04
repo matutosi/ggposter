@@ -52,6 +52,36 @@ test_that("fit_content=TRUE sizes the body row to the body's measured height", {
   expect_gt(h_fit, h_fill)
 })
 
+test_that("show_plot_area=TRUE adds a plot_area grob at the body cell, FALSE omits it", {
+  th <- poster_theme()
+  body <- grid::textGrob("hello")
+  card_off <- poster_card(body, header = "TITLE", theme = th, show_plot_area = FALSE)
+  card_on  <- poster_card(body, header = "TITLE", theme = th, show_plot_area = TRUE)
+
+  expect_false("plot_area" %in% card_off$layout$name)
+  expect_true("plot_area" %in% card_on$layout$name)
+
+  body_row <- card_on$layout[card_on$layout$name == "body", ]
+  area_row <- card_on$layout[card_on$layout$name == "plot_area", ]
+  expect_equal(area_row$t, body_row$t)
+  expect_equal(area_row$l, body_row$l)
+})
+
+test_that("show_plot_area=TRUE also outlines the header tab, separately from the body", {
+  th <- poster_theme()
+  body <- grid::textGrob("hello")
+  card_on <- poster_card(body, header = "TITLE", theme = th, show_plot_area = TRUE)
+
+  header_cell <- card_on$grobs[[which(card_on$layout$name == "header")]]
+  expect_true("plot_area" %in% header_cell$layout$name)
+
+  # the header's own border must sit at the tab's own (narrow) column, not
+  # stretched across the whole card width.
+  tab_col   <- header_cell$layout[header_cell$layout$name == "tab", ]
+  area_col  <- header_cell$layout[header_cell$layout$name == "plot_area", ]
+  expect_equal(area_col$l, tab_col$l)
+})
+
 test_that("header_tab() sizes the tab to the label without clipping it", {
   # Regression test: header_tab() used to resolve the label's measured width
   # eagerly with convertWidth() at construction time, which -- when called

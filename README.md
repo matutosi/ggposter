@@ -154,6 +154,31 @@ knitr::include_graphics("man/figures/README-poster-preview.png")
 
 <img src="man/figures/README-poster-preview.png" alt="An example poster built from the mpg dataset, with a placeholder title and authors, showing a full-width title band and a two-column body of tab-headed cards for text, tables, figures, and photos." width="100%" />
 
+### Seeing each card’s plot area
+
+Every card’s header tab and body – the area its text, table, figure, or
+photo strip actually occupies – can be outlined with
+`show_plot_area = TRUE`. A table/figure paired with a bullet-list
+description gets two separate borders, one for each side, rather than
+one around the pair. This is useful for checking exactly how much of a
+card each of its parts fills, without changing anything about the poster
+itself:
+
+``` r
+p_plot_area <- poster(
+  spec,
+  objects = list(tbl_class = tbl_class, tbl_drv = tbl_drv,
+                 fig_facet = fig_facet, fig_scatter = fig_scatter),
+  theme = theme_green(base_size = 24),
+  base_dir = img_dir,
+  show_plot_area = TRUE
+)
+render_poster(p_plot_area, "man/figures/README-poster-preview-plot-area.png", scale = 0.3, dpi = 150)
+knitr::include_graphics("man/figures/README-poster-preview-plot-area.png")
+```
+
+<img src="man/figures/README-poster-preview-plot-area.png" alt="The same example poster, with a dashed magenta border drawn around each card's header tab and body area -- and, for tables and figures with notes, a separate border around the notes column -- to show exactly how much space each part occupies." width="100%" />
+
 Save it at true size, with fonts embedded:
 
 ``` r
