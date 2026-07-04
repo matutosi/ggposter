@@ -1,10 +1,9 @@
 # Build a poster from a declarative spec
 
 Assembles a title band and a multi-column body of section cards into a
-single
-[patchwork::patchwork](https://patchwork.data-imaginist.com/reference/patchwork-package.html)
-object sized for a real paper size (default A1 portrait). The spec can
-be an R list (built by hand, or by reading YAML with
+single [gtable::gtable](https://gtable.r-lib.org/reference/gtable.html)
+sized for a real paper size (default A1 portrait). The spec can be an R
+list (built by hand, or by reading YAML with
 [`read_poster_yaml()`](https://matutosi.github.io/ggposter/reference/read_poster_yaml.md))
 or a path to a YAML file, in which case it is read automatically.
 
@@ -40,8 +39,8 @@ poster(spec, objects = list(), theme = NULL, base_dir = NULL)
 ## Value
 
 An object of class `ggposter`, a thin wrapper around a
-[patchwork::patchwork](https://patchwork.data-imaginist.com/reference/patchwork-package.html)
-object. Print it to preview, or pass it to
+[gtable::gtable](https://gtable.r-lib.org/reference/gtable.html). Print
+it to preview, or pass it to
 [`render_poster()`](https://matutosi.github.io/ggposter/reference/render_poster.md)
 to save a PDF/PNG at true size.
 

@@ -12,8 +12,10 @@ card_image(
   files,
   labels = NULL,
   theme = poster_theme(),
-  height = 60,
-  space = 3
+  height = NULL,
+  width = NULL,
+  space = 3,
+  label_position = c("below", "inside")
 )
 ```
 
@@ -25,8 +27,7 @@ card_image(
 
 - labels:
 
-  Optional character vector of captions, same length as `files`, drawn
-  under each photo.
+  Optional character vector of captions, same length as `files`.
 
 - theme:
 
@@ -37,12 +38,29 @@ card_image(
 - height:
 
   Height of each photo, as a
-  [grid::unit](https://rdrr.io/r/grid/unit.html) or millimetres.
+  [grid::unit](https://rdrr.io/r/grid/unit.html) or millimetres. `NULL`
+  (default, if `width` is also `NULL`) uses 60mm.
+
+- width:
+
+  Alternative to `height`: a target *total* row width (all photos plus
+  the gaps between them). Each photo's height is solved so that, at its
+  own aspect ratio, the row sums to this width – useful for making a
+  photo band fill a specific fraction of a card's width regardless of
+  how many photos it has. Takes precedence over `height` if both are
+  given.
 
 - space:
 
   Gap between photos, as a
   [grid::unit](https://rdrr.io/r/grid/unit.html) or millimetres.
+
+- label_position:
+
+  `"below"` (default) draws each caption in its own row under the photo.
+  `"inside"` overlays it near the bottom of the photo itself (white text
+  on a semi-transparent bar), so the row's height is just the photo
+  height.
 
 ## Value
 

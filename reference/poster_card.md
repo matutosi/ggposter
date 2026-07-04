@@ -9,7 +9,13 @@ consistent look.
 ## Usage
 
 ``` r
-poster_card(body, header = NULL, theme = poster_theme(), header_size = NULL)
+poster_card(
+  body,
+  header = NULL,
+  theme = poster_theme(),
+  header_size = NULL,
+  fit_content = FALSE
+)
 ```
 
 ## Arguments
@@ -34,6 +40,16 @@ poster_card(body, header = NULL, theme = poster_theme(), header_size = NULL)
   Font size of the header, in points. Defaults to
   `theme$base_size * 1.15`.
 
+- fit_content:
+
+  If `TRUE`, size the body cell to `body`'s own measured height times
+  `theme$content_pad_factor`, instead of filling however much vertical
+  space the card is given (the latter is what you want when the card's
+  height is a relative share of the column, e.g. from
+  [`poster()`](https://matutosi.github.io/ggposter/reference/poster.md)'s
+  numeric `section$height`; the former is what `section$height = "auto"`
+  uses).
+
 ## Value
 
 A [gtable::gtable](https://gtable.r-lib.org/reference/gtable.html) grob
@@ -43,9 +59,7 @@ of class `poster_card`.
 
 The returned object is a
 [gtable::gtable](https://gtable.r-lib.org/reference/gtable.html) (a
-grob), which can be placed by
-[`patchwork::wrap_elements()`](https://patchwork.data-imaginist.com/reference/wrap_elements.html)
-or drawn directly with
+grob), which can be placed in another gtable or drawn directly with
 [`grid::grid.draw()`](https://rdrr.io/r/grid/grid.draw.html).
 
 ## Examples

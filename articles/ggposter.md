@@ -8,9 +8,8 @@ of the poster is a set of **columns**, each a vertical stack of
 **cards**. A card is a rounded box with an accent-coloured header tab
 and one piece of content – text, a table, a ggplot figure, or a strip of
 photos. Every card is built as a plain \[grid\] grob, and the whole
-poster is assembled with [patchwork](https://patchwork.data-imre.com/),
-so the same building blocks work whether the content is a bullet list or
-a `ggplot`.
+poster is assembled as one \[gtable::gtable\], so the same building
+blocks work whether the content is a bullet list or a `ggplot`.
 
 Content and layout are described either as an R list, or as YAML read by
 \[read_poster_yaml()\]. Figures, tables, and photos referenced from the
@@ -36,7 +35,7 @@ spec <- list(
       body = list(type = "text", md = c(
         "- Poster content is declared as an R list or YAML.",
         "- Figures and tables are passed in as R objects.",
-        "- The whole poster renders as one patchwork object."
+        "- The whole poster renders as one gtable object."
       ))
     ),
     figure = list(
@@ -54,7 +53,7 @@ p <- poster(spec, objects = list(fig = fig))
 ```
 
 `p` is a `ggposter` object – a thin wrapper around the assembled
-`patchwork`. Font sizes and spacing are absolute physical measurements
+`gtable`. Font sizes and spacing are absolute physical measurements
 sized for the poster’s true paper size, so previewing at an arbitrary
 plot size (as this vignette must) needs a scaled-down render rather than
 printing `p` directly:

@@ -48,7 +48,13 @@ is wrapped in a card so the poster keeps one consistent look.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">poster_card</span><span class="op">(</span><span class="va">body</span>, header <span class="op">=</span> <span class="cn">NULL</span>, theme <span class="op">=</span> <span class="fu"><a href="poster_theme.html">poster_theme</a></span><span class="op">(</span><span class="op">)</span>, header_size <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">poster_card</span><span class="op">(</span></span>
+<span>  <span class="va">body</span>,</span>
+<span>  header <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  theme <span class="op">=</span> <span class="fu"><a href="poster_theme.html">poster_theme</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  header_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  fit_content <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -72,6 +78,15 @@ is wrapped in a card so the poster keeps one consistent look.</p>
 <dd><p>Font size of the header, in points. Defaults to
 <code>theme$base_size * 1.15</code>.</p></dd>
 
+
+<dt id="arg-fit-content">fit_content<a class="anchor" aria-label="anchor" href="#arg-fit-content"></a></dt>
+<dd><p>If <code>TRUE</code>, size the body cell to <code>body</code>'s own measured
+height times <code>theme$content_pad_factor</code>, instead of filling however
+much vertical space the card is given (the latter is what you want when
+the card's height is a relative share of the column, e.g. from
+<code><a href="poster.html">poster()</a></code>'s numeric <code>section$height</code>; the former is what
+<code>section$height = "auto"</code> uses).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -79,8 +94,8 @@ is wrapped in a card so the poster keeps one consistent look.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The returned object is a <a href="https://gtable.r-lib.org/reference/gtable.html" class="external-link">gtable::gtable</a> (a grob), which can be placed by
-<code><a href="https://patchwork.data-imaginist.com/reference/wrap_elements.html" class="external-link">patchwork::wrap_elements()</a></code> or drawn directly with <code><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid::grid.draw()</a></code>.</p>
+    <p>The returned object is a <a href="https://gtable.r-lib.org/reference/gtable.html" class="external-link">gtable::gtable</a> (a grob), which can be placed in
+another gtable or drawn directly with <code><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid::grid.draw()</a></code>.</p>
     </div>
 
     <div class="section level2">

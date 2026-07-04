@@ -1,9 +1,13 @@
 # Text card content: a bullet list rendered as markdown
 
-Wraps a character vector of markdown lines (or a single markdown string)
-as a body grob using
+Wraps a character vector of markdown lines as a body grob using
 [`gridtext::textbox_grob()`](https://wilkelab.org/gridtext/reference/textbox_grob.html),
-so bold/italic/links work.
+so bold/italic/links work. Each line is laid out as its own row, one per
+element of `md`; a `"- "`-prefixed line gets a bullet in its own narrow
+column so a wrapped continuation line aligns under the item's own text
+rather than under the bullet (a hanging indent) – gridtext has no CSS
+`text-indent`/`padding-left` support to do this within a single call, so
+each item is measured and wrapped separately instead.
 
 ## Usage
 
@@ -15,8 +19,8 @@ card_text(md, theme = poster_theme(), width = NULL)
 
 - md:
 
-  Character vector. Each element becomes one paragraph/bullet; they are
-  joined with newlines. Markdown syntax (e.g. `**bold**`) is honoured.
+  Character vector. Each element becomes one paragraph/bullet. Markdown
+  syntax (e.g. `**bold**`) is honoured.
 
 - theme:
 

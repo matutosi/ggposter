@@ -19,8 +19,10 @@ poster_theme(
   base_size = 26,
   base_family = NULL,
   cjk_family = NULL,
-  pad = 5,
-  gap = 6
+  pad = NULL,
+  gap = 6,
+  lineheight = 0.95,
+  content_pad_factor = 1.2
 )
 ```
 
@@ -73,12 +75,32 @@ poster_theme(
 - pad:
 
   Inner padding of a card, as a
-  [grid::unit](https://rdrr.io/r/grid/unit.html) or millimetres.
+  [grid::unit](https://rdrr.io/r/grid/unit.html) or millimetres. `NULL`
+  (default) uses one line's height of `base_size`/`lineheight` – a
+  physical-unit conversion of the font size, not a text measurement, so
+  it scales with `base_size` without needing a real output device open.
 
 - gap:
 
   Gap between stacked cards, as a
   [grid::unit](https://rdrr.io/r/grid/unit.html) or millimetres.
+
+- lineheight:
+
+  Line spacing multiplier for wrapped text (title band and
+  [`card_text()`](https://matutosi.github.io/ggposter/reference/card_text.md)),
+  passed to [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html). Values
+  below 1 (e.g. 0.95) tuck wrapped lines closer together than most
+  text-rendering defaults.
+
+- content_pad_factor:
+
+  Multiplier applied to a block of text/table content's own measured
+  height to get its enclosing box's height, used wherever a poster
+  element sizes itself to fit its content (the title band, and any card
+  with `height = "auto"`; see
+  [`poster()`](https://matutosi.github.io/ggposter/reference/poster.md)).
+  `1.2` means 20% breathing room above/below the content.
 
 ## Value
 

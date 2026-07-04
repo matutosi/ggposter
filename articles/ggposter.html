@@ -72,8 +72,8 @@ the full width; and the rest of the poster is a set of
 <strong>cards</strong>. A card is a rounded box with an accent-coloured
 header tab and one piece of content – text, a table, a ggplot figure, or
 a strip of photos. Every card is built as a plain [grid] grob, and the
-whole poster is assembled with <a href="https://patchwork.data-imre.com/" class="external-link">patchwork</a>, so the same
-building blocks work whether the content is a bullet list or a
+whole poster is assembled as one [gtable::gtable], so the same building
+blocks work whether the content is a bullet list or a
 <code>ggplot</code>.</p>
 <p>Content and layout are described either as an R list, or as YAML read
 by [read_poster_yaml()]. Figures, tables, and photos referenced from the
@@ -97,7 +97,7 @@ while data analysis stays in R.</p>
 <span>      body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"text"</span>, md <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>        <span class="st">"- Poster content is declared as an R list or YAML."</span>,</span>
 <span>        <span class="st">"- Figures and tables are passed in as R objects."</span>,</span>
-<span>        <span class="st">"- The whole poster renders as one patchwork object."</span></span>
+<span>        <span class="st">"- The whole poster renders as one gtable object."</span></span>
 <span>      <span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    figure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -113,7 +113,7 @@ while data analysis stays in R.</p>
 <span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/poster.html">poster</a></span><span class="op">(</span><span class="va">spec</span>, objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fig <span class="op">=</span> <span class="va">fig</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><code>p</code> is a <code>ggposter</code> object – a thin wrapper
-around the assembled <code>patchwork</code>. Font sizes and spacing are
+around the assembled <code>gtable</code>. Font sizes and spacing are
 absolute physical measurements sized for the poster’s true paper size,
 so previewing at an arbitrary plot size (as this vignette must) needs a
 scaled-down render rather than printing <code>p</code> directly:</p>

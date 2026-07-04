@@ -49,8 +49,10 @@ photo band, as in the sample poster.</p>
 <span>  <span class="va">files</span>,</span>
 <span>  labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  theme <span class="op">=</span> <span class="fu"><a href="poster_theme.html">poster_theme</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  height <span class="op">=</span> <span class="fl">60</span>,</span>
-<span>  space <span class="op">=</span> <span class="fl">3</span></span>
+<span>  height <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  space <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  label_position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"below"</span>, <span class="st">"inside"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -64,7 +66,7 @@ photo band, as in the sample poster.</p>
 
 <dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
 <dd><p>Optional character vector of captions, same length as
-<code>files</code>, drawn under each photo.</p></dd>
+<code>files</code>.</p></dd>
 
 
 <dt id="arg-theme">theme<a class="anchor" aria-label="anchor" href="#arg-theme"></a></dt>
@@ -72,11 +74,28 @@ photo band, as in the sample poster.</p>
 
 
 <dt id="arg-height">height<a class="anchor" aria-label="anchor" href="#arg-height"></a></dt>
-<dd><p>Height of each photo, as a <a href="https://rdrr.io/r/grid/unit.html" class="external-link">grid::unit</a> or millimetres.</p></dd>
+<dd><p>Height of each photo, as a <a href="https://rdrr.io/r/grid/unit.html" class="external-link">grid::unit</a> or millimetres.
+<code>NULL</code> (default, if <code>width</code> is also <code>NULL</code>) uses 60mm.</p></dd>
+
+
+<dt id="arg-width">width<a class="anchor" aria-label="anchor" href="#arg-width"></a></dt>
+<dd><p>Alternative to <code>height</code>: a target <em>total</em> row width (all
+photos plus the gaps between them). Each photo's height is solved so
+that, at its own aspect ratio, the row sums to this width – useful for
+making a photo band fill a specific fraction of a card's width
+regardless of how many photos it has. Takes precedence over <code>height</code>
+if both are given.</p></dd>
 
 
 <dt id="arg-space">space<a class="anchor" aria-label="anchor" href="#arg-space"></a></dt>
 <dd><p>Gap between photos, as a <a href="https://rdrr.io/r/grid/unit.html" class="external-link">grid::unit</a> or millimetres.</p></dd>
+
+
+<dt id="arg-label-position">label_position<a class="anchor" aria-label="anchor" href="#arg-label-position"></a></dt>
+<dd><p><code>"below"</code> (default) draws each caption in its own
+row under the photo. <code>"inside"</code> overlays it near the bottom of the
+photo itself (white text on a semi-transparent bar), so the row's
+height is just the photo height.</p></dd>
 
 </dl></div>
     <div class="section level2">

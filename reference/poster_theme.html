@@ -59,8 +59,10 @@ call.</p>
 <span>  base_size <span class="op">=</span> <span class="fl">26</span>,</span>
 <span>  base_family <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cjk_family <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  pad <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  gap <span class="op">=</span> <span class="fl">6</span></span>
+<span>  pad <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  gap <span class="op">=</span> <span class="fl">6</span>,</span>
+<span>  lineheight <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  content_pad_factor <span class="op">=</span> <span class="fl">1.2</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -112,11 +114,28 @@ default via <code><a href="poster_font.html">poster_font()</a></code>.</p></dd>
 
 
 <dt id="arg-pad">pad<a class="anchor" aria-label="anchor" href="#arg-pad"></a></dt>
-<dd><p>Inner padding of a card, as a <a href="https://rdrr.io/r/grid/unit.html" class="external-link">grid::unit</a> or millimetres.</p></dd>
+<dd><p>Inner padding of a card, as a <a href="https://rdrr.io/r/grid/unit.html" class="external-link">grid::unit</a> or millimetres.
+<code>NULL</code> (default) uses one line's height of <code>base_size</code>/<code>lineheight</code> –
+a physical-unit conversion of the font size, not a text measurement, so
+it scales with <code>base_size</code> without needing a real output device open.</p></dd>
 
 
 <dt id="arg-gap">gap<a class="anchor" aria-label="anchor" href="#arg-gap"></a></dt>
 <dd><p>Gap between stacked cards, as a <a href="https://rdrr.io/r/grid/unit.html" class="external-link">grid::unit</a> or millimetres.</p></dd>
+
+
+<dt id="arg-lineheight">lineheight<a class="anchor" aria-label="anchor" href="#arg-lineheight"></a></dt>
+<dd><p>Line spacing multiplier for wrapped text (title band and
+<code><a href="card_text.html">card_text()</a></code>), passed to <code><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">grid::gpar()</a></code>. Values below 1 (e.g. 0.95) tuck
+wrapped lines closer together than most text-rendering defaults.</p></dd>
+
+
+<dt id="arg-content-pad-factor">content_pad_factor<a class="anchor" aria-label="anchor" href="#arg-content-pad-factor"></a></dt>
+<dd><p>Multiplier applied to a block of text/table
+content's own measured height to get its enclosing box's height, used
+wherever a poster element sizes itself to fit its content (the title
+band, and any card with <code>height = "auto"</code>; see <code><a href="poster.html">poster()</a></code>). <code>1.2</code> means
+20% breathing room above/below the content.</p></dd>
 
 </dl></div>
     <div class="section level2">
