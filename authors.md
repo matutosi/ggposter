@@ -7,7 +7,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/matutosi/ggposter/blob/develop/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/matutosi/ggposter/blob/main/DESCRIPTION)
 
 Matsumura T (2026). *ggposter: Build A1 Conference Posters from ggplot2
 with YAML and patchwork*. R package version 0.6.0,
