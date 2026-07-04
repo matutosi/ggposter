@@ -3,7 +3,6 @@
 .RData
 .Ruserdata
 /tools/
-/man/
 /R/inprogress.R
 /inst/doc
 /vignettes/ggposter-*-preview.png
