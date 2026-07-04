@@ -8,21 +8,36 @@ card_image(
   files,
   labels = NULL,
   theme = poster_theme(),
-  height = 60,
-  space = 3
+  height = NULL,
+  width = NULL,
+  space = 3,
+  label_position = c("below", "inside")
 )
 }
 \arguments{
 \item{files}{Character vector of image file paths.}
 
 \item{labels}{Optional character vector of captions, same length as
-\code{files}, drawn under each photo.}
+\code{files}.}
 
 \item{theme}{A \code{\link[=poster_theme]{poster_theme()}} object.}
 
-\item{height}{Height of each photo, as a \link[grid:unit]{grid::unit} or millimetres.}
+\item{height}{Height of each photo, as a \link[grid:unit]{grid::unit} or millimetres.
+\code{NULL} (default, if \code{width} is also \code{NULL}) uses 60mm.}
+
+\item{width}{Alternative to \code{height}: a target \emph{total} row width (all
+photos plus the gaps between them). Each photo's height is solved so
+that, at its own aspect ratio, the row sums to this width -- useful for
+making a photo band fill a specific fraction of a card's width
+regardless of how many photos it has. Takes precedence over \code{height}
+if both are given.}
 
 \item{space}{Gap between photos, as a \link[grid:unit]{grid::unit} or millimetres.}
+
+\item{label_position}{\code{"below"} (default) draws each caption in its own
+row under the photo. \code{"inside"} overlays it near the bottom of the
+photo itself (white text on a semi-transparent bar), so the row's
+height is just the photo height.}
 }
 \value{
 A grob suitable as the \code{body} argument of \code{\link[=poster_card]{poster_card()}}.

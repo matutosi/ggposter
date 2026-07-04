@@ -52,13 +52,23 @@ poster_size <- function(size = "A1", orientation = "portrait") {
 #' @keywords internal
 #' @noRd
 anchor_top_left <- function(g, clip = "off") {
+  w <- measure_width(g)
+  h <- measure_height(g)
   vp <- grid::viewport(x = grid::unit(0, "npc"), y = grid::unit(1, "npc"),
-                       just = c("left", "top"), clip = clip,
-                       width = measure_width(g), height = measure_height(g))
-  grid::grobTree(g, vp = vp)
+                       just = c("left", "top"), clip = clip, width = w, height = h)
+  out <- grid::grobTree(g, vp = vp)
+  # Stash the size we already measured from the *unwrapped* g as a plain
+  # attribute, so a later measure_width()/measure_height() call on `out`
+  # doesn't have to re-derive it from a bare gTree wrapper (which, being a
+  # generic class with no heightDetails/widthDetails method, can't be
+  # measured via grid's generics at all -- see the header_tab comment in
+  # R/card.R for the same class of problem).
+  attr(out, "measured_size") <- list(width = w, height = h)
+  out
 }
 
-#' Measure a grob's width/height, correctly for [gtable::gtable] objects
+#' Measure a grob's width/height, correctly for [gtable::gtable] objects and
+#' for grobs previously sized by [anchor_top_left()]
 #'
 #' [grid::grobWidth()]/[grid::grobHeight()] can return the wrong (often tiny)
 #' size for a `gtable` produced by [gridExtra::tableGrob()] -- some versions
@@ -66,12 +76,17 @@ anchor_top_left <- function(g, clip = "off") {
 #' summing the actual column/row units. [gtable::gtable_width()] and
 #' [gtable::gtable_height()] sum the real column/row units and are reliable
 #' for any `gtable`; for a plain grob, the grid generics are used instead.
+#' A grob returned by [anchor_top_left()] carries its already-known size as
+#' a `"measured_size"` attribute, which is used in preference to either (a
+#' bare `grobTree()` wrapper has no measurable height/width of its own).
 #'
 #' @param g A grob or gtable.
 #' @return A [grid::unit] scalar.
 #' @keywords internal
 #' @noRd
 measure_width <- function(g) {
+  cached <- attr(g, "measured_size")
+  if (!is.null(cached)) return(cached$width)
   if (inherits(g, "gtable")) gtable::gtable_width(g) else grid::grobWidth(g)
 }
 
@@ -79,5 +94,7 @@ measure_width <- function(g) {
 #' @keywords internal
 #' @noRd
 measure_height <- function(g) {
+  cached <- attr(g, "measured_size")
+  if (!is.null(cached)) return(cached$height)
   if (inherits(g, "gtable")) gtable::gtable_height(g) else grid::grobHeight(g)
 }

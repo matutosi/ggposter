@@ -1,10 +1,16 @@
 #' Text card content: a bullet list rendered as markdown
 #'
-#' Wraps a character vector of markdown lines (or a single markdown string) as
-#' a body grob using [gridtext::textbox_grob()], so bold/italic/links work.
+#' Wraps a character vector of markdown lines as a body grob using
+#' [gridtext::textbox_grob()], so bold/italic/links work. Each line is laid
+#' out as its own row, one per element of `md`; a `"- "`-prefixed line gets
+#' a bullet in its own narrow column so a wrapped continuation line aligns
+#' under the item's own text rather than under the bullet (a hanging
+#' indent) -- gridtext has no CSS `text-indent`/`padding-left` support to do
+#' this within a single call, so each item is measured and wrapped
+#' separately instead.
 #'
-#' @param md Character vector. Each element becomes one paragraph/bullet; they
-#'   are joined with newlines. Markdown syntax (e.g. `**bold**`) is honoured.
+#' @param md Character vector. Each element becomes one paragraph/bullet.
+#'   Markdown syntax (e.g. `**bold**`) is honoured.
 #' @param theme A [poster_theme()] object.
 #' @param width Wrap width, as a [grid::unit] or millimetres. `NULL` lets the
 #'   grob size to its natural width (no wrapping).
@@ -14,17 +20,84 @@
 #' @examples
 #' g <- card_text(c("- point one", "- point two"), poster_theme())
 card_text <- function(md, theme = poster_theme(), width = NULL) {
-  bullet <- paste0(intToUtf8(0x2022), " ")
-  md <- gsub("^-\\s+", bullet, md)  # "- item" -> bullet + item (gridtext has no <ul> support)
-  md <- gsub("`", "", md)         # drop code spans (gridtext has no <code> support)
-  md <- paste(md, collapse = "<br>")
   gp <- grid::gpar(fontsize = theme$base_size, fontfamily = theme$base_family,
-                   col = theme$body_text)
+                   col = theme$body_text, lineheight = theme$lineheight)
   width <- if (is.null(width)) grid::unit(1, "npc") else as_mm_unit(width)
-  gridtext::textbox_grob(md, x = 0, y = 1, hjust = 0, vjust = 1,
-                         gp = gp, box_gp = grid::gpar(col = NA),
-                         padding = grid::unit(c(0, 0, 0, 0), "mm"),
-                         width = width)
+  bullet <- paste0(intToUtf8(0x2022), " ")
+  bullet_w <- grid::grobWidth(grid::textGrob(bullet, gp = gp))
+
+  box <- function(text, w) {
+    text <- gsub("`", "", text)  # drop code spans (gridtext has no <code> support)
+    gridtext::textbox_grob(text, x = 0, y = 1, hjust = 0, vjust = 1, halign = 0,
+                           gp = gp, box_gp = grid::gpar(col = NA),
+                           padding = grid::unit(c(0, 0, 0, 0), "mm"),
+                           width = w)
+  }
+
+  rows <- lapply(md, function(line) {
+    if (!grepl("^-\\s+", line)) return(box(line, width))
+    text    <- sub("^-\\s+", "", line)
+    text_w  <- width - bullet_w
+    txt_box <- box(text, text_w)
+    bl <- grid::textGrob(bullet, x = 0, y = 1, hjust = 0, vjust = 1, gp = gp)
+    row <- gtable::gtable(widths = grid::unit.c(bullet_w, text_w),
+                         heights = grid::grobHeight(txt_box))
+    row <- gtable::gtable_add_grob(row, bl,      t = 1, l = 1, name = "bullet")
+    row <- gtable::gtable_add_grob(row, txt_box, t = 1, l = 2, name = "text")
+    row
+  })
+
+  heights <- do.call(grid::unit.c, lapply(rows, function(r) {
+    if (inherits(r, "gtable")) gtable::gtable_height(r) else grid::grobHeight(r)
+  }))
+  out <- gtable::gtable(widths = width, heights = heights)
+  for (i in seq_along(rows)) {
+    out <- gtable::gtable_add_grob(out, rows[[i]], t = i, l = 1, name = paste0("line", i))
+  }
+  out
+}
+
+#' Place a bullet-list description beside a table or figure
+#'
+#' Splits a card's body horizontally into the given content on the left and
+#' a bullet list (via [card_text()], left-aligned by default) on the right,
+#' at a relative width split. Used by [poster()] when a `table`/`figure`
+#' section body has a `notes` field.
+#'
+#' @param main The main content grob (e.g. from [card_table()] or
+#'   [card_figure()]), already built to fit in `total_width_mm * (1 -
+#'   notes_width)` (minus the gap) -- `with_notes()` only lays it out
+#'   alongside the notes, it does not resize it.
+#' @param notes_md Character vector of markdown bullet lines for
+#'   [card_text()].
+#' @param theme A [poster_theme()] object.
+#' @param total_width_mm Total width available to `main` and the notes
+#'   column together, in millimetres. Needed (rather than a relative split)
+#'   because relative (`"null"`) gtable units can't be measured outside of a
+#'   full layout render, and this whole grob's height must be measurable so
+#'   a `height = "auto"` card can size itself to it (see [build_column()]).
+#' @param notes_width Fraction (0-1) of `total_width_mm` given to the notes
+#'   column; `main` gets the remainder minus a small gap.
+#' @return A grob suitable as the `body` argument of [poster_card()].
+#' @keywords internal
+#' @noRd
+with_notes <- function(main, notes_md, theme, total_width_mm, notes_width = 0.35) {
+  gap_mm         <- 5 / 3
+  notes_width_mm <- total_width_mm * notes_width
+  main_width_mm  <- total_width_mm - notes_width_mm - gap_mm
+  notes_grob <- card_text(notes_md, theme, width = notes_width_mm)
+  row_height <- max(measure_height(main), measure_height(notes_grob))
+  row <- gtable::gtable(
+    widths  = grid::unit(c(main_width_mm, gap_mm, notes_width_mm), "mm"),
+    heights = row_height
+  )
+  row <- gtable::gtable_add_grob(row, main, t = 1, l = 1, name = "main")
+  # Top-anchored explicitly, rather than relying on how a shorter grob
+  # happens to be positioned within a taller cell: when notes is shorter
+  # than main (the common case), it must sit level with the top of main,
+  # not centred in the row.
+  row <- gtable::gtable_add_grob(row, anchor_top_left(notes_grob), t = 1, l = 3, name = "notes")
+  anchor_top_left(row)
 }
 
 #' Table card content: a booktab-style table grob
@@ -169,17 +242,24 @@ card_figure <- function(gg, theme = poster_theme(), width = NULL, height = NULL)
 #' Force a grob to a fixed width/height via a wrapping viewport
 #' @param g A grob.
 #' @param width,height Target size as [grid::unit] or millimetres. `NULL`
-#'   leaves that dimension unconstrained.
-#' @return The grob with a size-fixing viewport attached.
+#'   leaves that dimension unconstrained (filling whatever space the
+#'   surrounding cell gives it).
+#' @return The grob with a size-fixing viewport attached. When both `width`
+#'   and `height` are given, the resulting size is cached (see
+#'   [measure_width()]/[measure_height()]) since a bare `grobTree()` wrapper
+#'   otherwise can't be measured; when only one is given the other still
+#'   falls through to `"npc"`, unchanged from before.
 #' @keywords internal
 #' @noRd
 poster_fix_size <- function(g, width = NULL, height = NULL) {
   if (is.null(width) && is.null(height)) return(g)
-  vp <- grid::viewport(
-    width  = if (!is.null(width))  as_mm_unit(width)  else grid::unit(1, "npc"),
-    height = if (!is.null(height)) as_mm_unit(height) else grid::unit(1, "npc")
-  )
-  grid::grobTree(g, vp = vp)
+  w <- if (!is.null(width))  as_mm_unit(width)  else grid::unit(1, "npc")
+  h <- if (!is.null(height)) as_mm_unit(height) else grid::unit(1, "npc")
+  out <- grid::grobTree(g, vp = grid::viewport(width = w, height = h))
+  if (!is.null(width) && !is.null(height)) {
+    attr(out, "measured_size") <- list(width = w, height = h)
+  }
+  out
 }
 
 #' Image card content: one or more photos arranged in a row, with optional labels
@@ -190,10 +270,21 @@ poster_fix_size <- function(g, width = NULL, height = NULL) {
 #'
 #' @param files Character vector of image file paths.
 #' @param labels Optional character vector of captions, same length as
-#'   `files`, drawn under each photo.
+#'   `files`.
 #' @param theme A [poster_theme()] object.
 #' @param height Height of each photo, as a [grid::unit] or millimetres.
+#'   `NULL` (default, if `width` is also `NULL`) uses 60mm.
+#' @param width Alternative to `height`: a target *total* row width (all
+#'   photos plus the gaps between them). Each photo's height is solved so
+#'   that, at its own aspect ratio, the row sums to this width -- useful for
+#'   making a photo band fill a specific fraction of a card's width
+#'   regardless of how many photos it has. Takes precedence over `height`
+#'   if both are given.
 #' @param space Gap between photos, as a [grid::unit] or millimetres.
+#' @param label_position `"below"` (default) draws each caption in its own
+#'   row under the photo. `"inside"` overlays it near the bottom of the
+#'   photo itself (white text on a semi-transparent bar), so the row's
+#'   height is just the photo height.
 #'
 #' @return A grob suitable as the `body` argument of [poster_card()].
 #' @export
@@ -201,39 +292,74 @@ poster_fix_size <- function(g, width = NULL, height = NULL) {
 #' f <- system.file("extdata", "small.JPG", package = "ggposter")
 #' g <- card_image(f, labels = "sample", theme = poster_theme())
 card_image <- function(files, labels = NULL, theme = poster_theme(),
-                       height = 60, space = 3) {
-  height <- as_mm_unit(height)
-  space  <- as_mm_unit(space)
+                       height = NULL, width = NULL, space = 3,
+                       label_position = c("below", "inside")) {
+  label_position <- match.arg(label_position)
+  space <- as_mm_unit(space)
   n <- length(files)
   if (!is.null(labels) && length(labels) != n) {
     cli::cli_abort("{.arg labels} must have the same length as {.arg files}.")
   }
 
-  labs <- if (is.null(labels)) NULL else lapply(labels, function(l) {
-    grid::textGrob(l, gp = grid::gpar(fontsize = theme$base_size * 0.6,
-                                      fontfamily = theme$base_family,
-                                      col = theme$body_text))
-  })
-  row_height <- if (is.null(labs)) {
+  ars <- vapply(files, function(f) {
+    info <- magick::image_info(magick::image_read(f))
+    info$width / info$height
+  }, numeric(1))
+
+  if (!is.null(width)) {
+    space_mm  <- grid::convertWidth(space, "mm", valueOnly = TRUE)
+    target_mm <- grid::convertWidth(as_mm_unit(width), "mm", valueOnly = TRUE)
+    height <- grid::unit(max((target_mm - space_mm * (n - 1)) / sum(ars), 1), "mm")
+  } else {
+    height <- as_mm_unit(height %||% 60)
+  }
+
+  inside <- !is.null(labels) && label_position == "inside"
+  labs <- if (is.null(labels)) {
+    NULL
+  } else if (inside) {
+    lapply(labels, function(l) {
+      grid::textGrob(l, x = grid::unit(0.5, "npc"), y = grid::unit(2, "mm"),
+                     just = c("center", "bottom"),
+                     gp = grid::gpar(fontsize = theme$base_size * 0.6,
+                                     fontfamily = theme$base_family, col = "#FFFFFF"))
+    })
+  } else {
+    lapply(labels, function(l) {
+      grid::textGrob(l, gp = grid::gpar(fontsize = theme$base_size * 0.6,
+                                        fontfamily = theme$base_family,
+                                        col = theme$body_text))
+    })
+  }
+  label_gap <- grid::unit(1, "mm")
+  row_height <- if (is.null(labs) || inside) {
     height
   } else {
     label_h <- do.call(grid::unit.c, lapply(labs, grid::grobHeight))
-    height + grid::unit(3, "mm") + max(label_h)
+    height + label_gap + max(label_h)
   }
 
   built <- lapply(seq_len(n), function(i) {
     img <- magick::image_read(files[[i]])
-    info <- magick::image_info(img)
-    ar <- info$width / info$height
+    ar <- ars[[i]]
     photo_width <- height * ar
     rg <- grid::rasterGrob(grDevices::as.raster(img), width = grid::unit(1, "npc"),
                            height = grid::unit(1, "npc"))
     photo_vp <- grid::viewport(width = photo_width, height = height)
+
+    if (inside) {
+      bar_h <- grid::grobHeight(labs[[i]]) + grid::unit(4, "mm")
+      bar <- grid::rectGrob(y = 0, height = bar_h, just = "bottom",
+                            gp = grid::gpar(fill = grDevices::rgb(0, 0, 0, 0.55), col = NA))
+      photo <- grid::grobTree(rg, bar, labs[[i]], vp = photo_vp)
+      return(list(width = photo_width, grob = photo))
+    }
+
     photo <- grid::grobTree(rg, vp = photo_vp)
     if (is.null(labs)) return(list(width = photo_width, grob = photo))
     cell <- gtable::gtable(widths = photo_width,
-                          heights = grid::unit.c(height, grid::unit(3, "mm"),
-                                                 row_height - height - grid::unit(3, "mm")))
+                          heights = grid::unit.c(height, label_gap,
+                                                 row_height - height - label_gap))
     cell <- gtable::gtable_add_grob(cell, photo,   t = 1, l = 1)
     cell <- gtable::gtable_add_grob(cell, labs[[i]], t = 3, l = 1)
     list(width = photo_width, grob = cell)

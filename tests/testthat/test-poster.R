@@ -97,6 +97,37 @@ test_that("build_body() does not pass an absolute mm width for text by default",
   expect_true(grid::is.grob(g2))
 })
 
+test_that("section$height = 'auto' fits the card to its content instead of a relative share", {
+  spec <- simple_spec()
+  spec$sections$intro$height <- "auto"
+  spec$sections$outro$height <- 1
+  p <- poster(spec)
+  expect_s3_class(p, "ggposter")
+  out <- tempfile(fileext = ".png")
+  expect_no_error(render_poster(p, out, scale = 0.1, dpi = 50))
+})
+
+test_that("section$height = 'auto' works for every section in a column", {
+  spec <- simple_spec()
+  spec$sections$intro$height <- "auto"
+  spec$sections$outro$height <- "auto"
+  p <- poster(spec)
+  out <- tempfile(fileext = ".png")
+  expect_no_error(render_poster(p, out, scale = 0.1, dpi = 50))
+})
+
+test_that("a table/figure body with notes= is placed beside a bullet list", {
+  spec <- simple_spec()
+  spec$sections$intro$body <- list(
+    type = "table", object = "tbl",
+    notes = c("- point one", "- point two")
+  )
+  p <- poster(spec, objects = list(tbl = data.frame(a = 1:2, b = 3:4)))
+  expect_s3_class(p, "ggposter")
+  out <- tempfile(fileext = ".png")
+  expect_no_error(render_poster(p, out, scale = 0.1, dpi = 50))
+})
+
 test_that("poster() reads a spec from a YAML file path", {
   path <- system.file("extdata", "poster_sample.yml", package = "ggposter")
   skip_if(!nzchar(path), "sample yaml not found")

@@ -21,12 +21,12 @@ list spec.}
 }
 \value{
 An object of class \code{ggposter}, a thin wrapper around a
-\link[patchwork:patchwork-package]{patchwork::patchwork} object. Print it to preview, or pass it to
+\link[gtable:gtable]{gtable::gtable}. Print it to preview, or pass it to
 \code{\link[=render_poster]{render_poster()}} to save a PDF/PNG at true size.
 }
 \description{
 Assembles a title band and a multi-column body of section cards into a
-single \link[patchwork:patchwork-package]{patchwork::patchwork} object sized for a real paper size (default A1
+single \link[gtable:gtable]{gtable::gtable} sized for a real paper size (default A1
 portrait). The spec can be an R list (built by hand, or by reading YAML
 with \code{\link[=read_poster_yaml]{read_poster_yaml()}}) or a path to a YAML file, in which case it is
 read automatically.

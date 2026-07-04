@@ -19,7 +19,18 @@
 #' @param cjk_family Font family for CJK (Japanese) text. `NULL` falls back to
 #'   `base_family`.
 #' @param pad Inner padding of a card, as a [grid::unit] or millimetres.
+#'   `NULL` (default) uses one line's height of `base_size`/`lineheight` --
+#'   a physical-unit conversion of the font size, not a text measurement, so
+#'   it scales with `base_size` without needing a real output device open.
 #' @param gap Gap between stacked cards, as a [grid::unit] or millimetres.
+#' @param lineheight Line spacing multiplier for wrapped text (title band and
+#'   [card_text()]), passed to [grid::gpar()]. Values below 1 (e.g. 0.95) tuck
+#'   wrapped lines closer together than most text-rendering defaults.
+#' @param content_pad_factor Multiplier applied to a block of text/table
+#'   content's own measured height to get its enclosing box's height, used
+#'   wherever a poster element sizes itself to fit its content (the title
+#'   band, and any card with `height = "auto"`; see [poster()]). `1.2` means
+#'   20% breathing room above/below the content.
 #'
 #' @return An object of class `poster_theme`.
 #' @export
@@ -36,11 +47,21 @@ poster_theme <- function(accent = "#2E7D32",
                          base_size = 26,
                          base_family = NULL,
                          cjk_family = NULL,
-                         pad = 5,
-                         gap = 6) {
+                         pad = NULL,
+                         gap = 6,
+                         lineheight = 0.95,
+                         content_pad_factor = 1.2) {
   if (is.null(box_border)) box_border <- accent
   if (is.null(base_family)) base_family <- poster_font()
   if (is.null(cjk_family)) cjk_family <- poster_font(cjk = TRUE, fallback = base_family)
+  if (is.null(pad)) {
+    # A generic points-to-mm unit conversion (fixed physical ratio, no font
+    # metrics involved) rather than a text measurement, so this doesn't need
+    # a real output device open to be correct (see the header_tab note in
+    # R/card.R for why measuring actual glyphs before render_poster() opens
+    # the real device is a foot-gun).
+    pad <- grid::convertHeight(grid::unit(base_size * lineheight, "points"), "mm", valueOnly = TRUE)
+  }
 
   structure(
     list(
@@ -55,7 +76,9 @@ poster_theme <- function(accent = "#2E7D32",
       base_family   = base_family,
       cjk_family    = cjk_family,
       pad           = as_mm_unit(pad),
-      gap           = as_mm_unit(gap)
+      gap           = as_mm_unit(gap),
+      lineheight    = lineheight,
+      content_pad_factor = content_pad_factor
     ),
     class = "poster_theme"
   )

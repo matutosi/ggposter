@@ -1,14 +1,14 @@
 Package: ggposter
-Title: Build A1 Conference Posters from ggplot2 with YAML and patchwork
+Title: Build A1 Conference Posters from ggplot2 with YAML
 Version: 0.6.0
 Authors@R:
     person("Toshikazu", "Matsumura", , "matutosi@gmail.com", role = c("aut", "cre"))
 Description: ggposter declares a poster as a title band plus columns of
     rounded, tab-headed cards (text, tables, ggplot2 figures, or photo
-    strips), assembled with patchwork and rendered at true size (e.g. A1)
-    with embedded fonts, including CJK. Content and layout can be described
-    as an R list or a YAML file, while figures, tables, and photos are
-    supplied as R objects.
+    strips), assembled with grid and gtable and rendered at true size
+    (e.g. A1) with embedded fonts, including CJK. Content and layout can be
+    described as an R list or a YAML file, while figures, tables, and photos
+    are supplied as R objects.
 License: MIT + file LICENSE
 URL: https://matutosi.github.io/ggposter/, https://github.com/matutosi/ggposter
 BugReports: https://github.com/matutosi/ggposter/issues
@@ -23,7 +23,6 @@ Imports:
     gridtext,
     gtable,
     magick,
-    patchwork,
     ragg,
     stats,
     systemfonts,

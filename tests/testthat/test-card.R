@@ -34,3 +34,33 @@ test_that("poster_card() accepts a ggplot body", {
 test_that("poster_card() rejects non-grob, non-ggplot bodies", {
   expect_error(poster_card("not a grob", header = "X", theme = poster_theme()))
 })
+
+test_that("fit_content=TRUE sizes the body row to the body's measured height", {
+  th <- poster_theme(base_size = 20, content_pad_factor = 1.2)
+  body <- grid::textGrob("hello", x = 0, y = 1, hjust = 0, vjust = 1)
+  card_fit  <- poster_card(body, header = "TITLE", theme = th, fit_content = TRUE)
+  card_fill <- poster_card(body, header = "TITLE", theme = th, fit_content = FALSE)
+
+  # the fit_content card's body row is an absolute size derived from the
+  # body's own height, so the whole card is shorter than one that fills
+  # whatever "null" space it's given (here, both start from the same
+  # unmeasured body, so fill defaults its row to 1 null unit, which
+  # convertHeight() resolves to 0 outside a real layout).
+  h_fit  <- grid::convertHeight(gtable::gtable_height(card_fit),  "mm", valueOnly = TRUE)
+  h_fill <- grid::convertHeight(gtable::gtable_height(card_fill), "mm", valueOnly = TRUE)
+  expect_gt(h_fit, 0)
+  expect_gt(h_fit, h_fill)
+})
+
+test_that("header_tab() sizes the tab to the label without clipping it", {
+  # Regression test: header_tab() used to resolve the label's measured width
+  # eagerly with convertWidth() at construction time, which -- when called
+  # before render_poster() opens the real output device, as poster() always
+  # does -- measured against fallback font metrics and could size the tab
+  # narrower than the label actually renders, clipping it. The label must
+  # stay a lazy grobWidth()-based unit, resolved at draw time.
+  th <- poster_theme(base_size = 24)
+  tab <- header_tab("SUMMARY BY DRIVETRAIN", th, th$base_size * 1.15)
+  expect_s3_class(tab, "header_tab")
+  expect_true(grid::is.unit(tab$width))
+})

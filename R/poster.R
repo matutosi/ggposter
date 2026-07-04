@@ -1,7 +1,7 @@
 #' Build a poster from a declarative spec
 #'
 #' Assembles a title band and a multi-column body of section cards into a
-#' single [patchwork] object sized for a real paper size (default A1
+#' single [gtable::gtable] sized for a real paper size (default A1
 #' portrait). The spec can be an R list (built by hand, or by reading YAML
 #' with [read_poster_yaml()]) or a path to a YAML file, in which case it is
 #' read automatically.
@@ -28,7 +28,7 @@
 #'   list spec.
 #'
 #' @return An object of class `ggposter`, a thin wrapper around a
-#'   [patchwork] object. Print it to preview, or pass it to
+#'   [gtable::gtable]. Print it to preview, or pass it to
 #'   [render_poster()] to save a PDF/PNG at true size.
 #' @export
 #' @examples
@@ -57,25 +57,44 @@ poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL) {
     NULL
   }
 
+  title_h <- if (!is.null(title_grob)) {
+    grid::convertHeight(sum(title_grob$heights), "mm", valueOnly = TRUE)
+  } else {
+    0
+  }
+  col_height_mm <- size_mm[["height"]] - title_h
+
   layout <- spec$layout %||% list(left = names(spec$sections), right = character(0))
   columns <- layout[setdiff(names(layout), "columns")]
   columns <- columns[lengths(columns) > 0]
   col_width_mm <- size_mm[["width"]] / max(length(columns), 1)
 
   col_grobs <- lapply(columns, function(section_names) {
-    build_column(section_names, spec$sections, theme, objects, base_dir, col_width_mm)
+    build_column(section_names, spec$sections, theme, objects, base_dir, col_width_mm, col_height_mm)
   })
 
-  body <- Reduce(function(a, b) a | b, col_grobs)
-
-  full <- if (!is.null(title_grob)) {
-    title_h <- grid::convertHeight(sum(title_grob$heights), "mm", valueOnly = TRUE)
-    body_h  <- size_mm[["height"]] - title_h
-    patchwork::wrap_elements(full = title_grob) /
-      body +
-      patchwork::plot_layout(heights = c(title_h, body_h))
+  # Stitching the title and columns together via patchwork's `/` and `|`
+  # operators (both of which route through `wrap_elements(full=)` for plain
+  # grobs/gtables) causes some cards to be drawn a second time, as faint
+  # duplicates further down the page, once there are 3+ stacked elements.
+  # gtable's own row/column spanning does the same job -- mixed absolute-mm
+  # rows are already used throughout this package -- without going through
+  # whatever in patchwork's "full patch" machinery causes the duplication,
+  # so build the whole poster as one plain gtable instead.
+  n_cols <- max(length(columns), 1)
+  row_heights <- if (!is.null(title_grob)) {
+    grid::unit(c(title_h, col_height_mm), "mm")
   } else {
-    body
+    grid::unit(col_height_mm, "mm")
+  }
+  full <- gtable::gtable(widths = grid::unit(rep(col_width_mm, n_cols), "mm"),
+                         heights = row_heights)
+  body_row <- if (!is.null(title_grob)) 2 else 1
+  if (!is.null(title_grob)) {
+    full <- gtable::gtable_add_grob(full, title_grob, t = 1, l = 1, r = n_cols, name = "title")
+  }
+  for (i in seq_along(col_grobs)) {
+    full <- gtable::gtable_add_grob(full, col_grobs[[i]], t = body_row, l = i, name = names(columns)[[i]] %||% paste0("col", i))
   }
 
   structure(
@@ -86,6 +105,15 @@ poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL) {
 }
 
 #' Build one column of stacked section cards
+#'
+#' A section's `height` is either a number (a relative share of the
+#' leftover space, after `"auto"` sections take what their content needs)
+#' or the string `"auto"`, meaning the card is built with [poster_card()]'s
+#' `fit_content = TRUE` and its *actual measured height* is used instead.
+#' Both kinds of section are resolved to absolute millimetre row heights on
+#' one plain [gtable::gtable()], which the caller places in the poster's
+#' root gtable.
+#'
 #' @param section_names Character vector of section names, top to bottom.
 #' @param sections Named list of section specs (`spec$sections`).
 #' @param theme A [poster_theme()] object.
@@ -93,16 +121,60 @@ poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL) {
 #' @param base_dir Directory used to resolve relative image paths.
 #' @param col_width_mm Column width in millimetres, used as the default text
 #'   wrap width when a section body does not specify one.
-#' @return A [patchwork] object stacking the column's cards.
+#' @param col_height_mm Total height available to the column, in
+#'   millimetres. Sections with a numeric `height` share out whatever is
+#'   left after the `"auto"` sections take the space their content needs.
+#' @return A [gtable::gtable()] stacking the column's cards.
 #' @keywords internal
 #' @noRd
-build_column <- function(section_names, sections, theme, objects, base_dir, col_width_mm) {
+build_column <- function(section_names, sections, theme, objects, base_dir,
+                          col_width_mm, col_height_mm) {
   cards <- lapply(section_names, function(nm) {
     build_section(nm, sections[[nm]], theme, objects, base_dir, col_width_mm)
   })
-  heights <- vapply(section_names, function(nm) sections[[nm]]$height %||% 1, numeric(1))
-  wrapped <- lapply(cards, patchwork::wrap_elements)
-  Reduce(function(a, b) a / b, wrapped) + patchwork::plot_layout(heights = heights)
+  raw_heights <- lapply(section_names, function(nm) sections[[nm]]$height %||% 1)
+  is_auto <- vapply(raw_heights, identical, logical(1), "auto")
+
+  auto_mm <- vapply(seq_along(cards), function(i) {
+    if (is_auto[[i]]) grid::convertHeight(measure_height(cards[[i]]), "mm", valueOnly = TRUE) else 0
+  }, numeric(1))
+  weights <- vapply(seq_along(raw_heights), function(i) {
+    if (is_auto[[i]]) 0 else as.numeric(raw_heights[[i]])
+  }, numeric(1))
+
+  # Resolving every row to a plain absolute mm value (rather than mixing in
+  # any "null" unit, whether from a numeric-weight section or a trailing
+  # spacer) is required here: handing patchwork's wrap_elements(full=) a
+  # gtable that contains a "null" row causes it to render that gtable's
+  # content a second time, as a faint duplicate further down the page, once
+  # the whole poster (title + body) is assembled. Absolute mm rows avoid
+  # that null-unit resolution path entirely.
+  leftover_mm  <- max(col_height_mm - sum(auto_mm), 0)
+  weight_total <- sum(weights)
+  row_mm <- vapply(seq_along(raw_heights), function(i) {
+    if (is_auto[[i]]) {
+      auto_mm[[i]]
+    } else if (weight_total > 0) {
+      leftover_mm * weights[[i]] / weight_total
+    } else {
+      0
+    }
+  }, numeric(1))
+  # If no section has a numeric weight to absorb the leftover space (every
+  # section is "auto"), append a blank spacer row sized to the leftover mm
+  # directly, so the column's total height still equals col_height_mm and
+  # the cards stay top-anchored instead of being centered within whatever
+  # (larger) space the page ultimately allots to this column.
+  if (weight_total == 0 && leftover_mm > 0) {
+    row_mm <- c(row_mm, leftover_mm)
+  }
+  heights <- grid::unit(row_mm, "mm")
+
+  col <- gtable::gtable(widths = grid::unit(1, "null"), heights = heights)
+  for (i in seq_along(cards)) {
+    col <- gtable::gtable_add_grob(col, cards[[i]], t = i, l = 1, name = section_names[[i]])
+  }
+  col
 }
 
 #' Build a single section card from its spec
@@ -117,10 +189,17 @@ build_section <- function(name, section, theme, objects, base_dir, col_width_mm)
     cli::cli_abort("Section {.val {name}} is referenced in {.field layout} but missing from {.field sections}.")
   }
   body <- build_body(section$body, theme, objects, base_dir, col_width_mm)
-  poster_card(body, header = section$header, theme = theme)
+  fit_content <- identical(section$height %||% 1, "auto")
+  poster_card(body, header = section$header, theme = theme, fit_content = fit_content)
 }
 
 #' Dispatch a section's `body` spec to the matching content builder
+#'
+#' `table` and `figure` bodies may also carry a `notes` field (a character
+#' vector of markdown bullet lines): when present, the built content is
+#' wrapped with [with_notes()] so the table/figure sits beside a bullet-list
+#' description instead of alone.
+#'
 #' @param body A body spec: `list(type = "text"|"table"|"figure"|"image", ...)`.
 #' @inheritParams build_column
 #' @return A grob (or ggplot, for `"figure"`) ready for [poster_card()].
@@ -128,7 +207,15 @@ build_section <- function(name, section, theme, objects, base_dir, col_width_mm)
 #' @noRd
 build_body <- function(body, theme, objects, base_dir, col_width_mm) {
   type <- body$type %||% "text"
-  switch(type,
+  has_notes <- type %in% c("table", "figure") && !is.null(body$notes)
+  notes_width <- body$notes_width %||% 0.35
+  pad_mm <- grid::convertWidth(theme$pad, "mm", valueOnly = TRUE)
+  # `body$width`, if given, is the *combined* budget for main content + notes
+  # (not the main content's own width): with_notes() splits it further below.
+  total_width_mm <- (body$width %||% col_width_mm) - 2 * pad_mm
+  main_width_mm  <- if (has_notes) total_width_mm * (1 - notes_width) - 5 else total_width_mm
+
+  content <- switch(type,
     # Text wraps relative to its card ("npc", the default in card_text())
     # unless the spec gives an explicit absolute width: gridtext's line
     # breaking is unreliable at the very small absolute point sizes that
@@ -139,14 +226,24 @@ build_body <- function(body, theme, objects, base_dir, col_width_mm) {
     text = card_text(body$md, theme, width = body$width),
     table = card_table(objects[[body$object]], theme,
                        title = body$title, caption = body$caption,
-                       width = (body$width %||% col_width_mm) -
-                         2 * grid::convertWidth(theme$pad, "mm", valueOnly = TRUE)),
+                       width = main_width_mm),
     figure = card_figure(objects[[body$object]], theme,
-                        width = body$width, height = body$height),
+                        # A figure paired with notes needs an explicit
+                        # height too (not just width), so with_notes() can
+                        # measure it (see poster_fix_size()'s caching, which
+                        # only kicks in when both dimensions are explicit).
+                        # 4:3 is just a reasonable default aspect ratio.
+                        width  = if (has_notes) main_width_mm else body$width,
+                        height = if (has_notes) (body$height %||% (main_width_mm * 0.75)) else body$height),
     image = card_image(file.path(base_dir, body$files), labels = body$labels,
-                       theme = theme, height = body$height %||% 60),
+                       theme = theme, height = body$height, width = body$width,
+                       label_position = body$label_position %||% "below"),
     cli::cli_abort("Unknown body type {.val {type}}.")
   )
+  if (has_notes) {
+    content <- with_notes(content, body$notes, theme, total_width_mm, notes_width = notes_width)
+  }
+  content
 }
 
 #' @export
@@ -166,7 +263,11 @@ print.ggposter <- function(x, ...) {
       x <- rescale_poster(x, scale)
     }
   }
-  print(x$patchwork, ...)
+  # x$patchwork is a plain gtable (see build_column()/poster()): unlike a
+  # patchwork/ggplot object, print()-ing a gtable just prints a text summary
+  # of its layout and draws nothing, so draw it explicitly instead.
+  grid::grid.newpage()
+  grid::grid.draw(x$patchwork)
   invisible(x)
 }
 

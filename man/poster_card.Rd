@@ -4,7 +4,13 @@
 \alias{poster_card}
 \title{Build a section card: a rounded box with a header tab and content}
 \usage{
-poster_card(body, header = NULL, theme = poster_theme(), header_size = NULL)
+poster_card(
+  body,
+  header = NULL,
+  theme = poster_theme(),
+  header_size = NULL,
+  fit_content = FALSE
+)
 }
 \arguments{
 \item{body}{The content. Either a grob, or a ggplot object (converted with
@@ -16,6 +22,13 @@ poster_card(body, header = NULL, theme = poster_theme(), header_size = NULL)
 
 \item{header_size}{Font size of the header, in points. Defaults to
 \code{theme$base_size * 1.15}.}
+
+\item{fit_content}{If \code{TRUE}, size the body cell to \code{body}'s own measured
+height times \code{theme$content_pad_factor}, instead of filling however
+much vertical space the card is given (the latter is what you want when
+the card's height is a relative share of the column, e.g. from
+\code{\link[=poster]{poster()}}'s numeric \code{section$height}; the former is what
+\code{section$height = "auto"} uses).}
 }
 \value{
 A \link[gtable:gtable]{gtable::gtable} grob of class \code{poster_card}.
@@ -27,8 +40,8 @@ and a body grob underneath. Every content type (text, table, figure, image)
 is wrapped in a card so the poster keeps one consistent look.
 }
 \details{
-The returned object is a \link[gtable:gtable]{gtable::gtable} (a grob), which can be placed by
-\code{\link[patchwork:wrap_elements]{patchwork::wrap_elements()}} or drawn directly with \code{\link[grid:grid.draw]{grid::grid.draw()}}.
+The returned object is a \link[gtable:gtable]{gtable::gtable} (a grob), which can be placed in
+another gtable or drawn directly with \code{\link[grid:grid.draw]{grid::grid.draw()}}.
 }
 \examples{
 body <- grid::textGrob("hello")

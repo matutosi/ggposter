@@ -15,8 +15,10 @@ poster_theme(
   base_size = 26,
   base_family = NULL,
   cjk_family = NULL,
-  pad = 5,
-  gap = 6
+  pad = NULL,
+  gap = 6,
+  lineheight = 0.95,
+  content_pad_factor = 1.2
 )
 }
 \arguments{
@@ -43,9 +45,22 @@ default via \code{\link[=poster_font]{poster_font()}}.}
 \item{cjk_family}{Font family for CJK (Japanese) text. \code{NULL} falls back to
 \code{base_family}.}
 
-\item{pad}{Inner padding of a card, as a \link[grid:unit]{grid::unit} or millimetres.}
+\item{pad}{Inner padding of a card, as a \link[grid:unit]{grid::unit} or millimetres.
+\code{NULL} (default) uses one line's height of \code{base_size}/\code{lineheight} --
+a physical-unit conversion of the font size, not a text measurement, so
+it scales with \code{base_size} without needing a real output device open.}
 
 \item{gap}{Gap between stacked cards, as a \link[grid:unit]{grid::unit} or millimetres.}
+
+\item{lineheight}{Line spacing multiplier for wrapped text (title band and
+\code{\link[=card_text]{card_text()}}), passed to \code{\link[grid:gpar]{grid::gpar()}}. Values below 1 (e.g. 0.95) tuck
+wrapped lines closer together than most text-rendering defaults.}
+
+\item{content_pad_factor}{Multiplier applied to a block of text/table
+content's own measured height to get its enclosing box's height, used
+wherever a poster element sizes itself to fit its content (the title
+band, and any card with \code{height = "auto"}; see \code{\link[=poster]{poster()}}). \code{1.2} means
+20\% breathing room above/below the content.}
 }
 \value{
 An object of class \code{poster_theme}.

@@ -20,32 +20,61 @@ poster_title <- function(title, subtitle = NULL, authors = NULL,
                          theme = poster_theme(), width = NULL) {
   gp <- function(mult, face = "plain", col = theme$header_text) {
     grid::gpar(fontsize = theme$base_size * mult, fontface = face,
-              fontfamily = theme$base_family, col = col)
+              fontfamily = theme$base_family, col = col,
+              lineheight = theme$lineheight)
   }
   wrap_width <- if (is.null(width)) NULL else as_mm_unit(width)
-  txt_grob <- function(label, ...) {
+  txt_grob <- function(label, gp, hjust = 0.5) {
+    x <- grid::unit(hjust, "npc")
     if (is.null(wrap_width)) {
-      grid::textGrob(label, ...)
+      grid::textGrob(label, x = x, hjust = hjust, gp = gp)
     } else {
-      gridtext::textbox_grob(label, gp = list(...)$gp, width = wrap_width,
-                             halign = 0.5, hjust = 0.5, x = grid::unit(0.5, "npc"))
+      gridtext::textbox_grob(label, gp = gp, width = wrap_width,
+                             halign = hjust, hjust = hjust, x = x)
     }
   }
 
-  rows <- list()
-  rows$title <- txt_grob(title, gp = gp(1.9, "bold"))
-  if (!is.null(subtitle))     rows$subtitle     <- txt_grob(subtitle, gp = gp(1.2))
-  if (!is.null(authors))      rows$authors      <- txt_grob(authors, gp = gp(1.0))
-  if (!is.null(affiliations)) rows$affiliations <- txt_grob(affiliations, gp = gp(0.85))
-  if (!is.null(funding))      rows$funding      <- txt_grob(funding, gp = gp(0.6))
-
-  heights <- lapply(rows, function(g) grid::grobHeight(g) + grid::unit(4, "mm"))
-  band <- gtable::gtable(widths = grid::unit(1, "null"),
-                        heights = do.call(grid::unit.c, heights))
-  for (i in seq_along(rows)) {
-    band <- gtable::gtable_add_grob(band, rows[[i]], t = i, l = 1, name = names(rows)[[i]])
+  # Each row's box is its own measured text height times content_pad_factor,
+  # rather than a flat fixed-mm pad -- this is what keeps the whole band's
+  # height proportioned to what's actually in it (see the outer padding
+  # below, which is now just a thin margin, not additional line spacing).
+  row_names   <- character(0)
+  row_grobs   <- list()
+  row_heights <- list()
+  push <- function(name, g, raw_height = NULL) {
+    row_names   <<- c(row_names, name)
+    row_grobs   <<- c(row_grobs, list(g))
+    h <- if (!is.null(raw_height)) raw_height else grid::grobHeight(g) * theme$content_pad_factor
+    row_heights <<- c(row_heights, list(h))
   }
-  band <- gtable::gtable_add_padding(band, grid::unit(c(8, 10, 8, 10), "mm"))
+
+  # Authors and affiliations are set at the same size as body text (1.0x);
+  # only the title/subtitle are enlarged and funding is shrunk and
+  # right-aligned, set apart from the author/affiliation block above it.
+  push("title", txt_grob(title, gp(1.9, "bold")))
+  if (!is.null(subtitle))     push("subtitle", txt_grob(subtitle, gp(1.2)))
+  if (!is.null(authors))      push("authors", txt_grob(authors, gp(1.0)))
+  if (!is.null(affiliations)) push("affiliations", txt_grob(affiliations, gp(1.0)))
+  if (!is.null(funding)) {
+    funding_grob <- txt_grob(funding, gp(0.6), hjust = 1)
+    if (length(row_grobs) > 0) {
+      # An extra spacer row, sized to duplicate the gap every other pair of
+      # rows already gets from their own content_pad_factor padding, so the
+      # gap above funding specifically comes out twice as large.
+      prev_grob <- row_grobs[[length(row_grobs)]]
+      gap_extra <- (grid::grobHeight(prev_grob) + grid::grobHeight(funding_grob)) *
+                   (theme$content_pad_factor - 1) / 2
+      push("funding_gap", grid::nullGrob(), raw_height = gap_extra)
+    }
+    push("funding", funding_grob)
+  }
+
+  band <- gtable::gtable(widths = grid::unit(1, "null"),
+                        heights = do.call(grid::unit.c, row_heights))
+  for (i in seq_along(row_grobs)) {
+    band <- gtable::gtable_add_grob(band, row_grobs[[i]], t = i, l = 1, name = row_names[[i]])
+  }
+  band <- gtable::gtable_add_padding(band, grid::unit(c(3, 10, 3, 10), "mm"))
 
   bg <- grid::rectGrob(gp = grid::gpar(fill = theme$accent, col = NA))
   band <- gtable::gtable_add_grob(band, bg, t = 1, l = 1, b = nrow(band), r = ncol(band),

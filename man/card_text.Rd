@@ -7,8 +7,8 @@
 card_text(md, theme = poster_theme(), width = NULL)
 }
 \arguments{
-\item{md}{Character vector. Each element becomes one paragraph/bullet; they
-are joined with newlines. Markdown syntax (e.g. \verb{**bold**}) is honoured.}
+\item{md}{Character vector. Each element becomes one paragraph/bullet.
+Markdown syntax (e.g. \verb{**bold**}) is honoured.}
 
 \item{theme}{A \code{\link[=poster_theme]{poster_theme()}} object.}
 
@@ -19,8 +19,14 @@ grob size to its natural width (no wrapping).}
 A grob suitable as the \code{body} argument of \code{\link[=poster_card]{poster_card()}}.
 }
 \description{
-Wraps a character vector of markdown lines (or a single markdown string) as
-a body grob using \code{\link[gridtext:textbox_grob]{gridtext::textbox_grob()}}, so bold/italic/links work.
+Wraps a character vector of markdown lines as a body grob using
+\code{\link[gridtext:textbox_grob]{gridtext::textbox_grob()}}, so bold/italic/links work. Each line is laid
+out as its own row, one per element of \code{md}; a \code{"- "}-prefixed line gets
+a bullet in its own narrow column so a wrapped continuation line aligns
+under the item's own text rather than under the bullet (a hanging
+indent) -- gridtext has no CSS \code{text-indent}/\code{padding-left} support to do
+this within a single call, so each item is measured and wrapped
+separately instead.
 }
 \examples{
 g <- card_text(c("- point one", "- point two"), poster_theme())

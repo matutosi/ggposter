@@ -10,10 +10,12 @@
 ggposter builds an A1 (or other true-size) conference poster from
 ggplot2. A poster is declared as a title band plus columns of rounded,
 tab-headed cards – text, tables, ggplot2 figures, or photo strips –
-assembled with [patchwork](https://patchwork.data-imaginist.com/) and
-rendered at true size with embedded fonts, including CJK (Japanese).
-Content and layout can be written as an R list or a YAML file; figures,
-tables, and photos are supplied separately as R objects.
+assembled with
+[grid](https://stat.ethz.ch/R-manual/R-devel/library/grid/html/00Index.html)
+and [gtable](https://gtable.r-lib.org/) and rendered at true size with
+embedded fonts, including CJK (Japanese). Content and layout can be
+written as an R list or a YAML file; figures, tables, and photos are
+supplied separately as R objects.
 
 ## Installation
 
@@ -31,71 +33,25 @@ The layout below follows a typical conference poster – a full-width
 title band and a two-column body of rounded, tab-headed cards for
 introduction/methods/summary on the left and results/conclusions on the
 right – filled in with the `mpg` fuel-economy dataset bundled with
-ggplot2. The title, author, and affiliation are placeholders.
+ggplot2. The title, author, and affiliation are placeholders. It also
+shows two features for keeping a card’s height tied to what’s actually
+in it, instead of a fixed proportion of the column: `height = "auto"`
+sizes a card to fit its own content, and `notes` puts a bullet-list
+description beside a table or figure.
 
 ``` r
 library(ggposter)
 library(ggplot2)
 
-spec <- list(
-  title = list(
-    title = "Example Poster: Fuel Economy Patterns in the mpg Dataset",
-    authors = "*Jane Doe (Example University), John Smith (Example Institute)",
-    funding = "This is a demonstration poster for the ggposter package; it does not describe real research."
-  ),
-  layout = list(
-    left  = c("objectives", "background", "methods", "summary_table", "photos_1"),
-    right = c("conclusions", "results_table", "fig_facet", "fig_scatter", "photos_2")
-  ),
-  sections = list(
-    objectives = list(header = "OBJECTIVES", height = 0.6, body = list(type = "text", md = c(
-      "- Demonstrate the ggposter package.",
-      "- Use the mpg fuel-economy dataset as example content.",
-      "- Combine text, tables, figures, and photos in one poster."
-    ))),
-    background = list(header = "BACKGROUND", height = 0.6, body = list(type = "text", md = c(
-      "- Conference posters often mix text, tables, and figures.",
-      "- ggposter arranges these as rounded, tab-headed cards.",
-      "- Layout and content can be declared as an R list or a YAML file."
-    ))),
-    methods = list(header = "METHODS", height = 0.7, body = list(type = "text", md = c(
-      "- Data: the mpg dataset (234 vehicles, model years 1999-2008).",
-      "- Figures: highway/city mileage by class and drivetrain.",
-      "- Photos: generic stock images bundled with ggposter."
-    ))),
-    summary_table = list(header = "SUMMARY BY CLASS", height = 1.5,
-      body = list(type = "table", object = "tbl_class", title = "Mean mileage by vehicle class")),
-    photos_1 = list(header = "Sample photos", height = 0.6, body = list(
-      type = "image",
-      files = c("small.JPG", "tall.jpg"),
-      labels = c("Photo A", "Photo B"),
-      height = 45
-    )),
-    conclusions = list(header = "CONCLUSIONS", height = 0.6, body = list(type = "text", md = c(
-      "- Compact and subcompact cars get the best highway mileage.",
-      "- SUVs and pickups get the lowest.",
-      "- ggposter can lay out this kind of summary automatically."
-    ))),
-    results_table = list(header = "SUMMARY BY DRIVETRAIN", height = 0.7,
-      body = list(type = "table", object = "tbl_drv", title = "Mean mileage by drivetrain")),
-    fig_facet = list(header = "Mileage by class", height = 1.3,
-      body = list(type = "figure", object = "fig_facet")),
-    fig_scatter = list(header = "Highway vs. city mileage", height = 1.1,
-      body = list(type = "figure", object = "fig_scatter")),
-    photos_2 = list(header = "More sample photos", height = 0.6, body = list(
-      type = "image",
-      files = c("wide.jpg", "large.JPG"),
-      labels = c("Photo C", "Photo D"),
-      height = 40
-    ))
-  )
-)
-
 tbl_class <- aggregate(cbind(hwy, cty) ~ class, data = mpg, FUN = function(x) round(mean(x), 1))
 names(tbl_class) <- c("Class", "Mean hwy", "Mean cty")
+class_best  <- tbl_class$Class[which.max(tbl_class$`Mean hwy`)]
+class_worst <- tbl_class$Class[which.min(tbl_class$`Mean hwy`)]
 
 tbl_drv <- aggregate(cbind(hwy, cty) ~ drv, data = mpg, FUN = function(x) round(mean(x), 1))
 names(tbl_drv) <- c("Drivetrain", "Mean hwy", "Mean cty")
+drv_best  <- tbl_drv$Drivetrain[which.max(tbl_drv$`Mean hwy`)]
+drv_worst <- tbl_drv$Drivetrain[which.min(tbl_drv$`Mean hwy`)]
 
 fig_facet <- ggplot(mpg, aes(displ, hwy)) +
   geom_point(colour = "#2E7D32") +
@@ -108,6 +64,74 @@ fig_scatter <- ggplot(mpg, aes(cty, hwy, colour = drv)) +
   theme(legend.position = "bottom")
 
 img_dir <- system.file("extdata", package = "ggposter")
+stock_photos <- c("small.JPG", "tall.jpg", "wide.jpg", "large.JPG")
+stock_labels <- c("Photo A", "Photo B", "Photo C", "Photo D")
+
+spec <- list(
+  title = list(
+    title = "Example Poster: Fuel Economy Patterns in the mpg Dataset",
+    authors = "*Jane Doe (Example University), John Smith (Example Institute)",
+    funding = "This is a demonstration poster for the ggposter package; it does not describe real research."
+  ),
+  layout = list(
+    left  = c("objectives", "background", "methods", "summary_table", "photos_1"),
+    right = c("conclusions", "results_table", "fig_facet", "fig_scatter", "photos_2")
+  ),
+  sections = list(
+    objectives = list(header = "OBJECTIVES", height = "auto", body = list(type = "text", md = c(
+      "- Demonstrate the ggposter package.",
+      "- Use the mpg fuel-economy dataset as example content.",
+      "- Combine text, tables, figures, and photos in one poster."
+    ))),
+    background = list(header = "BACKGROUND", height = "auto", body = list(type = "text", md = c(
+      "- Conference posters often mix text, tables, and figures.",
+      "- ggposter arranges these as rounded, tab-headed cards.",
+      "- Layout and content can be declared as an R list or a YAML file."
+    ))),
+    methods = list(header = "METHODS", height = "auto", body = list(type = "text", md = c(
+      "- Data: the mpg dataset (234 vehicles, model years 1999-2008).",
+      "- Figures: highway/city mileage by class and drivetrain.",
+      "- Photos: generic stock images bundled with ggposter."
+    ))),
+    summary_table = list(header = "SUMMARY BY CLASS", height = "auto", body = list(
+      type = "table", object = "tbl_class", title = "Mean mileage by vehicle class",
+      notes = c(
+        sprintf("- **%s** has the best highway mileage.", class_best),
+        sprintf("- **%s** has the worst.", class_worst)
+      )
+    )),
+    photos_1 = list(header = "Sample photos", height = "auto", body = list(
+      type = "image", files = stock_photos, labels = stock_labels,
+      width = 230
+    )),
+    conclusions = list(header = "CONCLUSIONS", height = "auto", body = list(type = "text", md = c(
+      "- Compact and subcompact cars get the best highway mileage.",
+      "- SUVs and pickups get the lowest.",
+      "- ggposter can lay out this kind of summary automatically."
+    ))),
+    results_table = list(header = "SUMMARY BY DRIVETRAIN", height = "auto", body = list(
+      type = "table", object = "tbl_drv", title = "Mean mileage by drivetrain",
+      notes = c(
+        sprintf("- **%s**-wheel drive has the best highway mileage.", drv_best),
+        sprintf("- **%s**-wheel drive has the worst.", drv_worst)
+      )
+    )),
+    fig_facet = list(header = "Mileage by class", height = 1.3,
+      body = list(type = "figure", object = "fig_facet")),
+    fig_scatter = list(header = "Highway vs. city mileage", height = "auto", body = list(
+      type = "figure", object = "fig_scatter", notes_width = 0.45,
+      notes = c(
+        "- Highway and city mileage are closely correlated.",
+        "- 4-wheel drive vehicles cluster at the low-mileage end.",
+        "- Front-wheel drive vehicles cluster at the high-mileage end."
+      )
+    )),
+    photos_2 = list(header = "More sample photos", height = "auto", body = list(
+      type = "image", files = stock_photos, labels = stock_labels,
+      width = 230
+    ))
+  )
+)
 
 p <- poster(
   spec,
