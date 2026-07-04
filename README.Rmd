@@ -106,8 +106,8 @@ spec <- list(
     summary_table = list(header = "SUMMARY BY CLASS", height = "auto", body = list(
       type = "table", object = "tbl_class", title = "Mean mileage by vehicle class",
       notes = c(
-        sprintf("- **%s** has the best highway mileage.", class_best),
-        sprintf("- **%s** has the worst.", class_worst)
+        sprintf("- **%s** has the best highway mileage of all vehicle classes in this dataset.", class_best),
+        sprintf("- **%s** has the worst, largely due to its greater size and weight.", class_worst)
       )
     )),
     photos_1 = list(header = "Sample photos", height = "auto", body = list(
@@ -122,8 +122,8 @@ spec <- list(
     results_table = list(header = "SUMMARY BY DRIVETRAIN", height = "auto", body = list(
       type = "table", object = "tbl_drv", title = "Mean mileage by drivetrain",
       notes = c(
-        sprintf("- **%s**-wheel drive has the best highway mileage.", drv_best),
-        sprintf("- **%s**-wheel drive has the worst.", drv_worst)
+        sprintf("- **%s**-wheel drive has the best highway mileage among the three drivetrain types.", drv_best),
+        sprintf("- **%s**-wheel drive has the worst, mainly due to the added weight of the drivetrain.", drv_worst)
       )
     )),
     fig_facet = list(header = "Mileage by class", height = 1.3,
