@@ -12,6 +12,15 @@ tab-headed cards (text, tables, figures, or photo strips), assembled with
 \code{\link[=poster]{poster()}} to build one from an R list or YAML file, and the package
 vignette (\code{vignette("ggposter")}) for a full walkthrough.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://matutosi.github.io/ggposter/}
+  \item \url{https://github.com/matutosi/ggposter}
+  \item Report bugs at \url{https://github.com/matutosi/ggposter/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Toshikazu Matsumura \email{matutosi@gmail.com}
 

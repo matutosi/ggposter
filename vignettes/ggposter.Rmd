@@ -167,7 +167,7 @@ community_params <- tibble::tribble(
 )
 
 # illustrative points matching the reported mean +/- SD, not raw field data
-df_cutting <- purrr::pmap_dfr(community_params, function(Community, n,
+df_cutting <- purrr::list_rbind(purrr::pmap(community_params, function(Community, n,
                                                           height_mean, height_sd,
                                                           freq_mean, freq_sd) {
   tibble::tibble(
@@ -175,20 +175,20 @@ df_cutting <- purrr::pmap_dfr(community_params, function(Community, n,
     cutting_height = pmax(0, rnorm(n, height_mean, height_sd)),
     cutting_freq   = pmax(1, rnorm(n, freq_mean, freq_sd))
   )
-})
+}))
 fig_cutting <- ggplot(df_cutting, aes(cutting_freq, cutting_height)) +
   geom_point(alpha = 0.6, colour = "#2E7D32") +
   facet_wrap(~Community, nrow = 1) +
   labs(x = "Cutting frequency (/yr)", y = "Cutting height (cm)") +
   theme_bw()
 
-df_ord <- purrr::pmap_dfr(community_params, function(Community, n, ...) {
+df_ord <- purrr::list_rbind(purrr::pmap(community_params, function(Community, n, ...) {
   centre <- switch(Community,
     com1 = c(1, 1), com2 = c(1, -1), com3 = c(-1, 0.5), com4 = c(-1.2, -1))
   tibble::tibble(Community = Community,
                  NMDS1 = rnorm(n, centre[1], 0.4),
                  NMDS2 = rnorm(n, centre[2], 0.4))
-})
+}))
 fig_ordination <- ggplot(df_ord, aes(NMDS1, NMDS2, colour = Community)) +
   geom_point(alpha = 0.7) +
   stat_ellipse() +
