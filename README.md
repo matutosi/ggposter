@@ -53,15 +53,25 @@ names(tbl_drv) <- c("Drivetrain", "Mean hwy", "Mean cty")
 drv_best  <- tbl_drv$Drivetrain[which.max(tbl_drv$`Mean hwy`)]
 drv_worst <- tbl_drv$Drivetrain[which.min(tbl_drv$`Mean hwy`)]
 
-fig_facet <- ggplot(mpg, aes(displ, hwy)) +
-  geom_point(colour = "#2E7D32") +
-  facet_wrap(~class, nrow = 1) +
+fig_facet <- ggplot(mpg, aes(displ, hwy, colour = class)) +
+  geom_point() +
   theme_bw()
+
+tbl_class_count <- as.data.frame(table(mpg$class))
+names(tbl_class_count) <- c("class", "n")
+class_most  <- as.character(tbl_class_count$class[which.max(tbl_class_count$n)])
+class_fewest <- as.character(tbl_class_count$class[which.min(tbl_class_count$n)])
+fig_count <- ggplot(tbl_class_count, aes(class, n, fill = class)) +
+  geom_col(show.legend = FALSE) +
+  labs(x = NULL, y = "Number of vehicles") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 fig_scatter <- ggplot(mpg, aes(cty, hwy, colour = drv)) +
   geom_point(alpha = 0.7) +
   theme_bw() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "inside", legend.position.inside = c(0.85, 0.2),
+        legend.background = element_rect(fill = scales::alpha("white", 0.7), colour = NA))
 
 img_dir <- system.file("extdata", package = "ggposter")
 stock_photos <- c("small.JPG", "tall.jpg", "wide.jpg", "large.JPG")
@@ -74,7 +84,7 @@ spec <- list(
     funding = "This is a demonstration poster for the ggposter package; it does not describe real research."
   ),
   layout = list(
-    left  = c("objectives", "background", "methods", "summary_table", "photos_1"),
+    left  = c("objectives", "background", "methods", "summary_table", "photos_1", "fig_count"),
     right = c("conclusions", "results_table", "fig_facet", "fig_scatter", "photos_2")
   ),
   sections = list(
@@ -93,33 +103,45 @@ spec <- list(
       "- Figures: highway/city mileage by class and drivetrain.",
       "- Photos: generic stock images bundled with ggposter."
     ))),
-    summary_table = list(header = "SUMMARY BY CLASS", height = "auto", body = list(
+    summary_table = list(header = "SUMMARY by class", height = "auto", body = list(
       type = "table", object = "tbl_class", title = "Mean mileage by vehicle class",
       notes = c(
         sprintf("- **%s** has the best highway mileage of all vehicle classes in this dataset.", class_best),
-        sprintf("- **%s** has the worst, largely due to its greater size and weight.", class_worst)
+        sprintf("- **%s** has the worst, largely due to its greater size and weight.", class_worst),
+        "- Compact and subcompact classes have nearly identical mean highway mileage.",
+        "- Midsize vehicles average close to the compact/subcompact classes.",
+        "- Pickup and SUV classes have the two lowest highway mileages, both under 19 mpg.",
+        "- City mileage tracks highway mileage closely across all seven classes."
       )
     )),
     photos_1 = list(header = "Sample photos", height = "auto", body = list(
       type = "image", files = stock_photos, labels = stock_labels,
       width = 230
     )),
+    fig_count = list(header = "Vehicles by class", height = "auto", body = list(
+      type = "figure", object = "fig_count", notes_width = 0.4, height = 190,
+      notes = c(
+        sprintf("- **%s** is the most common class in this dataset.", class_most),
+        sprintf("- **%s** is the least common.", class_fewest)
+      )
+    )),
     conclusions = list(header = "CONCLUSIONS", height = "auto", body = list(type = "text", md = c(
       "- Compact and subcompact cars get the best highway mileage.",
       "- SUVs and pickups get the lowest.",
       "- ggposter can lay out this kind of summary automatically."
     ))),
-    results_table = list(header = "SUMMARY BY DRIVETRAIN", height = "auto", body = list(
+    results_table = list(header = "SUMMARY by drivetrain", height = "auto", body = list(
       type = "table", object = "tbl_drv", title = "Mean mileage by drivetrain",
       notes = c(
         sprintf("- **%s**-wheel drive has the best highway mileage among the three drivetrain types.", drv_best),
-        sprintf("- **%s**-wheel drive has the worst, mainly due to the added weight of the drivetrain.", drv_worst)
+        sprintf("- **%s**-wheel drive has the worst, mainly due to the added weight of the drivetrain.", drv_worst),
+        "- The gap between front- and four-wheel drive is nearly 9 mpg highway."
       )
     )),
-    fig_facet = list(header = "Mileage by class", height = 1.3,
+    fig_facet = list(header = "Mileage by class", height = 0.65,
       body = list(type = "figure", object = "fig_facet")),
     fig_scatter = list(header = "Highway vs. city mileage", height = "auto", body = list(
-      type = "figure", object = "fig_scatter", notes_width = 0.45,
+      type = "figure", object = "fig_scatter", notes_width = 0.45, height = 229,
       notes = c(
         "- Highway and city mileage are closely correlated.",
         "- 4-wheel drive vehicles cluster at the low-mileage end.",
@@ -136,7 +158,8 @@ spec <- list(
 p <- poster(
   spec,
   objects = list(tbl_class = tbl_class, tbl_drv = tbl_drv,
-                 fig_facet = fig_facet, fig_scatter = fig_scatter),
+                 fig_facet = fig_facet, fig_scatter = fig_scatter,
+                 fig_count = fig_count),
   theme = theme_green(base_size = 24),
   base_dir = img_dir
 )
@@ -168,7 +191,8 @@ itself:
 p_plot_area <- poster(
   spec,
   objects = list(tbl_class = tbl_class, tbl_drv = tbl_drv,
-                 fig_facet = fig_facet, fig_scatter = fig_scatter),
+                 fig_facet = fig_facet, fig_scatter = fig_scatter,
+                 fig_count = fig_count),
   theme = theme_green(base_size = 24),
   base_dir = img_dir,
   show_plot_area = TRUE
