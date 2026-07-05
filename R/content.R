@@ -279,11 +279,14 @@ card_figure <- function(gg, theme = poster_theme(), width = NULL, height = NULL)
 #' @param width,height Target size as [grid::unit] or millimetres. `NULL`
 #'   leaves that dimension unconstrained (filling whatever space the
 #'   surrounding cell gives it).
-#' @return The grob with a size-fixing viewport attached. When both `width`
-#'   and `height` are given, the resulting size is cached (see
-#'   [measure_width()]/[measure_height()]) since a bare `grobTree()` wrapper
-#'   otherwise can't be measured; when only one is given the other still
-#'   falls through to `"npc"`, unchanged from before.
+#' @return The grob with a size-fixing viewport attached. Each explicitly
+#'   given dimension is cached (see [measure_width()]/[measure_height()])
+#'   since a bare `grobTree()` wrapper has no measurable size of its own --
+#'   without this a fit-to-content (`height = "auto"`) figure card that sets
+#'   an explicit height but no width can't be measured, and the next card
+#'   overlaps it. The unspecified dimension is stored as `NULL` (its
+#'   viewport uses `"npc"`, unmeasurable outside a layout) so its
+#'   `measure_*()` falls through to the generic.
 #' @keywords internal
 #' @noRd
 poster_fix_size <- function(g, width = NULL, height = NULL) {
@@ -291,9 +294,10 @@ poster_fix_size <- function(g, width = NULL, height = NULL) {
   w <- if (!is.null(width))  as_mm_unit(width)  else grid::unit(1, "npc")
   h <- if (!is.null(height)) as_mm_unit(height) else grid::unit(1, "npc")
   out <- grid::grobTree(g, vp = grid::viewport(width = w, height = h))
-  if (!is.null(width) && !is.null(height)) {
-    attr(out, "measured_size") <- list(width = w, height = h)
-  }
+  attr(out, "measured_size") <- list(
+    width  = if (!is.null(width))  w else NULL,
+    height = if (!is.null(height)) h else NULL
+  )
   out
 }
 

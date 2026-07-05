@@ -86,7 +86,7 @@ anchor_top_left <- function(g, clip = "off") {
 #' @noRd
 measure_width <- function(g) {
   cached <- attr(g, "measured_size")
-  if (!is.null(cached)) return(cached$width)
+  if (!is.null(cached) && !is.null(cached$width)) return(cached$width)
   if (inherits(g, "gtable")) gtable::gtable_width(g) else grid::grobWidth(g)
 }
 
@@ -95,6 +95,6 @@ measure_width <- function(g) {
 #' @noRd
 measure_height <- function(g) {
   cached <- attr(g, "measured_size")
-  if (!is.null(cached)) return(cached$height)
+  if (!is.null(cached) && !is.null(cached$height)) return(cached$height)
   if (inherits(g, "gtable")) gtable::gtable_height(g) else grid::grobHeight(g)
 }

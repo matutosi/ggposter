@@ -37,6 +37,19 @@ test_that("card_figure() re-themes and optionally fixes size", {
   expect_true(grid::is.grob(g))
 })
 
+test_that("poster_fix_size() caches an explicit height even when width is left auto", {
+  # Regression test: it used to cache the size only when BOTH width and
+  # height were given, so a figure with an explicit height but auto width
+  # had no measurable size -- a height='auto' card then underestimated it
+  # and the next card overlapped it.
+  g <- grid::rectGrob()
+  fixed <- ggposter:::poster_fix_size(g, height = 100)
+  expect_equal(grid::convertHeight(ggposter:::measure_height(fixed), "mm", valueOnly = TRUE), 100)
+  ms <- attr(fixed, "measured_size")
+  expect_false(is.null(ms$height))  # the given dimension is cached
+  expect_null(ms$width)             # the auto dimension falls through
+})
+
 test_that("card_image() lays out photos at correct relative widths", {
   files <- rep(system.file("extdata", "small.JPG", package = "ggposter"), 2)
   skip_if(!nzchar(files[[1]]), "sample image not found")

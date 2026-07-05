@@ -40,6 +40,28 @@ test_that("poster() measures 'auto' card heights against a real device, so long 
   expect_true(all(heights_mm[1:2] > 30))
 })
 
+test_that("a height='auto' figure card with an explicit height (no width) is sized to that height", {
+  # Regression test: a figure given an explicit height but no width wasn't
+  # measurable (poster_fix_size() only cached when BOTH were given), so the
+  # "auto" card underestimated its height and the following card overlapped.
+  skip_if_not_installed("ggplot2")
+  gg <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+  spec <- list(
+    layout = list(left = c("a", "b")),
+    sections = list(
+      a = list(header = "A", height = "auto",
+               body = list(type = "figure", object = "gg", height = 120)),
+      b = list(header = "B", height = "auto", body = list(type = "text", md = "- next card"))
+    )
+  )
+  p <- poster(spec, objects = list(gg = gg))
+  col <- p$patchwork$grobs[[which(p$patchwork$layout$name == "left")]]
+  heights_mm <- grid::convertHeight(col$heights, "mm", valueOnly = TRUE)
+  # card A must be at least as tall as its 120mm figure (plus header/pad),
+  # not underestimated
+  expect_gt(heights_mm[1], 120)
+})
+
 test_that("poster() assembles a spec into a ggposter object", {
   p <- poster(simple_spec())
   expect_s3_class(p, "ggposter")
