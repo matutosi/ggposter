@@ -68,17 +68,29 @@ test_that("poster() assembles a spec into a ggposter object", {
   expect_equal(unname(p$size_mm), c(594, 841))
 })
 
-test_that("poster(show_plot_area=TRUE) builds and renders without error", {
-  p <- poster(simple_spec(), show_plot_area = TRUE)
-  expect_true(p$show_plot_area)
+test_that("render_poster(show_plot_area=TRUE) renders without error, and it is not a poster() argument", {
+  # show_plot_area is an output/inspection option on render_poster(), not
+  # part of the poster's content, so poster() must not carry it.
+  expect_false("show_plot_area" %in% names(formals(poster)))
+
+  p <- poster(simple_spec())
   out <- tempfile(fileext = ".png")
-  expect_no_error(render_poster(p, out, scale = 0.1, dpi = 50))
+  expect_no_error(render_poster(p, out, scale = 0.1, dpi = 50, show_plot_area = TRUE))
+  expect_true(file.exists(out))
 })
 
-test_that("rescale_poster() preserves show_plot_area", {
-  p <- poster(simple_spec(), show_plot_area = TRUE)
-  scaled <- rescale_poster(p, 0.5)
-  expect_true(scaled$show_plot_area)
+test_that("rescale_poster(show_plot_area=TRUE) rebuilds with per-card plot-area borders", {
+  p <- poster(simple_spec())
+  scaled <- rescale_poster(p, 0.5, show_plot_area = TRUE)
+  col  <- scaled$patchwork$grobs[[which(scaled$patchwork$layout$name == "left")]]
+  card <- col$grobs[[1]]
+  expect_true("plot_area" %in% card$layout$name)
+
+  # the default (no overlay) rebuild must not add them
+  plain <- rescale_poster(p, 0.5)
+  col_p  <- plain$patchwork$grobs[[which(plain$patchwork$layout$name == "left")]]
+  card_p <- col_p$grobs[[1]]
+  expect_false("plot_area" %in% card_p$layout$name)
 })
 
 test_that("poster() errors when a layout entry has no matching section", {

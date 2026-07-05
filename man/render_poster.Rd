@@ -4,7 +4,7 @@
 \alias{render_poster}
 \title{Render a poster to PDF or PNG at true size}
 \usage{
-render_poster(x, file, scale = 1, dpi = 300)
+render_poster(x, file, scale = 1, dpi = 300, show_plot_area = FALSE)
 }
 \arguments{
 \item{x}{A \code{ggposter} object, as returned by \code{\link[=poster]{poster()}}.}
@@ -17,6 +17,13 @@ an A4-sized preview of an A1 poster. Font/line sizes stay proportional
 because the whole canvas (not just DPI) is scaled.}
 
 \item{dpi}{Resolution for PNG output. Ignored for PDF.}
+
+\item{show_plot_area}{If \code{TRUE}, output a version with a dashed border
+drawn around each card's content area (header tab, and each body /
+notes column), on top of the content without hiding it. Useful for
+checking a layout. It's an output option, not part of the poster's
+content, so the same \code{x} renders both the normal and the outlined
+version without rebuilding it yourself.}
 }
 \value{
 The output file path, invisibly.
@@ -32,5 +39,6 @@ else uses \link[ragg:agg_png]{ragg::agg_png}.
 p <- poster(spec)
 render_poster(p, "poster.pdf")
 render_poster(p, "preview.png", scale = 0.25)
+render_poster(p, "layout-check.png", scale = 0.25, show_plot_area = TRUE)
 }
 }

@@ -26,14 +26,13 @@
 #' @param base_dir Directory used to resolve relative image paths in the spec.
 #'   Defaults to the YAML file's directory, or the working directory for a
 #'   list spec.
-#' @param show_plot_area If `TRUE`, draw a dashed border around every
-#'   section's body cell -- the area its figure/table/text/image content
-#'   actually occupies -- on top of the content, without hiding it. See
-#'   [poster_card()].
 #'
 #' @return An object of class `ggposter`, a thin wrapper around a
 #'   [gtable::gtable]. Print it to preview, or pass it to
-#'   [render_poster()] to save a PDF/PNG at true size.
+#'   [render_poster()] to save a PDF/PNG at true size. To inspect the layout
+#'   with each card's content area outlined, pass `show_plot_area = TRUE` to
+#'   [render_poster()] -- it's an output option, so the same poster object
+#'   renders both the normal and the outlined version.
 #' @export
 #' @examples
 #' spec <- list(
@@ -45,8 +44,28 @@
 #'   )
 #' )
 #' p <- poster(spec)
-poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL,
-                   show_plot_area = FALSE) {
+poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL) {
+  build_poster(spec, objects = objects, theme = theme, base_dir = base_dir,
+               show_plot_area = FALSE)
+}
+
+#' Build a ggposter object, optionally with plot-area outlines
+#'
+#' The implementation behind [poster()]. Kept separate so that
+#' [render_poster()] can rebuild a poster with `show_plot_area = TRUE`
+#' without exposing that inspection-only overlay on [poster()]'s own
+#' (content/layout) API.
+#'
+#' @inheritParams poster
+#' @param show_plot_area If `TRUE`, draw a dashed border around every
+#'   section's body cell -- the area its figure/table/text/image content
+#'   actually occupies -- on top of the content, without hiding it. See
+#'   [poster_card()].
+#' @return An object of class `ggposter`.
+#' @keywords internal
+#' @noRd
+build_poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL,
+                         show_plot_area = FALSE) {
   # "auto"-height cards (build_column()) and the title band both need a
   # concrete numeric mm height at this point, resolved by measuring text
   # against whatever device is current right now. render_poster() doesn't
@@ -125,7 +144,7 @@ poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL,
 
   structure(
     list(patchwork = full, theme = theme, size_mm = size_mm, spec = spec,
-        objects = objects, base_dir = base_dir, show_plot_area = show_plot_area),
+        objects = objects, base_dir = base_dir),
     class = "ggposter"
   )
 }
@@ -319,10 +338,13 @@ print.ggposter <- function(x, ...) {
 #' @param x A `ggposter` object, as returned by [poster()].
 #' @param scale Multiplier applied to paper size, theme, and explicit body
 #'   dimensions.
+#' @param show_plot_area Passed to [build_poster()] when rebuilding, so
+#'   [render_poster()] can produce a plot-area-outlined version from the
+#'   stored spec/objects/theme.
 #' @return A new `ggposter` object at the scaled size.
 #' @keywords internal
 #' @noRd
-rescale_poster <- function(x, scale) {
+rescale_poster <- function(x, scale, show_plot_area = FALSE) {
   theme <- x$theme
   mm <- function(u) grid::convertWidth(u, "mm", valueOnly = TRUE) * scale
   theme$base_size     <- theme$base_size * scale
@@ -340,6 +362,6 @@ rescale_poster <- function(x, scale) {
     section
   })
 
-  poster(spec, objects = x$objects, theme = theme, base_dir = x$base_dir,
-        show_plot_area = x$show_plot_area %||% FALSE)
+  build_poster(spec, objects = x$objects, theme = theme, base_dir = x$base_dir,
+               show_plot_area = show_plot_area)
 }

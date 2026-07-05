@@ -12,6 +12,12 @@
 #'   an A4-sized preview of an A1 poster. Font/line sizes stay proportional
 #'   because the whole canvas (not just DPI) is scaled.
 #' @param dpi Resolution for PNG output. Ignored for PDF.
+#' @param show_plot_area If `TRUE`, output a version with a dashed border
+#'   drawn around each card's content area (header tab, and each body /
+#'   notes column), on top of the content without hiding it. Useful for
+#'   checking a layout. It's an output option, not part of the poster's
+#'   content, so the same `x` renders both the normal and the outlined
+#'   version without rebuilding it yourself.
 #'
 #' @return The output file path, invisibly.
 #' @export
@@ -20,12 +26,18 @@
 #' p <- poster(spec)
 #' render_poster(p, "poster.pdf")
 #' render_poster(p, "preview.png", scale = 0.25)
+#' render_poster(p, "layout-check.png", scale = 0.25, show_plot_area = TRUE)
 #' }
-render_poster <- function(x, file, scale = 1, dpi = 300) {
+render_poster <- function(x, file, scale = 1, dpi = 300, show_plot_area = FALSE) {
   if (!inherits(x, "ggposter")) {
     cli::cli_abort("{.arg x} must be a {.cls ggposter} object, as returned by {.fn poster}.")
   }
-  if (scale != 1) x <- rescale_poster(x, scale)
+  # Rebuild when scaling, or when the plot-area overlay is requested (the
+  # borders are baked in at build time, so a plain poster object doesn't
+  # carry them). scale = 1 here is an identity rescale that just adds them.
+  if (scale != 1 || isTRUE(show_plot_area)) {
+    x <- rescale_poster(x, scale, show_plot_area = show_plot_area)
+  }
 
   ext <- tolower(tools::file_ext(file))
   width  <- x$size_mm[["width"]]

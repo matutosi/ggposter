@@ -4,13 +4,7 @@
 \alias{poster}
 \title{Build a poster from a declarative spec}
 \usage{
-poster(
-  spec,
-  objects = list(),
-  theme = NULL,
-  base_dir = NULL,
-  show_plot_area = FALSE
-)
+poster(spec, objects = list(), theme = NULL, base_dir = NULL)
 }
 \arguments{
 \item{spec}{An R list following the schema above, or a path to a YAML file.}
@@ -24,16 +18,14 @@ from \code{spec$theme}.}
 \item{base_dir}{Directory used to resolve relative image paths in the spec.
 Defaults to the YAML file's directory, or the working directory for a
 list spec.}
-
-\item{show_plot_area}{If \code{TRUE}, draw a dashed border around every
-section's body cell -- the area its figure/table/text/image content
-actually occupies -- on top of the content, without hiding it. See
-\code{\link[=poster_card]{poster_card()}}.}
 }
 \value{
 An object of class \code{ggposter}, a thin wrapper around a
 \link[gtable:gtable]{gtable::gtable}. Print it to preview, or pass it to
-\code{\link[=render_poster]{render_poster()}} to save a PDF/PNG at true size.
+\code{\link[=render_poster]{render_poster()}} to save a PDF/PNG at true size. To inspect the layout
+with each card's content area outlined, pass \code{show_plot_area = TRUE} to
+\code{\link[=render_poster]{render_poster()}} -- it's an output option, so the same poster object
+renders both the normal and the outlined version.
 }
 \description{
 Assembles a title band and a multi-column body of section cards into a
