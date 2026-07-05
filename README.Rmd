@@ -246,3 +246,174 @@ render_poster(p, "preview.png", scale = 0.25, dpi = 150)   # A4-ish preview
 
 See `vignette("ggposter")` for the full spec schema, theming, and a
 reproduction of a real conference poster.
+
+## How to make an academic poster
+
+The poster below is a quick tour of ggposter's card types rather than a
+real research example: the left column has one card of each kind --
+a bullet list, a figure, a figure with `notes` beside it, a table, a
+table with a `caption` below it, and a photo -- and the right column
+shows the R code that built the matching card on the left.
+
+```{r howto, warning = FALSE, message = FALSE}
+howto_fig <- ggplot(mpg, aes(displ, hwy)) +
+  geom_point(colour = "#2E7D32") +
+  theme_bw()
+
+howto_fig_notes <- ggplot(mpg, aes(class, hwy)) +
+  geom_boxplot(fill = "#A5D6A7") +
+  labs(x = "Class", y = "Highway mpg") +
+  theme_bw()
+
+howto_tbl <- data.frame(Class = c("compact", "suv", "pickup"),
+                         Hwy = c(28.3, 18.1, 16.9))
+
+howto_tbl_notes <- data.frame(Drivetrain = c("f", "4", "r"),
+                               `Mean highway mpg` = c(28.2, 19.2, 21.0),
+                               check.names = FALSE)
+
+howto_spec <- list(
+  title = list(
+    title = "How to Make an Academic Poster",
+    authors = "*A guide to the ggposter card types",
+    funding = "Each left-column card demonstrates one card type; the matching right-column card shows the R code that built it."
+  ),
+  layout = list(
+    left  = c("howto_bullets", "howto_figure", "howto_figure_notes",
+              "howto_table", "howto_table_notes", "howto_photo"),
+    right = c("code_bullets", "code_figure", "code_figure_notes",
+              "code_table", "code_table_notes", "code_photo")
+  ),
+  sections = list(
+    howto_bullets = list(header = "Bullet list only", height = "auto", body = list(
+      type = "text", md = c(
+        "- Bullet points summarize key facts.",
+        "- Each line starts with a dash.",
+        "- Long lines wrap to fit the card."
+      )
+    )),
+    howto_figure = list(header = "Figure only", height = "auto", body = list(
+      type = "figure", object = "howto_fig", height = 130
+    )),
+    howto_figure_notes = list(header = "Figure + bullets (right)", height = "auto", body = list(
+      type = "figure", object = "howto_fig_notes", height = 130, notes_width = 0.4,
+      notes = c(
+        "- A figure's notes= sits beside it.",
+        "- Great for calling out a takeaway."
+      )
+    )),
+    howto_table = list(header = "Table only", height = "auto", body = list(
+      type = "table", object = "howto_tbl"
+    )),
+    howto_table_notes = list(header = "Table + bullets (below)", height = "auto", body = list(
+      type = "table", object = "howto_tbl_notes",
+      caption = paste(
+        "A table's caption= adds a note below it.",
+        "Good for a source or short takeaway.",
+        sep = "\n"
+      )
+    )),
+    howto_photo = list(header = "Photo", height = "auto", body = list(
+      type = "image", files = "small.JPG", labels = "Sample photo", width = 160
+    )),
+
+    code_bullets = list(header = "Code: bullet list", height = "auto", body = list(
+      type = "text", md = c(
+        "list(",
+        " header = \"Bullet list only\",",
+        " body = list(",
+        "  type = \"text\",",
+        "  md = c(",
+        "   \"- Bullet points summarize key facts.\",",
+        "   \"- Each line starts with a dash.\",",
+        "   \"- Long lines wrap to fit the card.\"",
+        "  )",
+        " )",
+        ")"
+      )
+    )),
+    code_figure = list(header = "Code: figure only", height = "auto", body = list(
+      type = "text", md = c(
+        "list(",
+        " header = \"Figure only\",",
+        " body = list(",
+        "  type = \"figure\",",
+        "  object = \"howto_fig\",",
+        "  height = 130",
+        " )",
+        ")"
+      )
+    )),
+    code_figure_notes = list(header = "Code: figure + bullets", height = "auto", body = list(
+      type = "text", md = c(
+        "list(",
+        " header = \"Figure + bullets (right)\",",
+        " body = list(",
+        "  type = \"figure\",",
+        "  object = \"howto_fig_notes\",",
+        "  height = 130,",
+        "  notes_width = 0.4,",
+        "  notes = c(",
+        "   \"- A figure's notes= sits beside it.\",",
+        "   \"- Great for calling out a takeaway.\"",
+        "  )",
+        " )",
+        ")"
+      )
+    )),
+    code_table = list(header = "Code: table only", height = "auto", body = list(
+      type = "text", md = c(
+        "list(",
+        " header = \"Table only\",",
+        " body = list(",
+        "  type = \"table\",",
+        "  object = \"howto_tbl\"",
+        " )",
+        ")"
+      )
+    )),
+    code_table_notes = list(header = "Code: table + bullets", height = "auto", body = list(
+      type = "text", md = c(
+        "list(",
+        " header = \"Table + bullets (below)\",",
+        " body = list(",
+        "  type = \"table\",",
+        "  object = \"howto_tbl_notes\",",
+        "  caption = paste(",
+        "   \"A table's caption= adds a note below it.\",",
+        "   \"Good for a source or short takeaway.\",",
+        "   sep = \"\\n\"",
+        "  )",
+        " )",
+        ")"
+      )
+    )),
+    code_photo = list(header = "Code: photo", height = "auto", body = list(
+      type = "text", md = c(
+        "list(",
+        " header = \"Photo\",",
+        " body = list(",
+        "  type = \"image\",",
+        "  files = \"small.JPG\",",
+        "  labels = \"Sample photo\",",
+        "  width = 160",
+        " )",
+        ")"
+      )
+    ))
+  )
+)
+
+p_howto <- poster(
+  howto_spec,
+  objects = list(howto_fig = howto_fig, howto_fig_notes = howto_fig_notes,
+                 howto_tbl = howto_tbl, howto_tbl_notes = howto_tbl_notes),
+  theme = theme_green(base_size = 24),
+  base_dir = img_dir
+)
+```
+
+```{r howto_preview, warning = FALSE, fig.alt = "A tutorial poster titled 'How to Make an Academic Poster', with a left column showing one example of each ggposter card type (bullet list, figure, figure with notes, table, table with a caption, and photo) and a right column showing the R code that built each matching card."}
+render_poster(p_howto, "man/figures/README-howto-poster.png", scale = 0.3, dpi = 150)
+knitr::include_graphics("man/figures/README-howto-poster.png")
+```
