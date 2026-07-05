@@ -1,0 +1,138 @@
+poster:
+  size: A1
+  orientation: portrait
+
+theme:
+  accent: "#2E7D32"
+  base_size: 24
+
+title:
+  title: "Example Poster: Fuel Economy Patterns in the mpg Dataset"
+  authors: "*Jane Doe (Example University), John Smith (Example Institute)"
+  funding: "This is a demonstration poster for the ggposter package; it does not describe real research."
+
+layout:
+  left:  [objectives, background, methods, summary_table, fig_box, fig_heat]
+  right: [conclusions, results_table, fig_facet, fig_scatter, photos_2]
+
+sections:
+  objectives:
+    header: "OBJECTIVES"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "- Demonstrate the ggposter package."
+        - "- Use the mpg fuel-economy dataset as example content."
+        - "- Combine text, tables, figures, and photos in one poster."
+
+  background:
+    header: "BACKGROUND"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "- Conference posters often mix text, tables, and figures."
+        - "- ggposter arranges these as rounded, tab-headed cards."
+        - "- Layout and content can be declared as an R list or a YAML file."
+
+  methods:
+    header: "METHODS"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "- Data: the mpg dataset (234 vehicles, model years 1999-2008)."
+        - "- Figures: highway/city mileage by class and drivetrain."
+        - "- Photos: generic stock images bundled with ggposter."
+
+  summary_table:
+    header: "SUMMARY by class"
+    height: "auto"
+    body:
+      type: table
+      object: tbl_class
+      title: "Mean mileage by vehicle class"
+      notes:
+        - "- **compact** has the best highway mileage of all vehicle classes in this dataset."
+        - "- **pickup** has the worst, largely due to its greater size and weight."
+        - "- Compact and subcompact classes have nearly identical mean highway mileage."
+        - "- Midsize vehicles average close to the compact/subcompact classes."
+        - "- Pickup and SUV classes have the two lowest highway mileages, both under 19 mpg."
+        - "- City mileage tracks highway mileage closely across all seven classes."
+
+  fig_box:
+    header: "Mileage spread by drivetrain"
+    height: "auto"
+    body:
+      type: figure
+      object: fig_box
+      notes_width: 0.4
+      height: 117
+      notes:
+        - "- Boxes show the full spread of highway mileage, not just the mean."
+        - "- **f**-wheel drive has the highest median highway mileage."
+
+  fig_heat:
+    header: "Mean mileage: class x drivetrain"
+    height: "auto"
+    body:
+      type: figure
+      object: fig_heat
+      notes_width: 0.4
+      height: 137
+      notes:
+        - "- Colour shows mean highway mpg for each class/drivetrain combination."
+        - "- Blank cells are combinations that don't occur in the data."
+
+  conclusions:
+    header: "CONCLUSIONS"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "- Compact and subcompact cars get the best highway mileage."
+        - "- SUVs and pickups get the lowest."
+        - "- ggposter can lay out this kind of summary automatically."
+
+  results_table:
+    header: "SUMMARY by drivetrain"
+    height: "auto"
+    body:
+      type: table
+      object: tbl_drv
+      title: "Mean mileage by drivetrain"
+      notes:
+        - "- **f**-wheel drive has the best highway mileage among the three drivetrain types."
+        - "- **4**-wheel drive has the worst, mainly due to the added weight of the drivetrain."
+        - "- The gap between front- and four-wheel drive is nearly 9 mpg highway."
+
+  fig_facet:
+    header: "Mileage by class"
+    height: "auto"
+    body:
+      type: figure
+      object: fig_facet
+      height: 280
+
+  fig_scatter:
+    header: "Highway vs. city mileage"
+    height: "auto"
+    body:
+      type: figure
+      object: fig_scatter
+      notes_width: 0.45
+      height: 102
+      notes:
+        - "- Highway and city mileage are closely correlated."
+        - "- 4-wheel drive vehicles cluster at the low-mileage end."
+        - "- Front-wheel drive vehicles cluster at the high-mileage end."
+
+  photos_2:
+    header: "More sample photos"
+    height: "auto"
+    body:
+      type: image
+      files: ["small.JPG", "tall.jpg", "wide.jpg", "large.JPG"]
+      labels: ["Photo A", "Photo B", "Photo C", "Photo D"]
+      width: 230

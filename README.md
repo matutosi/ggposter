@@ -182,6 +182,24 @@ p <- poster(
 )
 ```
 
+The same layout, theme, title, and section text can live in a YAML file
+instead of an inline R list, keeping the declarative content separate
+from the R code. Only the figures and tables stay in R, passed in via
+`objects` (reusing the same objects built above); image paths in the
+spec resolve relative to the YAML file’s own directory. `p_yml` below is
+identical to `p` above:
+
+``` r
+yml_path <- system.file("extdata", "poster_readme_example.yml", package = "ggposter")
+
+p_yml <- poster(
+  yml_path,
+  objects = list(tbl_class = tbl_class, tbl_drv = tbl_drv,
+                 fig_facet = fig_facet, fig_scatter = fig_scatter,
+                 fig_box = fig_box, fig_heat = fig_heat)
+)
+```
+
 Rendering a poster at true size makes font sizes and spacing come out
 correctly proportioned; previewing it at an arbitrary plot size (as this
 README does) does not, so we render a scaled-down preview PNG instead of
