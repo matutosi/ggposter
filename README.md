@@ -259,9 +259,6 @@ howto_fig_notes <- ggplot(mpg, aes(class, hwy)) +
   labs(x = "Class", y = "Highway mpg") +
   theme_bw()
 
-howto_tbl <- data.frame(Class = c("compact", "suv", "pickup"),
-                         Hwy = c(28.3, 18.1, 16.9))
-
 howto_tbl_notes <- data.frame(Drivetrain = c("f", "4", "r"),
                                `Mean highway mpg` = c(28.2, 19.2, 21.0),
                                check.names = FALSE)
@@ -274,9 +271,9 @@ howto_spec <- list(
   ),
   layout = list(
     left  = c("howto_bullets", "howto_figure", "howto_figure_notes",
-              "howto_table", "howto_table_notes", "howto_photo"),
+              "howto_table_notes", "howto_photo"),
     right = c("code_bullets", "code_figure", "code_figure_notes",
-              "code_table", "code_table_notes", "code_photo")
+              "code_table_notes", "code_photo")
   ),
   sections = list(
     howto_bullets = list(header = "Bullet list only", height = "auto", body = list(
@@ -289,26 +286,24 @@ howto_spec <- list(
     howto_figure = list(header = "Figure only", height = "auto", body = list(
       type = "figure", object = "howto_fig", height = 130
     )),
-    howto_figure_notes = list(header = "Figure + bullets (right)", height = "auto", body = list(
-      type = "figure", object = "howto_fig_notes", height = 130, notes_width = 0.4,
-      notes = c(
-        "- A figure's notes= sits beside it.",
-        "- Great for calling out a takeaway."
-      )
-    )),
-    howto_table = list(header = "Table only", height = "auto", body = list(
-      type = "table", object = "howto_tbl"
-    )),
-    howto_table_notes = list(header = "Table + bullets (below)", height = "auto", body = list(
-      type = "table", object = "howto_tbl_notes",
+    howto_figure_notes = list(header = "Figure + bullets (below)", height = "auto", body = list(
+      type = "figure", object = "howto_fig_notes", height = 90,
       caption = paste(
-        "A table's caption= adds a note below it.",
-        "Good for a source or short takeaway.",
+        "- A figure's caption= adds bullets below it.",
+        "- Great for calling out key takeaways.",
         sep = "\n"
       )
     )),
-    howto_photo = list(header = "Photo", height = "auto", body = list(
-      type = "image", files = "small.JPG", labels = "Sample photo", width = 160
+    howto_table_notes = list(header = "Table + bullets (right)", height = "auto", body = list(
+      type = "table", object = "howto_tbl_notes", notes_width = 0.4,
+      notes = c(
+        "- A table's notes= sits beside it.",
+        "- Good for brief descriptions or context."
+      )
+    )),
+    howto_photo = list(header = "Photo strip", height = "auto", body = list(
+      type = "image", files = c("small.JPG", "tall.jpg", "wide.jpg"),
+      labels = c("Photo 1", "Photo 2", "Photo 3"), width = 200
     )),
 
     code_bullets = list(header = "Code: bullet list", height = "auto", body = list(
@@ -341,27 +336,16 @@ howto_spec <- list(
     code_figure_notes = list(header = "Code: figure + bullets", height = "auto", body = list(
       type = "text", md = c(
         "list(",
-        " header = \"Figure + bullets (right)\",",
+        " header = \"Figure + bullets (below)\",",
         " body = list(",
         "  type = \"figure\",",
         "  object = \"howto_fig_notes\",",
-        "  height = 130,",
-        "  notes_width = 0.4,",
-        "  notes = c(",
-        "   \"- A figure's notes= sits beside it.\",",
-        "   \"- Great for calling out a takeaway.\"",
+        "  height = 90,",
+        "  caption = paste(",
+        "   \"- A figure's caption= adds bullets below it.\",",
+        "   \"- Great for calling out key takeaways.\",",
+        "   sep = \"\\n\"",
         "  )",
-        " )",
-        ")"
-      )
-    )),
-    code_table = list(header = "Code: table only", height = "auto", body = list(
-      type = "text", md = c(
-        "list(",
-        " header = \"Table only\",",
-        " body = list(",
-        "  type = \"table\",",
-        "  object = \"howto_tbl\"",
         " )",
         ")"
       )
@@ -369,28 +353,28 @@ howto_spec <- list(
     code_table_notes = list(header = "Code: table + bullets", height = "auto", body = list(
       type = "text", md = c(
         "list(",
-        " header = \"Table + bullets (below)\",",
+        " header = \"Table + bullets (right)\",",
         " body = list(",
         "  type = \"table\",",
         "  object = \"howto_tbl_notes\",",
-        "  caption = paste(",
-        "   \"A table's caption= adds a note below it.\",",
-        "   \"Good for a source or short takeaway.\",",
-        "   sep = \"\\n\"",
+        "  notes_width = 0.4,",
+        "  notes = c(",
+        "   \"- A table's notes= sits beside it.\",",
+        "   \"- Good for brief descriptions or context.\"",
         "  )",
         " )",
         ")"
       )
     )),
-    code_photo = list(header = "Code: photo", height = "auto", body = list(
+    code_photo = list(header = "Code: photo strip", height = "auto", body = list(
       type = "text", md = c(
         "list(",
-        " header = \"Photo\",",
+        " header = \"Photo strip\",",
         " body = list(",
         "  type = \"image\",",
-        "  files = \"small.JPG\",",
-        "  labels = \"Sample photo\",",
-        "  width = 160",
+        "  files = c(\"small.JPG\", \"tall.jpg\", \"wide.jpg\"),",
+        "  labels = c(\"Photo 1\", \"Photo 2\", \"Photo 3\"),",
+        "  width = 200",
         " )",
         ")"
       )
@@ -401,9 +385,24 @@ howto_spec <- list(
 p_howto <- poster(
   howto_spec,
   objects = list(howto_fig = howto_fig, howto_fig_notes = howto_fig_notes,
-                 howto_tbl = howto_tbl, howto_tbl_notes = howto_tbl_notes),
+                 howto_tbl_notes = howto_tbl_notes),
   theme = theme_green(base_size = 24),
   base_dir = img_dir
+)
+```
+
+The same layout, theme, title, and section text can live in a YAML file
+instead of an inline R list; only the figures and tables stay in R,
+passed in via `objects`. `p_howto_yml` below is identical to `p_howto`
+above:
+
+``` r
+howto_yml_path <- system.file("extdata", "poster_sample_howto.yml", package = "ggposter")
+
+p_howto_yml <- poster(
+  howto_yml_path,
+  objects = list(howto_fig = howto_fig, howto_fig_notes = howto_fig_notes,
+                 howto_tbl_notes = howto_tbl_notes)
 )
 ```
 
@@ -412,4 +411,4 @@ render_poster(p_howto, "man/figures/README-howto-poster.png", scale = 0.3, dpi =
 knitr::include_graphics("man/figures/README-howto-poster.png")
 ```
 
-<img src="man/figures/README-howto-poster.png" alt="A tutorial poster titled 'How to Make an Academic Poster', with a left column showing one example of each ggposter card type (bullet list, figure, figure with notes, table, table with a caption, and photo) and a right column showing the R code that built each matching card." width="100%" />
+<img src="man/figures/README-howto-poster.png" alt="A tutorial poster titled 'How to Make an Academic Poster', with a left column showing one example of each ggposter card type (bullet list, figure, figure with bullets below, table with bullets to the right, and a photo strip) and a right column showing the R code that built each matching card." width="100%" />

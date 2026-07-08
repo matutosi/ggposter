@@ -32,7 +32,7 @@ supplied separately as R objects.
 You can install the development version of ggposter from
 [GitHub](https://github.com/) with:
 
-```{r}
+``` r
 # install.packages("remotes")
 remotes::install_github("matutosi/ggposter")
 ```
