@@ -268,6 +268,34 @@ poster_add_annotation <- function(g, title = NULL, caption = NULL, theme, size_m
   tbl
 }
 
+#' Place a bullet-list caption below a figure
+#'
+#' Stacks a card's main content on top of a bullet list (via [card_text()],
+#' left-aligned) below it, at the content's full width. Used by [poster()]
+#' when a `figure` section body has a `caption` field.
+#'
+#' @param main The main content grob (e.g. from [card_figure()]).
+#' @param caption_md Character vector of markdown bullet lines for
+#'   [card_text()].
+#' @param theme A [poster_theme()] object.
+#' @param width_mm Width available to `main` and the caption, in
+#'   millimetres.
+#' @return A grob suitable as the `body` argument of [poster_card()].
+#' @keywords internal
+#' @noRd
+with_caption_below <- function(main, caption_md, theme, width_mm) {
+  gap_mm <- 5 / 3
+  caption_grob <- card_text(caption_md, theme, width = width_mm)
+  tbl <- gtable::gtable(
+    widths  = grid::unit(width_mm, "mm"),
+    heights = grid::unit.c(measure_height(main), grid::unit(gap_mm, "mm"),
+                           measure_height(caption_grob))
+  )
+  tbl <- gtable::gtable_add_grob(tbl, main, t = 1, l = 1, name = "main")
+  tbl <- gtable::gtable_add_grob(tbl, anchor_top_left(caption_grob), t = 3, l = 1, name = "caption")
+  anchor_top_left(tbl)
+}
+
 #' Figure card content: a ggplot styled for poster font size
 #'
 #' Applies the poster's base font size/family to a ggplot's theme, then

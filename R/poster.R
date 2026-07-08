@@ -306,7 +306,10 @@ build_section <- function(name, section, theme, objects, base_dir, col_width_mm,
 #' `table` and `figure` bodies may also carry a `notes` field (a character
 #' vector of markdown bullet lines): when present, the built content is
 #' wrapped with [with_notes()] so the table/figure sits beside a bullet-list
-#' description instead of alone.
+#' description instead of alone. A `figure` body may instead carry a
+#' `caption` field (a markdown string, possibly with embedded `"\n"` for
+#' multiple bullet lines): when present, the built content is wrapped with
+#' [with_caption_below()] so the bullets sit below the figure at full width.
 #'
 #' @param body A body spec: `list(type = "text"|"table"|"figure"|"image", ...)`.
 #' @inheritParams build_column
@@ -315,7 +318,8 @@ build_section <- function(name, section, theme, objects, base_dir, col_width_mm,
 #' @noRd
 build_body <- function(body, theme, objects, base_dir, col_width_mm, show_plot_area = FALSE) {
   type <- body$type %||% "text"
-  has_notes <- type %in% c("table", "figure") && !is.null(body$notes)
+  has_notes   <- type %in% c("table", "figure") && !is.null(body$notes)
+  has_caption <- type == "figure" && !has_notes && !is.null(body$caption)
   notes_width <- body$notes_width %||% 0.35
   pad_mm <- grid::convertWidth(theme$pad, "mm", valueOnly = TRUE)
   # `body$width`, if given, is the *combined* budget for main content + notes
@@ -336,13 +340,14 @@ build_body <- function(body, theme, objects, base_dir, col_width_mm, show_plot_a
                        title = body$title, caption = body$caption,
                        width = main_width_mm),
     figure = card_figure(objects[[body$object]], theme,
-                        # A figure paired with notes needs an explicit
-                        # height too (not just width), so with_notes() can
-                        # measure it (see poster_fix_size()'s caching, which
-                        # only kicks in when both dimensions are explicit).
-                        # 4:3 is just a reasonable default aspect ratio.
-                        width  = if (has_notes) main_width_mm else body$width,
-                        height = if (has_notes) (body$height %||% (main_width_mm * 0.75)) else body$height),
+                        # A figure paired with notes or a caption needs an
+                        # explicit height too (not just width), so
+                        # with_notes()/with_caption_below() can measure it
+                        # (see poster_fix_size()'s caching, which only kicks
+                        # in when both dimensions are explicit). 4:3 is just
+                        # a reasonable default aspect ratio.
+                        width  = if (has_notes || has_caption) main_width_mm else body$width,
+                        height = if (has_notes || has_caption) (body$height %||% (main_width_mm * 0.75)) else body$height),
     image = card_image(file.path(base_dir, body$files), labels = body$labels,
                        theme = theme, height = body$height, width = body$width,
                        label_position = body$label_position %||% "below"),
@@ -351,6 +356,9 @@ build_body <- function(body, theme, objects, base_dir, col_width_mm, show_plot_a
   if (has_notes) {
     content <- with_notes(content, body$notes, theme, total_width_mm, notes_width = notes_width,
                           show_plot_area = show_plot_area)
+  } else if (has_caption) {
+    caption_md <- strsplit(body$caption, "\n")[[1]]
+    content <- with_caption_below(content, caption_md, theme, main_width_mm)
   }
   content
 }
