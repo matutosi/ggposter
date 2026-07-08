@@ -245,9 +245,10 @@ reproduction of a real conference poster.
 
 The poster below is a quick tour of ggposter’s card types rather than a
 real research example: the left column has one card of each kind – a
-bullet list, a figure, a figure with `notes` beside it, a table, a table
-with a `caption` below it, and a photo – and the right column shows the
-R code that built the matching card on the left.
+bullet list, a figure, a figure with a `caption` below it, a table with
+`notes` beside it, and a photo strip – the center column shows the YAML
+spec for the matching card on the left, and the right column shows the
+equivalent R code.
 
 ``` r
 howto_fig <- ggplot(mpg, aes(displ, hwy)) +
@@ -267,13 +268,15 @@ howto_spec <- list(
   title = list(
     title = "How to Make an Academic Poster",
     authors = "*A guide to the ggposter card types",
-    funding = "Each left-column card demonstrates one card type; the matching right-column card shows the R code that built it."
+    funding = "Each left-column card demonstrates one card type; the matching center-column card shows the YAML spec for it; the matching right-column card shows the equivalent R code."
   ),
   layout = list(
-    left  = c("howto_bullets", "howto_figure", "howto_figure_notes",
-              "howto_table_notes", "howto_photo"),
-    right = c("code_bullets", "code_figure", "code_figure_notes",
-              "code_table_notes", "code_photo")
+    left   = c("howto_bullets", "howto_figure", "howto_figure_notes",
+               "howto_table_notes", "howto_photo"),
+    center = c("yml_bullets", "yml_figure", "yml_figure_notes",
+               "yml_table_notes", "yml_photo"),
+    right  = c("code_bullets", "code_figure", "code_figure_notes",
+               "code_table_notes", "code_photo")
   ),
   sections = list(
     howto_bullets = list(header = "Bullet list only", height = "auto", body = list(
@@ -304,6 +307,77 @@ howto_spec <- list(
     howto_photo = list(header = "Photo strip", height = "auto", body = list(
       type = "image", files = c("small.JPG", "tall.jpg", "wide.jpg"),
       labels = c("Photo 1", "Photo 2", "Photo 3"), width = 200
+    )),
+
+    yml_bullets = list(header = "YAML: bullet list", height = "auto", body = list(
+      type = "text", md = c(
+        "howto_bullets:",
+        " header: \"Bullet list only\"",
+        " height: \"auto\"",
+        " body:",
+        "  type: text",
+        "  md:",
+        "   \\- \"- Bullet points summarize key facts.\"",
+        "   \\- \"- Each line starts with a dash.\"",
+        "   \\- \"- Long lines wrap to fit the card.\""
+      )
+    )),
+    yml_figure = list(header = "YAML: figure only", height = "auto", body = list(
+      type = "text", md = c(
+        "howto_figure:",
+        " header: \"Figure only\"",
+        " height: \"auto\"",
+        " body:",
+        "  type: figure",
+        "  object: howto_fig",
+        "  height: 130"
+      )
+    )),
+    yml_figure_notes = list(header = "YAML: figure + bullets", height = "auto", body = list(
+      type = "text", md = c(
+        "howto_figure_notes:",
+        " header: \"Figure + bullets (below)\"",
+        " height: \"auto\"",
+        " body:",
+        "  type: figure",
+        "  object: howto_fig_notes",
+        "  height: 90",
+        "  caption: |-",
+        "   \\- A figure's caption= adds bullets below it.",
+        "   \\- Great for calling out key takeaways."
+      )
+    )),
+    yml_table_notes = list(header = "YAML: table + bullets", height = "auto", body = list(
+      type = "text", md = c(
+        "howto_table_notes:",
+        " header: \"Table + bullets (right)\"",
+        " height: \"auto\"",
+        " body:",
+        "  type: table",
+        "  object: howto_tbl_notes",
+        "  notes_width: 0.4",
+        "  notes:",
+        "   \\- \"- A table's notes= sits beside it.\"",
+        "   \\- \"- Good for brief descriptions or context.\""
+      )
+    )),
+    yml_photo = list(header = "YAML: photo strip", height = "auto", body = list(
+      type = "text", md = c(
+        "howto_photo:",
+        " header: \"Photo strip\"",
+        " height: \"auto\"",
+        " body:",
+        "  type: image",
+        "  files:",
+        "   \\- small.JPG",
+        "   \\- tall.jpg",
+        "   \\- wide.jpg",
+        "  labels:",
+        "   \\- \"Photo 1\"",
+        "   \\- \"Photo 2\"",
+        "   \\- \"Photo 3\"",
+        "  width: 200"
+      )
     )),
 
     code_bullets = list(header = "Code: bullet list", height = "auto", body = list(
@@ -411,4 +485,4 @@ render_poster(p_howto, "man/figures/README-howto-poster.png", scale = 0.3, dpi =
 knitr::include_graphics("man/figures/README-howto-poster.png")
 ```
 
-<img src="man/figures/README-howto-poster.png" alt="A tutorial poster titled 'How to Make an Academic Poster', with a left column showing one example of each ggposter card type (bullet list, figure, figure with bullets below, table with bullets to the right, and a photo strip) and a right column showing the R code that built each matching card." width="100%" />
+<img src="man/figures/README-howto-poster.png" alt="A tutorial poster titled 'How to Make an Academic Poster', with a left column showing one example of each ggposter card type (bullet list, figure, figure with bullets below, table with bullets to the right, and a photo strip), a center column showing the YAML spec for each matching card, and a right column showing the R code that built each matching card." width="100%" />

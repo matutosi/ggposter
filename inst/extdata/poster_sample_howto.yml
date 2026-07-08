@@ -9,11 +9,12 @@ theme:
 title:
   title: "How to Make an Academic Poster"
   authors: "*A guide to the ggposter card types"
-  funding: "Each left-column card demonstrates one card type; the matching right-column card shows the R code that built it."
+  funding: "Each left-column card demonstrates one card type; the matching center-column card shows the YAML spec for it; the matching right-column card shows the equivalent R code."
 
 layout:
-  left:  [howto_bullets, howto_figure, howto_figure_notes, howto_table_notes, howto_photo]
-  right: [code_bullets, code_figure, code_figure_notes, code_table_notes, code_photo]
+  left:   [howto_bullets, howto_figure, howto_figure_notes, howto_table_notes, howto_photo]
+  center: [yml_bullets, yml_figure, yml_figure_notes, yml_table_notes, yml_photo]
+  right:  [code_bullets, code_figure, code_figure_notes, code_table_notes, code_photo]
 
 sections:
   howto_bullets:
@@ -64,6 +65,91 @@ sections:
       files: [small.JPG, tall.jpg, wide.jpg]
       labels: ["Photo 1", "Photo 2", "Photo 3"]
       width: 200
+
+  yml_bullets:
+    header: "YAML: bullet list"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "howto_bullets:"
+        - " header: \"Bullet list only\""
+        - " height: \"auto\""
+        - " body:"
+        - "  type: text"
+        - "  md:"
+        - "   \\- \"- Bullet points summarize key facts.\""
+        - "   \\- \"- Each line starts with a dash.\""
+        - "   \\- \"- Long lines wrap to fit the card.\""
+
+  yml_figure:
+    header: "YAML: figure only"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "howto_figure:"
+        - " header: \"Figure only\""
+        - " height: \"auto\""
+        - " body:"
+        - "  type: figure"
+        - "  object: howto_fig"
+        - "  height: 130"
+
+  yml_figure_notes:
+    header: "YAML: figure + bullets"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "howto_figure_notes:"
+        - " header: \"Figure + bullets (below)\""
+        - " height: \"auto\""
+        - " body:"
+        - "  type: figure"
+        - "  object: howto_fig_notes"
+        - "  height: 90"
+        - "  caption: |-"
+        - "   \\- A figure's caption= adds bullets below it."
+        - "   \\- Great for calling out key takeaways."
+
+  yml_table_notes:
+    header: "YAML: table + bullets"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "howto_table_notes:"
+        - " header: \"Table + bullets (right)\""
+        - " height: \"auto\""
+        - " body:"
+        - "  type: table"
+        - "  object: howto_tbl_notes"
+        - "  notes_width: 0.4"
+        - "  notes:"
+        - "   \\- \"- A table's notes= sits beside it.\""
+        - "   \\- \"- Good for brief descriptions or context.\""
+
+  yml_photo:
+    header: "YAML: photo strip"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "howto_photo:"
+        - " header: \"Photo strip\""
+        - " height: \"auto\""
+        - " body:"
+        - "  type: image"
+        - "  files:"
+        - "   \\- small.JPG"
+        - "   \\- tall.jpg"
+        - "   \\- wide.jpg"
+        - "  labels:"
+        - "   \\- \"Photo 1\""
+        - "   \\- \"Photo 2\""
+        - "   \\- \"Photo 3\""
+        - "  width: 200"
 
   code_bullets:
     header: "Code: bullet list"
