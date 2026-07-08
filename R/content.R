@@ -7,10 +7,14 @@
 #' under the item's own text rather than under the bullet (a hanging
 #' indent) -- gridtext has no CSS `text-indent`/`padding-left` support to do
 #' this within a single call, so each item is measured and wrapped
-#' separately instead.
+#' separately instead. Leading spaces on a line (e.g. to show nested YAML
+#' or code) are likewise stripped before markdown parsing -- gridtext/
+#' commonmark trims leading whitespace, including `&nbsp;` -- and rebuilt
+#' as a real, measured spacer column so the indent survives rendering.
 #'
 #' @param md Character vector. Each element becomes one paragraph/bullet.
-#'   Markdown syntax (e.g. `**bold**`) is honoured.
+#'   Markdown syntax (e.g. `**bold**`) is honoured. Leading spaces are
+#'   rendered as indentation.
 #' @param theme A [poster_theme()] object.
 #' @param width Wrap width, as a [grid::unit] or millimetres. `NULL` lets the
 #'   grob size to its natural width (no wrapping).
@@ -25,6 +29,7 @@ card_text <- function(md, theme = poster_theme(), width = NULL) {
   width <- if (is.null(width)) grid::unit(1, "npc") else as_mm_unit(width)
   bullet <- paste0(intToUtf8(0x2022), " ")
   bullet_w <- grid::grobWidth(grid::textGrob(bullet, gp = gp))
+  space_w  <- grid::grobWidth(grid::textGrob(" ", gp = gp))
 
   box <- function(text, w) {
     text <- gsub("`", "", text)  # drop code spans (gridtext has no <code> support)
@@ -35,15 +40,27 @@ card_text <- function(md, theme = poster_theme(), width = NULL) {
   }
 
   rows <- lapply(md, function(line) {
-    if (!grepl("^-\\s+", line)) return(box(line, width))
-    text    <- sub("^-\\s+", "", line)
-    text_w  <- width - bullet_w
+    n_indent  <- attr(regexpr("^ *", line), "match.length")
+    line      <- substring(line, n_indent + 1)
+    indent_w  <- n_indent * space_w
+    is_bullet <- grepl("^-\\s+", line)
+    if (n_indent == 0 && !is_bullet) return(box(line, width))
+
+    text    <- if (is_bullet) sub("^-\\s+", "", line) else line
+    lead_w  <- if (is_bullet) indent_w + bullet_w else indent_w
+    text_w  <- width - lead_w
     txt_box <- box(text, text_w)
-    bl <- grid::textGrob(bullet, x = 0, y = 1, hjust = 0, vjust = 1, gp = gp)
-    row <- gtable::gtable(widths = grid::unit.c(bullet_w, text_w),
-                         heights = grid::grobHeight(txt_box))
-    row <- gtable::gtable_add_grob(row, bl,      t = 1, l = 1, name = "bullet")
-    row <- gtable::gtable_add_grob(row, txt_box, t = 1, l = 2, name = "text")
+    row_height <- grid::grobHeight(txt_box)
+
+    if (is_bullet) {
+      bl <- grid::textGrob(bullet, x = 0, y = 1, hjust = 0, vjust = 1, gp = gp)
+      row <- gtable::gtable(widths = grid::unit.c(indent_w, bullet_w, text_w), heights = row_height)
+      row <- gtable::gtable_add_grob(row, bl,      t = 1, l = 2, name = "bullet")
+      row <- gtable::gtable_add_grob(row, txt_box, t = 1, l = 3, name = "text")
+    } else {
+      row <- gtable::gtable(widths = grid::unit.c(indent_w, text_w), heights = row_height)
+      row <- gtable::gtable_add_grob(row, txt_box, t = 1, l = 2, name = "text")
+    }
     row
   })
 

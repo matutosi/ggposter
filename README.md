@@ -271,6 +271,7 @@ howto_spec <- list(
     funding = "Each left-column card demonstrates one card type; the matching center-column card shows the YAML spec for it; the matching right-column card shows the equivalent R code."
   ),
   layout = list(
+    align_rows = TRUE,
     left   = c("howto_bullets", "howto_figure", "howto_figure_notes",
                "howto_table_notes", "howto_photo"),
     center = c("yml_bullets", "yml_figure", "yml_figure_notes",
@@ -301,7 +302,7 @@ howto_spec <- list(
       type = "table", object = "howto_tbl_notes", notes_width = 0.4,
       notes = c(
         "- A table's notes= sits beside it.",
-        "- Good for brief descriptions or context."
+        "- Good for a short note."
       )
     )),
     howto_photo = list(header = "Photo strip", height = "auto", body = list(
@@ -312,144 +313,144 @@ howto_spec <- list(
     yml_bullets = list(header = "YAML: bullet list", height = "auto", body = list(
       type = "text", md = c(
         "howto_bullets:",
-        " header: \"Bullet list only\"",
-        " height: \"auto\"",
-        " body:",
-        "  type: text",
-        "  md:",
-        "   \\- \"- Bullet points summarize key facts.\"",
-        "   \\- \"- Each line starts with a dash.\"",
-        "   \\- \"- Long lines wrap to fit the card.\""
+        "  header: \"Bullet list only\"",
+        "  height: \"auto\"",
+        "  body:",
+        "    type: text",
+        "    md:",
+        "      \\- \"- Bullet points summarize key facts.\"",
+        "      \\- \"- Each line starts with a dash.\"",
+        "      \\- \"- Long lines wrap to fit the card.\""
       )
     )),
     yml_figure = list(header = "YAML: figure only", height = "auto", body = list(
       type = "text", md = c(
         "howto_figure:",
-        " header: \"Figure only\"",
-        " height: \"auto\"",
-        " body:",
-        "  type: figure",
-        "  object: howto_fig",
-        "  height: 130"
+        "  header: \"Figure only\"",
+        "  height: \"auto\"",
+        "  body:",
+        "    type: figure",
+        "    object: howto_fig",
+        "    height: 130"
       )
     )),
     yml_figure_notes = list(header = "YAML: figure + bullets", height = "auto", body = list(
       type = "text", md = c(
         "howto_figure_notes:",
-        " header: \"Figure + bullets (below)\"",
-        " height: \"auto\"",
-        " body:",
-        "  type: figure",
-        "  object: howto_fig_notes",
-        "  height: 90",
-        "  caption: |-",
-        "   \\- A figure's caption= adds bullets below it.",
-        "   \\- Great for calling out key takeaways."
+        "  header: \"Figure + bullets (below)\"",
+        "  height: \"auto\"",
+        "  body:",
+        "    type: figure",
+        "    object: howto_fig_notes",
+        "    height: 90",
+        "    caption: |-",
+        "      \\- A figure's caption= adds bullets below it.",
+        "      \\- Great for calling out key takeaways."
       )
     )),
     yml_table_notes = list(header = "YAML: table + bullets", height = "auto", body = list(
       type = "text", md = c(
         "howto_table_notes:",
-        " header: \"Table + bullets (right)\"",
-        " height: \"auto\"",
-        " body:",
-        "  type: table",
-        "  object: howto_tbl_notes",
-        "  notes_width: 0.4",
-        "  notes:",
-        "   \\- \"- A table's notes= sits beside it.\"",
-        "   \\- \"- Good for brief descriptions or context.\""
+        "  header: \"Table + bullets (right)\"",
+        "  height: \"auto\"",
+        "  body:",
+        "    type: table",
+        "    object: howto_tbl_notes",
+        "    notes_width: 0.4",
+        "    notes:",
+        "      \\- \"- A table's notes= sits beside it.\"",
+        "      \\- \"- Good for a short note.\""
       )
     )),
     yml_photo = list(header = "YAML: photo strip", height = "auto", body = list(
       type = "text", md = c(
         "howto_photo:",
-        " header: \"Photo strip\"",
-        " height: \"auto\"",
-        " body:",
-        "  type: image",
-        "  files:",
-        "   \\- small.JPG",
-        "   \\- tall.jpg",
-        "   \\- wide.jpg",
-        "  labels:",
-        "   \\- \"Photo 1\"",
-        "   \\- \"Photo 2\"",
-        "   \\- \"Photo 3\"",
-        "  width: 200"
+        "  header: \"Photo strip\"",
+        "  height: \"auto\"",
+        "  body:",
+        "    type: image",
+        "    files:",
+        "      \\- small.JPG",
+        "      \\- tall.jpg",
+        "      \\- wide.jpg",
+        "    labels:",
+        "      \\- \"Photo 1\"",
+        "      \\- \"Photo 2\"",
+        "      \\- \"Photo 3\"",
+        "    width: 200"
       )
     )),
 
     code_bullets = list(header = "Code: bullet list", height = "auto", body = list(
       type = "text", md = c(
         "list(",
-        " header = \"Bullet list only\",",
-        " body = list(",
-        "  type = \"text\",",
-        "  md = c(",
-        "   \"- Bullet points summarize key facts.\",",
-        "   \"- Each line starts with a dash.\",",
-        "   \"- Long lines wrap to fit the card.\"",
+        "  header = \"Bullet list only\",",
+        "  body = list(",
+        "    type = \"text\",",
+        "    md = c(",
+        "      \"- Bullet points summarize key facts.\",",
+        "      \"- Each line starts with a dash.\",",
+        "      \"- Long lines wrap to fit the card.\"",
+        "    )",
         "  )",
-        " )",
         ")"
       )
     )),
     code_figure = list(header = "Code: figure only", height = "auto", body = list(
       type = "text", md = c(
         "list(",
-        " header = \"Figure only\",",
-        " body = list(",
-        "  type = \"figure\",",
-        "  object = \"howto_fig\",",
-        "  height = 130",
-        " )",
+        "  header = \"Figure only\",",
+        "  body = list(",
+        "    type = \"figure\",",
+        "    object = \"howto_fig\",",
+        "    height = 130",
+        "  )",
         ")"
       )
     )),
     code_figure_notes = list(header = "Code: figure + bullets", height = "auto", body = list(
       type = "text", md = c(
         "list(",
-        " header = \"Figure + bullets (below)\",",
-        " body = list(",
-        "  type = \"figure\",",
-        "  object = \"howto_fig_notes\",",
-        "  height = 90,",
-        "  caption = paste(",
-        "   \"- A figure's caption= adds bullets below it.\",",
-        "   \"- Great for calling out key takeaways.\",",
-        "   sep = \"\\n\"",
+        "  header = \"Figure + bullets (below)\",",
+        "  body = list(",
+        "    type = \"figure\",",
+        "    object = \"howto_fig_notes\",",
+        "    height = 90,",
+        "    caption = paste(",
+        "      \"- A figure's caption= adds bullets below it.\",",
+        "      \"- Great for calling out key takeaways.\",",
+        "      sep = \"\\n\"",
+        "    )",
         "  )",
-        " )",
         ")"
       )
     )),
     code_table_notes = list(header = "Code: table + bullets", height = "auto", body = list(
       type = "text", md = c(
         "list(",
-        " header = \"Table + bullets (right)\",",
-        " body = list(",
-        "  type = \"table\",",
-        "  object = \"howto_tbl_notes\",",
-        "  notes_width = 0.4,",
-        "  notes = c(",
-        "   \"- A table's notes= sits beside it.\",",
-        "   \"- Good for brief descriptions or context.\"",
+        "  header = \"Table + bullets (right)\",",
+        "  body = list(",
+        "    type = \"table\",",
+        "    object = \"howto_tbl_notes\",",
+        "    notes_width = 0.4,",
+        "    notes = c(",
+        "      \"- A table's notes= sits beside it.\",",
+        "      \"- Good for a short note.\"",
+        "    )",
         "  )",
-        " )",
         ")"
       )
     )),
     code_photo = list(header = "Code: photo strip", height = "auto", body = list(
       type = "text", md = c(
         "list(",
-        " header = \"Photo strip\",",
-        " body = list(",
-        "  type = \"image\",",
-        "  files = c(\"small.JPG\", \"tall.jpg\", \"wide.jpg\"),",
-        "  labels = c(\"Photo 1\", \"Photo 2\", \"Photo 3\"),",
-        "  width = 200",
-        " )",
+        "  header = \"Photo strip\",",
+        "  body = list(",
+        "    type = \"image\",",
+        "    files = c(\"small.JPG\", \"tall.jpg\", \"wide.jpg\"),",
+        "    labels = c(\"Photo 1\", \"Photo 2\", \"Photo 3\"),",
+        "    width = 200",
+        "  )",
         ")"
       )
     ))

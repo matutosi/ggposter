@@ -8,7 +8,8 @@ card_text(md, theme = poster_theme(), width = NULL)
 }
 \arguments{
 \item{md}{Character vector. Each element becomes one paragraph/bullet.
-Markdown syntax (e.g. \verb{**bold**}) is honoured.}
+Markdown syntax (e.g. \verb{**bold**}) is honoured. Leading spaces are
+rendered as indentation.}
 
 \item{theme}{A \code{\link[=poster_theme]{poster_theme()}} object.}
 
@@ -26,7 +27,10 @@ a bullet in its own narrow column so a wrapped continuation line aligns
 under the item's own text rather than under the bullet (a hanging
 indent) -- gridtext has no CSS \code{text-indent}/\code{padding-left} support to do
 this within a single call, so each item is measured and wrapped
-separately instead.
+separately instead. Leading spaces on a line (e.g. to show nested YAML
+or code) are likewise stripped before markdown parsing -- gridtext/
+commonmark trims leading whitespace, including \verb{&nbsp;} -- and rebuilt
+as a real, measured spacer column so the indent survives rendering.
 }
 \examples{
 g <- card_text(c("- point one", "- point two"), poster_theme())

@@ -40,8 +40,11 @@ See the package vignette for the full spec schema. In short:
 \item{\code{poster}}{\code{size} (e.g. \code{"A1"}) and \code{orientation}.}
 \item{\code{theme}}{Arguments passed to \code{\link[=poster_theme]{poster_theme()}}.}
 \item{\code{title}}{Arguments passed to \code{\link[=poster_title]{poster_title()}}.}
-\item{\code{layout}}{\code{columns}, \code{left}, \code{right}: which section names go in
-which column, top to bottom.}
+\item{\code{layout}}{\code{columns}, \code{left}, \code{right} (or any other column names):
+which section names go in which column, top to bottom. Set
+\code{align_rows: true} to line up each row position across columns to
+the tallest \code{"auto"}-height card at that position, instead of each
+column stacking at its own height.}
 \item{\code{sections}}{Named list; each has \code{header}, optional relative
 \code{height}, and a \code{body} of \code{type} \code{"text"}, \code{"table"}, \code{"figure"}, or
 \code{"image"} plus that type's arguments.}

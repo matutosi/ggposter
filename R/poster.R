@@ -11,8 +11,11 @@
 #'   \item{`poster`}{`size` (e.g. `"A1"`) and `orientation`.}
 #'   \item{`theme`}{Arguments passed to [poster_theme()].}
 #'   \item{`title`}{Arguments passed to [poster_title()].}
-#'   \item{`layout`}{`columns`, `left`, `right`: which section names go in
-#'     which column, top to bottom.}
+#'   \item{`layout`}{`columns`, `left`, `right` (or any other column names):
+#'     which section names go in which column, top to bottom. Set
+#'     `align_rows: true` to line up each row position across columns to
+#'     the tallest `"auto"`-height card at that position, instead of each
+#'     column stacking at its own height.}
 #'   \item{`sections`}{Named list; each has `header`, optional relative
 #'     `height`, and a `body` of `type` `"text"`, `"table"`, `"figure"`, or
 #'     `"image"` plus that type's arguments.}
@@ -109,7 +112,8 @@ build_poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL,
   col_height_mm <- size_mm[["height"]] - title_h
 
   layout <- spec$layout %||% list(left = names(spec$sections), right = character(0))
-  columns <- layout[setdiff(names(layout), "columns")]
+  align_rows <- isTRUE(layout$align_rows)
+  columns <- layout[setdiff(names(layout), c("columns", "align_rows"))]
   columns <- columns[lengths(columns) > 0]
   col_width_mm <- size_mm[["width"]] / max(length(columns), 1)
 
@@ -117,6 +121,30 @@ build_poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL,
     build_column(section_names, spec$sections, theme, objects, base_dir, col_width_mm, col_height_mm,
                  show_plot_area = show_plot_area)
   })
+
+  # layout$align_rows = TRUE lines up each row position across columns to
+  # the tallest "auto"-height card at that position, instead of letting
+  # every column stack its cards at their own independent heights. The
+  # first build_column() pass above only *measures* each card's natural
+  # height; once the per-row target is known from that measurement, affected
+  # columns are rebuilt so the shorter cards at that row stretch to match.
+  if (align_rows && length(col_grobs) > 1) {
+    n_rows <- max(vapply(col_grobs, function(cg) length(attr(cg, "is_auto")), integer(1)))
+    target_row_mm <- vapply(seq_len(n_rows), function(i) {
+      vals <- vapply(col_grobs, function(cg) {
+        is_auto <- attr(cg, "is_auto")
+        auto_mm <- attr(cg, "auto_mm")
+        if (i <= length(is_auto) && isTRUE(is_auto[[i]])) auto_mm[[i]] else NA_real_
+      }, numeric(1))
+      vals <- vals[!is.na(vals)]
+      if (length(vals)) max(vals) else NA_real_
+    }, numeric(1))
+
+    col_grobs <- lapply(columns, function(section_names) {
+      build_column(section_names, spec$sections, theme, objects, base_dir, col_width_mm, col_height_mm,
+                   show_plot_area = show_plot_area, target_row_mm = target_row_mm)
+    })
+  }
 
   # Stitching the title and columns together via patchwork's `/` and `|`
   # operators (both of which route through `wrap_elements(full=)` for plain
@@ -171,11 +199,19 @@ build_poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL,
 #'   left after the `"auto"` sections take the space their content needs.
 #' @param show_plot_area Passed through to [poster_card()] for every card in
 #'   the column.
-#' @return A [gtable::gtable()] stacking the column's cards.
+#' @param target_row_mm Optional numeric vector, one value per section in
+#'   `section_names`, from [build_poster()]'s cross-column `align_rows`
+#'   pass. An `"auto"` section whose target exceeds its own measured height
+#'   is rebuilt with `fit_content = FALSE` so it stretches to fill that
+#'   height instead of leaving blank space beneath a shorter card.
+#' @return A [gtable::gtable()] stacking the column's cards, carrying
+#'   `is_auto` and `auto_mm` attributes (one entry per section) so
+#'   [build_poster()] can compute row targets for `align_rows`.
 #' @keywords internal
 #' @noRd
 build_column <- function(section_names, sections, theme, objects, base_dir,
-                          col_width_mm, col_height_mm, show_plot_area = FALSE) {
+                          col_width_mm, col_height_mm, show_plot_area = FALSE,
+                          target_row_mm = NULL) {
   cards <- lapply(section_names, function(nm) {
     build_section(nm, sections[[nm]], theme, objects, base_dir, col_width_mm,
                   show_plot_area = show_plot_area)
@@ -186,6 +222,18 @@ build_column <- function(section_names, sections, theme, objects, base_dir,
   auto_mm <- vapply(seq_along(cards), function(i) {
     if (is_auto[[i]]) grid::convertHeight(measure_height(cards[[i]]), "mm", valueOnly = TRUE) else 0
   }, numeric(1))
+
+  if (!is.null(target_row_mm)) {
+    for (i in seq_along(cards)) {
+      if (is_auto[[i]] && !is.na(target_row_mm[[i]]) && target_row_mm[[i]] > auto_mm[[i]] + 1e-6) {
+        cards[[i]] <- build_section(section_names[[i]], sections[[section_names[[i]]]], theme, objects,
+                                    base_dir, col_width_mm, show_plot_area = show_plot_area,
+                                    fit_content_override = FALSE)
+        auto_mm[[i]] <- target_row_mm[[i]]
+      }
+    }
+  }
+
   weights <- vapply(seq_along(raw_heights), function(i) {
     if (is_auto[[i]]) 0 else as.numeric(raw_heights[[i]])
   }, numeric(1))
@@ -222,24 +270,33 @@ build_column <- function(section_names, sections, theme, objects, base_dir,
   for (i in seq_along(cards)) {
     col <- gtable::gtable_add_grob(col, cards[[i]], t = i, l = 1, name = section_names[[i]])
   }
+  attr(col, "is_auto") <- is_auto
+  attr(col, "auto_mm") <- auto_mm
   col
 }
 
 #' Build a single section card from its spec
 #' @param name Section name (used only for error messages).
 #' @param section A single section spec: `list(header=, height=, body=list(type=, ...))`.
+#' @param fit_content_override If not `NULL`, used instead of the usual
+#'   `identical(section$height, "auto")` rule -- see `build_column()`'s
+#'   `target_row_mm`.
 #' @inheritParams build_column
 #' @return A [poster_card()] grob.
 #' @keywords internal
 #' @noRd
 build_section <- function(name, section, theme, objects, base_dir, col_width_mm,
-                          show_plot_area = FALSE) {
+                          show_plot_area = FALSE, fit_content_override = NULL) {
   if (is.null(section)) {
     cli::cli_abort("Section {.val {name}} is referenced in {.field layout} but missing from {.field sections}.")
   }
   body <- build_body(section$body, theme, objects, base_dir, col_width_mm,
                      show_plot_area = show_plot_area)
-  fit_content <- identical(section$height %||% 1, "auto")
+  fit_content <- if (!is.null(fit_content_override)) {
+    fit_content_override
+  } else {
+    identical(section$height %||% 1, "auto")
+  }
   poster_card(body, header = section$header, theme = theme, fit_content = fit_content,
              show_plot_area = show_plot_area)
 }
