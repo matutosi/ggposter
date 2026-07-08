@@ -4,7 +4,7 @@ poster:
 
 theme:
   accent: "#2E7D32"
-  base_size: 24
+  base_size: 18
 
 title:
   title: "How to Make an Academic Poster"
@@ -13,9 +13,9 @@ title:
 
 layout:
   align_rows: true
-  left:   [howto_bullets, howto_figure, howto_figure_notes, howto_table_notes, howto_photo]
-  center: [yml_bullets, yml_figure, yml_figure_notes, yml_table_notes, yml_photo]
-  right:  [code_bullets, code_figure, code_figure_notes, code_table_notes, code_photo]
+  left:   [howto_bullets, howto_figure, howto_figure_notes, howto_table_notes, howto_photo, howto_title, howto_layout]
+  center: [yml_bullets, yml_figure, yml_figure_notes, yml_table_notes, yml_photo, yml_title, yml_layout]
+  right:  [code_bullets, code_figure, code_figure_notes, code_table_notes, code_photo, code_title, code_layout]
 
 sections:
   howto_bullets:
@@ -34,7 +34,7 @@ sections:
     body:
       type: figure
       object: howto_fig
-      height: 130
+      height: 55
 
   howto_figure_notes:
     header: "Figure + bullets (below)"
@@ -67,6 +67,26 @@ sections:
       labels: ["Photo 1", "Photo 2", "Photo 3"]
       width: 200
 
+  howto_title:
+    header: "The title band"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "- `title` is written once, not per column."
+        - "- `title`, `authors`, `funding` stack top to bottom."
+        - "- It spans the full poster width, above every column."
+
+  howto_layout:
+    header: "The layout"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "- `layout` assigns section names to columns."
+        - "- Column names are free-form -- not just left/right."
+        - "- `align_rows: true` lines up each row to the tallest card at that row."
+
   yml_bullets:
     header: "YAML: bullet list"
     height: "auto"
@@ -95,7 +115,7 @@ sections:
         - "  body:"
         - "    type: figure"
         - "    object: howto_fig"
-        - "    height: 130"
+        - "    height: 95"
 
   yml_figure_notes:
     header: "YAML: figure + bullets"
@@ -152,6 +172,29 @@ sections:
         - "      \\- \"Photo 3\""
         - "    width: 200"
 
+  yml_title:
+    header: "YAML: title"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "title:"
+        - "  title: \"How to Make an Academic Poster\""
+        - "  authors: \"*A guide to the ggposter card types\""
+        - "  funding: \"...\""
+
+  yml_layout:
+    header: "YAML: layout"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "layout:"
+        - "  align_rows: true"
+        - "  left: howto_bullets, ..."
+        - "  center: yml_bullets, ..."
+        - "  right: code_bullets, ..."
+
   code_bullets:
     header: "Code: bullet list"
     height: "auto"
@@ -181,7 +224,7 @@ sections:
         - "  body = list("
         - "    type = \"figure\","
         - "    object = \"howto_fig\","
-        - "    height = 130"
+        - "    height = 95"
         - "  )"
         - ")"
 
@@ -238,4 +281,29 @@ sections:
         - "    labels = c(\"Photo 1\", \"Photo 2\", \"Photo 3\"),"
         - "    width = 200"
         - "  )"
+        - ")"
+
+  code_title:
+    header: "Code: title"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "title = list("
+        - "  title = \"How to Make an Academic Poster\","
+        - "  authors = \"*A guide to the ggposter card types\","
+        - "  funding = \"...\""
+        - ")"
+
+  code_layout:
+    header: "Code: layout"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "layout = list("
+        - "  align_rows = TRUE,"
+        - "  left   = c(\"howto_bullets\", ...),"
+        - "  center = c(\"yml_bullets\", ...),"
+        - "  right  = c(\"code_bullets\", ...)"
         - ")"
