@@ -279,14 +279,37 @@ howto_spec <- list(
   ),
   layout = list(
     align_rows = TRUE,
-    left   = c("howto_bullets", "howto_figure", "howto_figure_notes",
-               "howto_table_notes", "howto_photo", "howto_title", "howto_layout"),
-    center = c("yml_bullets", "yml_figure", "yml_figure_notes",
-               "yml_table_notes", "yml_photo", "yml_title", "yml_layout"),
-    right  = c("code_bullets", "code_figure", "code_figure_notes",
-               "code_table_notes", "code_photo", "code_title", "code_layout")
+    left   = c(
+               "howto_title", "howto_layout",
+               "howto_bullets", "howto_table_notes", 
+               "howto_figure", "howto_figure_notes",
+               "howto_photo"),
+    center = c(
+               "yml_title", "yml_layout",
+               "yml_bullets", "yml_table_notes",
+               "yml_figure", "yml_figure_notes", 
+               "yml_photo"),
+    right  = c(
+               "code_title", "code_layout",
+               "code_bullets", "code_table_notes",
+               "code_figure", "code_figure_notes",
+               "code_photo")
   ),
   sections = list(
+    howto_title = list(header = "The title band", height = "auto", body = list(
+      type = "text", md = c(
+        "- `title` is written once, not per column.",
+        "- `title`, `authors`, `funding` stack top to bottom.",
+        "- It spans the full poster width, above every column."
+      )
+    )),
+    howto_layout = list(header = "The layout", height = "auto", body = list(
+      type = "text", md = c(
+        "- `layout` assigns section names to columns.",
+        "- Column names are free-form -- not just left/right.",
+        "- `align_rows: true` lines up each row to the tallest card at that row."
+      )
+    )),
     howto_bullets = list(header = "Bullet list only", height = "auto", body = list(
       type = "text", md = c(
         "- Bullet points summarize key facts.",
@@ -295,10 +318,10 @@ howto_spec <- list(
       )
     )),
     howto_figure = list(header = "Figure only", height = "auto", body = list(
-      type = "figure", object = "howto_fig", height = 55
+      type = "figure", object = "howto_fig", height = 100
     )),
     howto_figure_notes = list(header = "Figure + bullets (below)", height = "auto", body = list(
-      type = "figure", object = "howto_fig_notes", height = 90,
+      type = "figure", object = "howto_fig_notes", height = 110,
       caption = paste(
         "- A figure's caption= adds bullets below it.",
         "- Great for calling out key takeaways.",
@@ -316,21 +339,24 @@ howto_spec <- list(
       type = "image", files = c("small.JPG", "tall.jpg", "wide.jpg"),
       labels = c("Photo 1", "Photo 2", "Photo 3"), width = 200
     )),
-    howto_title = list(header = "The title band", height = "auto", body = list(
-      type = "text", md = c(
-        "- `title` is written once, not per column.",
-        "- `title`, `authors`, `funding` stack top to bottom.",
-        "- It spans the full poster width, above every column."
-      )
-    )),
-    howto_layout = list(header = "The layout", height = "auto", body = list(
-      type = "text", md = c(
-        "- `layout` assigns section names to columns.",
-        "- Column names are free-form -- not just left/right.",
-        "- `align_rows: true` lines up each row to the tallest card at that row."
-      )
-    )),
 
+    yml_title = list(header = "YAML: title", height = "auto", body = list(
+      type = "text", md = c(
+        "title:",
+        "  title: \"How to Make an Academic Poster\"",
+        "  authors: \"*A guide to the ggposter card types\"",
+        "  funding: \"...\""
+      )
+    )),
+    yml_layout = list(header = "YAML: layout", height = "auto", body = list(
+      type = "text", md = c(
+        "layout:",
+        "  align_rows: true",
+        "  left: howto_bullets, ...",
+        "  center: yml_bullets, ...",
+        "  right: code_bullets, ..."
+      )
+    )),
     yml_bullets = list(header = "YAML: bullet list", height = "auto", body = list(
       type = "text", md = c(
         "howto_bullets:",
@@ -352,7 +378,7 @@ howto_spec <- list(
         "  body:",
         "    type: figure",
         "    object: howto_fig",
-        "    height: 55"
+        "    height: 80"
       )
     )),
     yml_figure_notes = list(header = "YAML: figure + bullets", height = "auto", body = list(
@@ -363,7 +389,7 @@ howto_spec <- list(
         "  body:",
         "    type: figure",
         "    object: howto_fig_notes",
-        "    height: 90",
+        "    height: 110",
         "    caption: |-",
         "      \\- A figure's caption= adds bullets below it.",
         "      \\- Great for calling out key takeaways."
@@ -401,24 +427,26 @@ howto_spec <- list(
         "    width: 200"
       )
     )),
-    yml_title = list(header = "YAML: title", height = "auto", body = list(
-      type = "text", md = c(
-        "title:",
-        "  title: \"How to Make an Academic Poster\"",
-        "  authors: \"*A guide to the ggposter card types\"",
-        "  funding: \"...\""
-      )
-    )),
-    yml_layout = list(header = "YAML: layout", height = "auto", body = list(
-      type = "text", md = c(
-        "layout:",
-        "  align_rows: true",
-        "  left: howto_bullets, ...",
-        "  center: yml_bullets, ...",
-        "  right: code_bullets, ..."
-      )
-    )),
 
+    code_title = list(header = "Code: title", height = "auto", body = list(
+      type = "text", md = c(
+        "title = list(",
+        "  title = \"How to Make an Academic Poster\",",
+        "  authors = \"*A guide to the ggposter card types\",",
+        "  funding = \"...\"",
+        ")"
+      )
+    )),
+    code_layout = list(header = "Code: layout", height = "auto", body = list(
+      type = "text", md = c(
+        "layout = list(",
+        "  align_rows = TRUE,",
+        "  left   = c(\"howto_bullets\", ...),",
+        "  center = c(\"yml_bullets\", ...),",
+        "  right  = c(\"code_bullets\", ...)",
+        ")"
+      )
+    )),
     code_bullets = list(header = "Code: bullet list", height = "auto", body = list(
       type = "text", md = c(
         "list(",
@@ -441,7 +469,7 @@ howto_spec <- list(
         "  body = list(",
         "    type = \"figure\",",
         "    object = \"howto_fig\",",
-        "    height = 55",
+        "    height = 80",
         "  )",
         ")"
       )
@@ -453,7 +481,7 @@ howto_spec <- list(
         "  body = list(",
         "    type = \"figure\",",
         "    object = \"howto_fig_notes\",",
-        "    height = 90,",
+        "    height = 80,",
         "    caption = paste(",
         "      \"- A figure's caption= adds bullets below it.\",",
         "      \"- Great for calling out key takeaways.\",",
@@ -489,25 +517,6 @@ howto_spec <- list(
         "    labels = c(\"Photo 1\", \"Photo 2\", \"Photo 3\"),",
         "    width = 200",
         "  )",
-        ")"
-      )
-    )),
-    code_title = list(header = "Code: title", height = "auto", body = list(
-      type = "text", md = c(
-        "title = list(",
-        "  title = \"How to Make an Academic Poster\",",
-        "  authors = \"*A guide to the ggposter card types\",",
-        "  funding = \"...\"",
-        ")"
-      )
-    )),
-    code_layout = list(header = "Code: layout", height = "auto", body = list(
-      type = "text", md = c(
-        "layout = list(",
-        "  align_rows = TRUE,",
-        "  left   = c(\"howto_bullets\", ...),",
-        "  center = c(\"yml_bullets\", ...),",
-        "  right  = c(\"code_bullets\", ...)",
         ")"
       )
     ))
