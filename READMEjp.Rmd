@@ -18,40 +18,35 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-ggposter builds an A1 (or other true-size) conference poster from ggplot2.
-A poster is declared as a title band plus columns of rounded, tab-headed
-cards -- text, tables, ggplot2 figures, or photo strips -- assembled with
+ggposter は，ggplot2 から A1判(または他の実寸)の学会用ポスターを作成するパッケージだ．
+ポスターは，タイトルバンドと，角丸でタブ見出しの付いたカード(テキスト，表，
+ggplot2の図，または写真ストリップ)の列として宣言し，
 [grid](https://stat.ethz.ch/R-manual/R-devel/library/grid/html/00Index.html)
-and [gtable](https://gtable.r-lib.org/) and rendered at true size
-with embedded fonts, including CJK (Japanese). Content and layout can be
-written as an R list or a YAML file; figures, tables, and photos are
-supplied separately as R objects.
+と[gtable](https://gtable.r-lib.org/)によって組み立てられ，
+CJK(日本語を含む)フォントを埋め込んだ実寸で描画される．内容とレイアウトは，
+Rのリストまたは YAML ファイルとして記述でき，図・表・写真は別途 R オブジェクトとして渡す．
 
-## Introduction
+## はじめに
 
 https://matutosi.github.io/ggposter/
 
-## Installation
+## インストール
 
-You can install the development version of ggposter from
-[GitHub](https://github.com/) with:
+開発版の ggposter は，[GitHub](https://github.com/) から次のようにインストールできる．
 
 ``` r
 # install.packages("remotes")
 remotes::install_github("matutosi/ggposter")
 ```
 
-## Example
+## 使用例
 
-The layout below follows a typical conference poster -- a full-width title
-band and a two-column body of rounded, tab-headed cards for
-introduction/methods/summary on the left and results/conclusions on the
-right -- filled in with the `mpg` fuel-economy dataset bundled with ggplot2.
-The title, author, and affiliation are placeholders. It also shows two
-features for keeping a card's height tied to what's actually in it, instead
-of a fixed proportion of the column: `height = "auto"` sizes a card to fit
-its own content, and `notes` puts a bullet-list description beside a table
-or figure.
+以下のレイアウトは，一般的な学会ポスター(全幅のタイトルバンドと，
+左側に紹介・方法・要約，右側に結果・結論を配置した2列構成のカード群)にならい，
+ggplot2に同梱されている `mpg` 燃費データセットで内容を埋めたものだ．
+タイトル・著者・所属はプレースホルダーである．また，カードの高さを列の固定比率ではなく，
+実際の内容に合わせる2つの機能も示している．`height = "auto"` はカードの高さを
+その内容に合わせて自動調整し，`notes` は表や図の横に箇条書きの説明を追加する．
 
 ```{r example, warning = FALSE, message = FALSE}
 library(ggposter)
@@ -196,12 +191,12 @@ p <- poster(
 )
 ```
 
-The same layout, theme, title, and section text can live in a YAML file
-instead of an inline R list, keeping the declarative content separate from
-the R code. Only the figures and tables stay in R, passed in via `objects`
-(reusing the same objects built above); image paths in the spec resolve
-relative to the YAML file's own directory. `p_yml` below is identical to
-`p` above:
+同じレイアウト・テーマ・タイトル・セクション本文は，Rのリストとして
+インラインで書く代わりに，YAMLファイルとして持たせることもできる．
+宣言的な内容と R コードを分離できる．図と表だけは R 側に残り，
+`objects` 経由で渡す(上で作成した同じオブジェクトを再利用)．
+仕様内の画像パスは，YAMLファイル自身のディレクトリからの相対パスとして解決される．
+以下の `p_yml` は，上の `p` と同一のものである．
 
 ```{r example-yml, warning = FALSE, message = FALSE}
 yml_path <- system.file("extdata", "poster_readme_example.yml", package = "ggposter")
@@ -214,26 +209,24 @@ p_yml <- poster(
 )
 ```
 
-Rendering a poster at true size makes font sizes and spacing come out
-correctly proportioned; previewing it at an arbitrary plot size (as this
-README does) does not, so we render a scaled-down preview PNG instead of
-printing `p` directly:
+ポスターを実寸で描画すると，フォントサイズや余白のバランスが正しく整うが，
+(このREADMEのように)任意のプロットサイズでプレビューするとそうはならないため，
+`p` をそのまま出力する代わりに，縮小したプレビューPNGを描画する．
 
 ```{r example_preview, warning = FALSE, fig.alt = "An example poster built from the mpg dataset, with a placeholder title and authors, showing a full-width title band and a two-column body of tab-headed cards for text, tables, figures, and photos."}
 render_poster(p, "man/figures/README-poster-preview.png", scale = 0.3, dpi = 150)
 knitr::include_graphics("man/figures/README-poster-preview.png")
 ```
 
-### Seeing each card's plot area
+### 各カードのプロット領域を確認する
 
-Passing `show_plot_area = TRUE` to `render_poster()` outlines every card's
-header tab and body -- the area its text, table, figure, or photo strip
-actually occupies -- with a dashed border, on top of the content. A
-table/figure paired with a bullet-list description gets two separate
-borders, one for each side, rather than one around the pair. It's an output
-option, so the *same* poster `p` renders both the normal version above and
-the outlined version below -- useful for checking exactly how much of a
-card each of its parts fills:
+`render_poster()` に `show_plot_area = TRUE` を渡すと，
+各カードのヘッダータブと本体(テキスト・表・図・写真ストリップが実際に占める領域)を，
+内容の上から破線の枠で囲んで表示する．表や図に箇条書きの説明が添えられている場合は，
+ペア全体を1つの枠で囲むのではなく，それぞれの側に別々の枠が付く．
+これは出力時のオプションなので，同じポスター `p` から，上の通常版と，
+下の枠付き版の両方を描画できる．各カードのどの部分がどれだけの領域を占めているかを
+確認するのに便利である．
 
 ```{r example_plot_area, warning = FALSE, fig.alt = "The same example poster, with a dashed magenta border drawn around each card's header tab and body area -- and, for tables and figures with notes, a separate border around the notes column -- to show exactly how much space each part occupies."}
 render_poster(p, "man/figures/README-poster-preview-plot-area.png",
@@ -241,25 +234,23 @@ render_poster(p, "man/figures/README-poster-preview-plot-area.png",
 knitr::include_graphics("man/figures/README-poster-preview-plot-area.png")
 ```
 
-Save it at true size, with fonts embedded:
+フォントを埋め込んで実寸で保存する:
 
 ``` r
-render_poster(p, "poster.pdf")                            # true A1 size
-render_poster(p, "preview.png", scale = 0.25, dpi = 150)   # A4-ish preview
+render_poster(p, "poster.pdf")                            # 実寸のA1サイズ
+render_poster(p, "preview.png", scale = 0.25, dpi = 150)   # A4程度のプレビュー
 ```
 
-See `vignette("ggposter")` for the full spec schema, theming, and a
-reproduction of a real conference poster.
+仕様のスキーマ全体・テーマ設定・実際の学会ポスターの再現例については，
+`vignette("ggposter")` を参照のこと．
 
-## How to make an academic poster
+## 学術ポスターの作り方
 
-The poster below is a quick tour of ggposter's card types rather than a
-real research example: the left column has one card of each kind --
-a bullet list, a figure, a figure with a `caption` below it, a table
-with `notes` beside it, a photo strip, and finally how the `title` and
-`layout` parts of the spec themselves are written -- the center column
-shows the YAML spec for the matching card on the left, and the right
-column shows the equivalent R code.
+以下のポスターは，実際の研究例ではなく，ggposterのカードタイプを一通り紹介するものだ．
+左列には各カードタイプ(箇条書き，図，図の下にキャプションを添えたもの，横に`notes`を
+添えた表，写真ストリップ，そして仕様自体の`title`部分と`layout`部分の書き方)が
+1枚ずつ並び，中央列には左列の各カードに対応するYAML仕様，右列には対応するRコードが
+表示される．
 
 ```{r howto, warning = FALSE, message = FALSE}
 howto_fig <- ggplot(mpg, aes(displ, hwy)) +
@@ -285,13 +276,13 @@ howto_spec <- list(
     align_rows = TRUE,
     left   = c(
                "howto_title", "howto_layout",
-               "howto_bullets", "howto_table_notes", 
+               "howto_bullets", "howto_table_notes",
                "howto_figure", "howto_figure_notes",
                "howto_photo"),
     center = c(
                "yml_title", "yml_layout",
                "yml_bullets", "yml_table_notes",
-               "yml_figure", "yml_figure_notes", 
+               "yml_figure", "yml_figure_notes",
                "yml_photo"),
     right  = c(
                "code_title", "code_layout",
@@ -536,9 +527,10 @@ p_howto <- poster(
 )
 ```
 
-The same layout, theme, title, and section text can live in a YAML file
-instead of an inline R list; only the figures and tables stay in R, passed
-in via `objects`. `p_howto_yml` below is identical to `p_howto` above:
+同じレイアウト・テーマ・タイトル・セクション本文は，Rのリストとして
+インラインで書く代わりに，YAMLファイルとして持たせることもできる．
+図と表だけは R 側に残り，`objects` 経由で渡す．
+以下の `p_howto_yml` は，上の `p_howto` と同一のものである．
 
 ```{r howto-yml, warning = FALSE, message = FALSE}
 howto_yml_path <- system.file("extdata", "poster_sample_howto.yml", package = "ggposter")
