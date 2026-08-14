@@ -2,7 +2,7 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
   release:
     types: [published]
@@ -42,10 +42,9 @@ jobs:
           path: docs
 
   deploy:
-    # Only deploy from main (or a release/manual run): pushes to develop and
-    # pull requests just verify the site still builds, without publishing
-    # WIP content to the live GitHub Pages site.
-    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    # Pull requests just verify the site still builds; everything else
+    # (a push to main, a release, a manual run) publishes it.
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     permissions:

@@ -7,6 +7,14 @@ R言語で学術ポスター(PDF、CJKフォント埋め込み対応)を作成�
 
 _最終更新: 2026-08-15_
 
+### ブランチ運用
+
+**main 一本で作業する。develop は廃止した。**
+一人開発で develop と main が並行して進んだことがなく、マージは常に fast-forward で
+実質2本目の意味がなかったため。pkgdown サイトは main への push で毎回デプロイされる
+(`.github/workflows/pkgdown.yaml`。PR ではビルド検証のみ)。
+公開したくない変更はブランチではなくローカルに置いておく。
+
 ### 現在の状態
 
 README(英語・日本語)と `R/` の API、および同梱 YAML (`inst/extdata/`) の整合を確認・修正し、
@@ -48,4 +56,4 @@ README.md と READMEjp.md を `rmarkdown::render()` で再生成した。
 
 ### 次にやること候補
 
-- develop を main にマージする。
+- 特になし。
