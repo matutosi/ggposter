@@ -255,11 +255,11 @@ reproduction of a real conference poster.
 
 The poster below is a quick tour of ggposter's card types rather than a
 real research example: the left column has one card of each kind --
-a bullet list, a figure, a figure with a `caption` below it, a table
-with `notes` beside it, a photo strip, and finally how the `title` and
-`layout` parts of the spec themselves are written -- the center column
-shows the YAML spec for the matching card on the left, and the right
-column shows the equivalent R code.
+first how the `title` band and the `layout` parts of the spec themselves
+are written, then a bullet list, a table with `notes` beside it, a
+figure, a figure with a `caption` below it, and a photo strip -- the
+center column shows the YAML spec for the matching card on the left, and
+the right column shows the equivalent R code.
 
 ```{r howto, warning = FALSE, message = FALSE}
 howto_fig <- ggplot(mpg, aes(displ, hwy)) +
@@ -382,7 +382,7 @@ howto_spec <- list(
         "  body:",
         "    type: figure",
         "    object: howto_fig",
-        "    height: 80"
+        "    height: 100"
       )
     )),
     yml_figure_notes = list(header = "YAML: figure + bullets", height = "auto", body = list(
@@ -473,7 +473,7 @@ howto_spec <- list(
         "  body = list(",
         "    type = \"figure\",",
         "    object = \"howto_fig\",",
-        "    height = 80",
+        "    height = 100",
         "  )",
         ")"
       )
@@ -485,7 +485,7 @@ howto_spec <- list(
         "  body = list(",
         "    type = \"figure\",",
         "    object = \"howto_fig_notes\",",
-        "    height = 80,",
+        "    height = 110,",
         "    caption = paste(",
         "      \"- A figure's caption= adds bullets below it.\",",
         "      \"- Great for calling out key takeaways.\",",

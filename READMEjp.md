@@ -1,38 +1,30 @@
----
-output: github_document
----
 
 <!-- READMEjp.md is generated from READMEjp.Rmd. Please edit that file -->
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
 
 # ggposter
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
-ggposter は，ggplot2 から A1判(または他の実寸)の学会用ポスターを作成するパッケージだ．
+ggposter は，ggplot2 から
+A1判(または他の実寸)の学会用ポスターを作成するパッケージだ．
 ポスターは，タイトルバンドと，角丸でタブ見出しの付いたカード(テキスト，表，
 ggplot2の図，または写真ストリップ)の列として宣言し，
 [grid](https://stat.ethz.ch/R-manual/R-devel/library/grid/html/00Index.html)
 と[gtable](https://gtable.r-lib.org/)によって組み立てられ，
 CJK(日本語を含む)フォントを埋め込んだ実寸で描画される．内容とレイアウトは，
-Rのリストまたは YAML ファイルとして記述でき，図・表・写真は別途 R オブジェクトとして渡す．
+Rのリストまたは YAML ファイルとして記述でき，図・表・写真は別途 R
+オブジェクトとして渡す．
 
 ## はじめに
 
-https://matutosi.github.io/ggposter/
+<https://matutosi.github.io/ggposter/>
 
 ## インストール
 
-開発版の ggposter は，[GitHub](https://github.com/) から次のようにインストールできる．
+開発版の ggposter は，[GitHub](https://github.com/)
+から次のようにインストールできる．
 
 ``` r
 # install.packages("remotes")
@@ -45,10 +37,11 @@ remotes::install_github("matutosi/ggposter")
 左側に紹介・方法・要約，右側に結果・結論を配置した2列構成のカード群)にならい，
 ggplot2に同梱されている `mpg` 燃費データセットで内容を埋めたものだ．
 タイトル・著者・所属はプレースホルダーである．また，カードの高さを列の固定比率ではなく，
-実際の内容に合わせる2つの機能も示している．`height = "auto"` はカードの高さを
-その内容に合わせて自動調整し，`notes` は表や図の横に箇条書きの説明を追加する．
+実際の内容に合わせる2つの機能も示している．`height = "auto"`
+はカードの高さを その内容に合わせて自動調整し，`notes`
+は表や図の横に箇条書きの説明を追加する．
 
-```{r example, warning = FALSE, message = FALSE}
+``` r
 library(ggposter)
 library(ggplot2)
 
@@ -193,12 +186,12 @@ p <- poster(
 
 同じレイアウト・テーマ・タイトル・セクション本文は，Rのリストとして
 インラインで書く代わりに，YAMLファイルとして持たせることもできる．
-宣言的な内容と R コードを分離できる．図と表だけは R 側に残り，
-`objects` 経由で渡す(上で作成した同じオブジェクトを再利用)．
+宣言的な内容と R コードを分離できる．図と表だけは R 側に残り， `objects`
+経由で渡す(上で作成した同じオブジェクトを再利用)．
 仕様内の画像パスは，YAMLファイル自身のディレクトリからの相対パスとして解決される．
 以下の `p_yml` は，上の `p` と同一のものである．
 
-```{r example-yml, warning = FALSE, message = FALSE}
+``` r
 yml_path <- system.file("extdata", "poster_readme_example.yml", package = "ggposter")
 
 p_yml <- poster(
@@ -213,10 +206,12 @@ p_yml <- poster(
 (このREADMEのように)任意のプロットサイズでプレビューするとそうはならないため，
 `p` をそのまま出力する代わりに，縮小したプレビューPNGを描画する．
 
-```{r example_preview, warning = FALSE, fig.alt = "An example poster built from the mpg dataset, with a placeholder title and authors, showing a full-width title band and a two-column body of tab-headed cards for text, tables, figures, and photos."}
+``` r
 render_poster(p, "man/figures/README-poster-preview.png", scale = 0.3, dpi = 150)
 knitr::include_graphics("man/figures/README-poster-preview.png")
 ```
+
+<img src="man/figures/README-poster-preview.png" alt="An example poster built from the mpg dataset, with a placeholder title and authors, showing a full-width title band and a two-column body of tab-headed cards for text, tables, figures, and photos." width="100%" />
 
 ### 各カードのプロット領域を確認する
 
@@ -228,11 +223,13 @@ knitr::include_graphics("man/figures/README-poster-preview.png")
 下の枠付き版の両方を描画できる．各カードのどの部分がどれだけの領域を占めているかを
 確認するのに便利である．
 
-```{r example_plot_area, warning = FALSE, fig.alt = "The same example poster, with a dashed magenta border drawn around each card's header tab and body area -- and, for tables and figures with notes, a separate border around the notes column -- to show exactly how much space each part occupies."}
+``` r
 render_poster(p, "man/figures/README-poster-preview-plot-area.png",
               scale = 0.3, dpi = 150, show_plot_area = TRUE)
 knitr::include_graphics("man/figures/README-poster-preview-plot-area.png")
 ```
+
+<img src="man/figures/README-poster-preview-plot-area.png" alt="The same example poster, with a dashed magenta border drawn around each card's header tab and body area -- and, for tables and figures with notes, a separate border around the notes column -- to show exactly how much space each part occupies." width="100%" />
 
 フォントを埋め込んで実寸で保存する:
 
@@ -252,7 +249,7 @@ render_poster(p, "preview.png", scale = 0.25, dpi = 150)   # A4程度のプレ�
 写真ストリップ)が1枚ずつ並び，中央列には左列の各カードに対応するYAML仕様，
 右列には対応するRコードが表示される．
 
-```{r howto, warning = FALSE, message = FALSE}
+``` r
 howto_fig <- ggplot(mpg, aes(displ, hwy)) +
   geom_point(colour = "#2E7D32") +
   theme_bw()
@@ -529,10 +526,10 @@ p_howto <- poster(
 
 同じレイアウト・テーマ・タイトル・セクション本文は，Rのリストとして
 インラインで書く代わりに，YAMLファイルとして持たせることもできる．
-図と表だけは R 側に残り，`objects` 経由で渡す．
-以下の `p_howto_yml` は，上の `p_howto` と同一のものである．
+図と表だけは R 側に残り，`objects` 経由で渡す． 以下の `p_howto_yml`
+は，上の `p_howto` と同一のものである．
 
-```{r howto-yml, warning = FALSE, message = FALSE}
+``` r
 howto_yml_path <- system.file("extdata", "poster_sample_howto.yml", package = "ggposter")
 
 p_howto_yml <- poster(
@@ -542,7 +539,9 @@ p_howto_yml <- poster(
 )
 ```
 
-```{r howto_preview, warning = FALSE, fig.alt = "A tutorial poster titled 'How to Make an Academic Poster', with a left column showing one example of each ggposter card type (bullet list, figure, figure with bullets below, table with bullets to the right, a photo strip, and explanations of the title band and layout config), a center column showing the YAML spec for each matching card, and a right column showing the R code that built each matching card."}
+``` r
 render_poster(p_howto, "man/figures/README-howto-poster.png", scale = 0.3, dpi = 150)
 knitr::include_graphics("man/figures/README-howto-poster.png")
 ```
+
+<img src="man/figures/README-howto-poster.png" alt="A tutorial poster titled 'How to Make an Academic Poster', with a left column showing one example of each ggposter card type (bullet list, figure, figure with bullets below, table with bullets to the right, a photo strip, and explanations of the title band and layout config), a center column showing the YAML spec for each matching card, and a right column showing the R code that built each matching card." width="100%" />

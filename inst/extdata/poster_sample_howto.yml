@@ -13,9 +13,9 @@ title:
 
 layout:
   align_rows: true
-  left:   [howto_bullets, howto_figure, howto_figure_notes, howto_table_notes, howto_photo, howto_title, howto_layout]
-  center: [yml_bullets, yml_figure, yml_figure_notes, yml_table_notes, yml_photo, yml_title, yml_layout]
-  right:  [code_bullets, code_figure, code_figure_notes, code_table_notes, code_photo, code_title, code_layout]
+  left:   [howto_title, howto_layout, howto_bullets, howto_table_notes, howto_figure, howto_figure_notes, howto_photo]
+  center: [yml_title, yml_layout, yml_bullets, yml_table_notes, yml_figure, yml_figure_notes, yml_photo]
+  right:  [code_title, code_layout, code_bullets, code_table_notes, code_figure, code_figure_notes, code_photo]
 
 sections:
   howto_bullets:
@@ -34,7 +34,7 @@ sections:
     body:
       type: figure
       object: howto_fig
-      height: 55
+      height: 100
 
   howto_figure_notes:
     header: "Figure + bullets (below)"
@@ -42,7 +42,7 @@ sections:
     body:
       type: figure
       object: howto_fig_notes
-      height: 90
+      height: 110
       caption: |-
         - A figure's caption= adds bullets below it.
         - Great for calling out key takeaways.
@@ -115,7 +115,7 @@ sections:
         - "  body:"
         - "    type: figure"
         - "    object: howto_fig"
-        - "    height: 95"
+        - "    height: 100"
 
   yml_figure_notes:
     header: "YAML: figure + bullets"
@@ -129,7 +129,7 @@ sections:
         - "  body:"
         - "    type: figure"
         - "    object: howto_fig_notes"
-        - "    height: 90"
+        - "    height: 110"
         - "    caption: |-"
         - "      \\- A figure's caption= adds bullets below it."
         - "      \\- Great for calling out key takeaways."
@@ -224,7 +224,7 @@ sections:
         - "  body = list("
         - "    type = \"figure\","
         - "    object = \"howto_fig\","
-        - "    height = 95"
+        - "    height = 100"
         - "  )"
         - ")"
 
@@ -239,7 +239,7 @@ sections:
         - "  body = list("
         - "    type = \"figure\","
         - "    object = \"howto_fig_notes\","
-        - "    height = 90,"
+        - "    height = 110,"
         - "    caption = paste("
         - "      \"- A figure's caption= adds bullets below it.\","
         - "      \"- Great for calling out key takeaways.\","
