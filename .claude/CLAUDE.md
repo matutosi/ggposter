@@ -17,6 +17,17 @@ _最終更新: 2026-08-15_
 
 ### 現在の状態
 
+**このファイルをリポジトリ直下から `.claude/CLAUDE.md` へ移した** (2026-08-15 JST)．
+プロジェクトの指示ファイルを `.claude/` にまとめる方針にしたため
+(`comptea` も同じ日に同じ形にした)．
+
+- `.gitignore` の `.claude/` を `.claude/*` ＋ `!.claude/CLAUDE.md` に変えた．
+  ディレクトリごと除外していると，中のファイルを `!` で戻せないため．
+  `.claude/settings.local.json` は除外のまま．
+- `.Rbuildignore` の `^\.claude$` は元からあるので，`R CMD build` の対象外のまま．
+
+以下は移動前の記録．
+
 README(英語・日本語)と `R/` の API、および同梱 YAML (`inst/extdata/`) の整合を確認・修正し、
 README.md と READMEjp.md を `rmarkdown::render()` で再生成した。
 
