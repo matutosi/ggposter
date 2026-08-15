@@ -7,7 +7,8 @@
 /inst/doc
 /vignettes/ggposter-*-preview.png
 docs
-.claude/
+.claude/*
+!.claude/CLAUDE.md
 # 生成物: render_poster() の出力と github_document のプレビュー
 /poster.pdf
 *.html
