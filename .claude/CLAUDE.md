@@ -16,7 +16,7 @@ R言語で学術ポスター(PDF、CJKフォント埋め込み対応)を作成�
 
 ## 進捗状況
 
-_最終更新: 2026-08-30 06:58 (x280-home)_
+_最終更新: 2026-08-30 07:14 (x280-home)_
 
 ### ブランチ運用
 
@@ -27,6 +27,15 @@ _最終更新: 2026-08-30 06:58 (x280-home)_
 公開したくない変更はブランチではなくローカルに置いておく。
 
 ### 現在の状態
+
+- 2026-08-30 07:14 (x280-home)
+  **patchwork/cowplot を figure に渡せることを確認し，README ではなく vignette
+  (`vignettes/ggposter.Rmd` の Content types 節) と `card_figure()` の roxygen に
+  1文ずつ反映した**．cowplot もインストールして同様に動作確認済み(警告なし)．
+  README.Rmd には元々「型ごとの説明」節が無いため反映していない．
+  `devtools::document()` 実行時に roxygen2 のバージョン差 (7.3.3→8.1.0) による
+  無関係な差分 (DESCRIPTION の RoxygenNote 等) が混ざったため，それらは元に戻し，
+  `man/card_figure.Rd` の意図した差分だけ残した．テスト94件は全通過．
 
 - 2026-08-30 06:58 (x280-home)
   **cowplot/patchwork でポスターを作れるか検討した (内部エンジンとしては非採用、入力側で検証)**．
@@ -91,4 +100,10 @@ README.md と READMEjp.md を `rmarkdown::render()` で再生成した。
 
 ### 次にやること候補
 
-- 特になし。
+- **【判断待ち】非対称レイアウト(acposter の `layout: grid: {x,y,w,h}` 相当)は現状できない**．
+  ggposter のレイアウトは「N本の固定幅カラムに，各カラムを上から下へ単純に積む」だけの
+  masonry 型 (`R/poster.R` の `build_column()`)。1つのカードが複数カラムをまたぐ(列span)，
+  複数行分の高さを占めて隣のカラムと非同期になる(行span)ことはできない(2026-08-30 確認)。
+  acposter は CSS Grid で x/y/w/h の自由配置が可能。実装すれば可能(gtable自体は
+  `l`/`r`/`t`/`b` で列・行またぎができる)だが，`layout:` API の拡張が要る規模の機能追加。
+  対応するかどうかは未定。

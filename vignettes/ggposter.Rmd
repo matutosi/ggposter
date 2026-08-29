@@ -217,7 +217,12 @@ Every section has a `header` (or `NULL` for no header) and a `body` with a
   [card_table()] as a booktab-style table with an optional title/caption.
   The table's font size is shrunk automatically to fit the column.
 * `"figure"` -- a ggplot object named in `objects`, rendered via
-  [card_figure()], re-themed to the poster's base font size/family.
+  [card_figure()], re-themed to the poster's base font size/family. To show
+  several plots as one figure, combine them first with
+  [patchwork](https://patchwork.data-imaginist.com/)'s `wrap_plots()` or
+  [cowplot](https://wilkelab.org/cowplot/)'s `plot_grid()` -- both return a
+  `ggplot` object, so the combined result can be passed as a single
+  `"figure"` just like any other plot.
 * `"image"` -- one or more photo files, rendered via [card_image()] as a
   labelled row (e.g. a "dominant species" photo band).
 

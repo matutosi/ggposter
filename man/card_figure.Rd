@@ -7,7 +7,10 @@
 card_figure(gg, theme = poster_theme(), width = NULL, height = NULL)
 }
 \arguments{
-\item{gg}{A ggplot object.}
+\item{gg}{A ggplot object. To combine several plots into one figure, build
+them with patchwork's \code{wrap_plots()} or cowplot's \code{plot_grid()} first --
+both return a \code{ggplot} object that can be passed here like any other
+plot.}
 
 \item{theme}{A \code{\link[=poster_theme]{poster_theme()}} object.}
 

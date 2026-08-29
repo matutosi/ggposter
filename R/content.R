@@ -301,7 +301,10 @@ with_caption_below <- function(main, caption_md, theme, width_mm) {
 #' Applies the poster's base font size/family to a ggplot's theme, then
 #' converts it to a grob.
 #'
-#' @param gg A ggplot object.
+#' @param gg A ggplot object. To combine several plots into one figure, build
+#'   them with patchwork's `wrap_plots()` or cowplot's `plot_grid()` first --
+#'   both return a `ggplot` object that can be passed here like any other
+#'   plot.
 #' @param theme A [poster_theme()] object.
 #' @param width,height Target size as a [grid::unit] or millimetres. `NULL`
 #'   keeps the plot's natural size.
