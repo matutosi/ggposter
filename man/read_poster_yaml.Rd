@@ -14,8 +14,9 @@ A list following the \code{\link[=poster]{poster()}} spec schema.
 }
 \description{
 Parses a YAML file into the list structure expected by \code{\link[=poster]{poster()}}. Only
-does light validation (presence of \code{sections} and \code{layout}); the content
-builders raise their own errors for malformed section bodies.
+does light validation (presence of \code{sections} and either \code{layout} or
+\code{grid}); the content builders raise their own errors for malformed
+section bodies.
 }
 \examples{
 path <- system.file("extdata", "poster_sample.yml", package = "ggposter")

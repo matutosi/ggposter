@@ -44,7 +44,18 @@ See the package vignette for the full spec schema. In short:
 which section names go in which column, top to bottom. Set
 \code{align_rows: true} to line up each row position across columns to
 the tallest \code{"auto"}-height card at that position, instead of each
-column stacking at its own height.}
+column stacking at its own height. Every section must appear
+exactly once across all columns.}
+\item{\code{grid}}{An alternative to \code{layout} for irregular (CSS-Grid-like)
+arrangements where a card spans multiple columns and/or rows:
+\code{columns} (integer) and \code{boxes} (a list of \code{list(name=, x=, y=, w=, h=)}, \code{x}/\code{y} 0-based, \code{w}/\code{h} defaulting to \code{1}). Row heights follow
+the same \code{height}/\code{"auto"} rule as \code{layout}, but resolved per row
+from whichever boxes in that row don't span multiple rows; a
+spanning box never stretches the rows/columns it spans, it is
+top-left anchored at its own natural size within them. Overlapping
+or out-of-bounds boxes, and any section not placed in exactly one
+box, raise an error; content taller than the page raises a warning.
+If both \code{layout} and \code{grid} are set, \code{grid} wins (with a warning).}
 \item{\code{sections}}{Named list; each has \code{header}, optional relative
 \code{height}, and a \code{body} of \code{type} \code{"text"}, \code{"table"}, \code{"figure"}, or
 \code{"image"} plus that type's arguments.}

@@ -16,7 +16,7 @@ R言語で学術ポスター(PDF、CJKフォント埋め込み対応)を作成�
 
 ## 進捗状況
 
-_最終更新: 2026-08-30 07:14 (x280-home)_
+_最終更新: 2026-08-30 07:43 (x280-home)_
 
 ### ブランチ運用
 
@@ -27,6 +27,16 @@ _最終更新: 2026-08-30 07:14 (x280-home)_
 公開したくない変更はブランチではなくローカルに置いておく。
 
 ### 現在の状態
+
+- 2026-08-30 07:43 (x280-home)
+  **acposter の `grid: {x,y,w,h}` 相当の非対称レイアウトを実装した(`spec$grid`)**．
+  `layout:` (等幅N列の単純な縦積み) とは別の入口として追加し，後方互換は維持
+  (両方指定時は `grid` を優先しつつ `cli_warn`)．行の高さは非spanのカードの
+  `height`/`"auto"` から決め，spanするカードは自身のサイズで左上固定(隣を伸ばさない)．
+  overlap/overflow/missing はエラー，ページより高い内容は警告(acposterのページ数
+  チェック相当，ユーザ確定の 1b)．`tests/testthat/test-grid.R` に15件追加(全109件通過)，
+  `R CMD check` は 0 errors/warnings/notes．vignette に「Irregular layouts with
+  `grid:`」節と実行例を追加し，knit して確認済み。
 
 - 2026-08-30 07:14 (x280-home)
   **patchwork/cowplot を figure に渡せることを確認し，README ではなく vignette
@@ -100,10 +110,4 @@ README.md と READMEjp.md を `rmarkdown::render()` で再生成した。
 
 ### 次にやること候補
 
-- **【判断待ち】非対称レイアウト(acposter の `layout: grid: {x,y,w,h}` 相当)は現状できない**．
-  ggposter のレイアウトは「N本の固定幅カラムに，各カラムを上から下へ単純に積む」だけの
-  masonry 型 (`R/poster.R` の `build_column()`)。1つのカードが複数カラムをまたぐ(列span)，
-  複数行分の高さを占めて隣のカラムと非同期になる(行span)ことはできない(2026-08-30 確認)。
-  acposter は CSS Grid で x/y/w/h の自由配置が可能。実装すれば可能(gtable自体は
-  `l`/`r`/`t`/`b` で列・行またぎができる)だが，`layout:` API の拡張が要る規模の機能追加。
-  対応するかどうかは未定。
+- 非対称レイアウトは `spec$grid` として実装済み(上の「現在の状態」参照)。特になし。

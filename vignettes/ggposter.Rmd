@@ -226,6 +226,70 @@ Every section has a `header` (or `NULL` for no header) and a `body` with a
 * `"image"` -- one or more photo files, rendered via [card_image()] as a
   labelled row (e.g. a "dominant species" photo band).
 
+## Irregular layouts with `grid:`
+
+`layout:` places every section into one of a fixed set of equal-width
+columns, each stacked top to bottom -- a good fit for most posters, but it
+can't put a card beside another card of a *different* height, or make one
+card span several columns. `grid:` is an alternative to `layout:` for that
+case: instead of naming columns, give the total column count and place
+each section by `x`/`y` grid coordinates (0-based) and, optionally, a
+`w`/`h` span (both default to `1`):
+
+```{r grid_example}
+grid_spec <- list(
+  title = list(title = "Irregular layout with grid:", authors = "*A. Author"),
+  grid = list(
+    columns = 3,
+    boxes = list(
+      list(name = "intro", x = 0, y = 0, w = 2),  # 2 columns wide
+      list(name = "tall",  x = 2, y = 0, h = 3),  # 3 rows tall
+      list(name = "a",     x = 0, y = 1),
+      list(name = "b",     x = 1, y = 1),
+      list(name = "wide",  x = 0, y = 2, w = 2)   # 2 columns wide
+    )
+  ),
+  sections = list(
+    intro = list(header = "INTRO", height = "auto", body = list(type = "text", md = c(
+      "- `intro` spans both left columns (`w = 2`) on row 0."
+    ))),
+    tall = list(header = "TALL", height = "auto", body = list(type = "text", md = c(
+      "- `tall` spans all three rows (`h = 3`) in the right column.",
+      "- A spanning box never stretches its neighbours: `a`/`b`/`wide`",
+      "  keep whatever height their own content needs.",
+      "- If `tall`'s content is shorter than the rows it spans, it just",
+      "  leaves blank space below instead of growing them."
+    ))),
+    a = list(header = "A", height = "auto", body = list(type = "text", md = "- One of two side-by-side cards.")),
+    b = list(header = "B", height = "auto", body = list(type = "text", md = "- The other side-by-side card.")),
+    wide = list(header = "WIDE", height = "auto", body = list(type = "text", md = "- `wide` spans both left columns again, on row 2."))
+  )
+)
+
+p_grid <- poster(grid_spec, theme = theme_green(base_size = 24))
+```
+
+```{r grid_preview, fig.alt = "An irregular poster layout: a two-column-wide INTRO band and a two-column-wide WIDE band sandwich two side-by-side cards A and B on the left, while a single TALL card spans all three rows on the right."}
+render_poster(p_grid, "ggposter-grid-preview.png", scale = 0.3, dpi = 150)
+knitr::include_graphics("ggposter-grid-preview.png")
+```
+
+A few rules to keep in mind:
+
+* Every section named in `sections` must appear in exactly one box, and
+  every box must name a section -- a mismatch, an out-of-bounds box (`x +
+  w` past `columns`, or a negative `x`/`y`), or two boxes claiming the same
+  cell all raise an error naming the offending box(es).
+* A row's height comes from whichever *non-spanning* boxes (`h == 1`) sit
+  in it, using the same `height` rule as `layout:` (a number shares out
+  leftover space; `"auto"` measures the tallest box's own content). A row
+  covered only by spanning boxes falls back to an equal share of the
+  leftover space.
+* If the resolved content is taller than the page, [poster()] warns
+  (rather than erroring) so you can still inspect what overflowed.
+* If a spec sets both `layout:` and `grid:`, `grid:` wins and a warning is
+  raised -- keep only one of the two in a spec you intend to reuse.
+
 ## Theming
 
 [poster_theme()] controls the accent colour, fonts, corner radius, and

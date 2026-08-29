@@ -15,7 +15,19 @@
 #'     which section names go in which column, top to bottom. Set
 #'     `align_rows: true` to line up each row position across columns to
 #'     the tallest `"auto"`-height card at that position, instead of each
-#'     column stacking at its own height.}
+#'     column stacking at its own height. Every section must appear
+#'     exactly once across all columns.}
+#'   \item{`grid`}{An alternative to `layout` for irregular (CSS-Grid-like)
+#'     arrangements where a card spans multiple columns and/or rows:
+#'     `columns` (integer) and `boxes` (a list of `list(name=, x=, y=, w=,
+#'     h=)`, `x`/`y` 0-based, `w`/`h` defaulting to `1`). Row heights follow
+#'     the same `height`/`"auto"` rule as `layout`, but resolved per row
+#'     from whichever boxes in that row don't span multiple rows; a
+#'     spanning box never stretches the rows/columns it spans, it is
+#'     top-left anchored at its own natural size within them. Overlapping
+#'     or out-of-bounds boxes, and any section not placed in exactly one
+#'     box, raise an error; content taller than the page raises a warning.
+#'     If both `layout` and `grid` are set, `grid` wins (with a warning).}
 #'   \item{`sections`}{Named list; each has `header`, optional relative
 #'     `height`, and a `body` of `type` `"text"`, `"table"`, `"figure"`, or
 #'     `"image"` plus that type's arguments.}
@@ -111,41 +123,6 @@ build_poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL,
   }
   col_height_mm <- size_mm[["height"]] - title_h
 
-  layout <- spec$layout %||% list(left = names(spec$sections), right = character(0))
-  align_rows <- isTRUE(layout$align_rows)
-  columns <- layout[setdiff(names(layout), c("columns", "align_rows"))]
-  columns <- columns[lengths(columns) > 0]
-  col_width_mm <- size_mm[["width"]] / max(length(columns), 1)
-
-  col_grobs <- lapply(columns, function(section_names) {
-    build_column(section_names, spec$sections, theme, objects, base_dir, col_width_mm, col_height_mm,
-                 show_plot_area = show_plot_area)
-  })
-
-  # layout$align_rows = TRUE lines up each row position across columns to
-  # the tallest "auto"-height card at that position, instead of letting
-  # every column stack its cards at their own independent heights. The
-  # first build_column() pass above only *measures* each card's natural
-  # height; once the per-row target is known from that measurement, affected
-  # columns are rebuilt so the shorter cards at that row stretch to match.
-  if (align_rows && length(col_grobs) > 1) {
-    n_rows <- max(vapply(col_grobs, function(cg) length(attr(cg, "is_auto")), integer(1)))
-    target_row_mm <- vapply(seq_len(n_rows), function(i) {
-      vals <- vapply(col_grobs, function(cg) {
-        is_auto <- attr(cg, "is_auto")
-        auto_mm <- attr(cg, "auto_mm")
-        if (i <= length(is_auto) && isTRUE(is_auto[[i]])) auto_mm[[i]] else NA_real_
-      }, numeric(1))
-      vals <- vals[!is.na(vals)]
-      if (length(vals)) max(vals) else NA_real_
-    }, numeric(1))
-
-    col_grobs <- lapply(columns, function(section_names) {
-      build_column(section_names, spec$sections, theme, objects, base_dir, col_width_mm, col_height_mm,
-                   show_plot_area = show_plot_area, target_row_mm = target_row_mm)
-    })
-  }
-
   # Stitching the title and columns together via patchwork's `/` and `|`
   # operators (both of which route through `wrap_elements(full=)` for plain
   # grobs/gtables) causes some cards to be drawn a second time, as faint
@@ -154,20 +131,62 @@ build_poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL,
   # rows are already used throughout this package -- without going through
   # whatever in patchwork's "full patch" machinery causes the duplication,
   # so build the whole poster as one plain gtable instead.
-  n_cols <- max(length(columns), 1)
-  row_heights <- if (!is.null(title_grob)) {
-    grid::unit(c(title_h, col_height_mm), "mm")
+  if (!is.null(spec$grid)) {
+    if (!is.null(spec$layout)) {
+      cli::cli_warn(c(
+        "Both {.field layout} and {.field grid} are set in the spec.",
+        "i" = "{.field grid} takes precedence; {.field layout} is ignored."
+      ))
+    }
+    n_cols <- validate_grid_columns(spec$grid)
+    grid_col_width_mm <- size_mm[["width"]] / n_cols
+    body_grob <- build_grid_body(spec$grid, spec$sections, theme, objects, base_dir,
+                                 grid_col_width_mm, col_height_mm, show_plot_area = show_plot_area)
+    full <- new_full_gtable(n_cols, grid_col_width_mm, title_grob, title_h, col_height_mm)
+    body_row <- if (!is.null(title_grob)) 2 else 1
+    full <- gtable::gtable_add_grob(full, body_grob, t = body_row, l = 1, r = n_cols, name = "grid_body")
   } else {
-    grid::unit(col_height_mm, "mm")
-  }
-  full <- gtable::gtable(widths = grid::unit(rep(col_width_mm, n_cols), "mm"),
-                         heights = row_heights)
-  body_row <- if (!is.null(title_grob)) 2 else 1
-  if (!is.null(title_grob)) {
-    full <- gtable::gtable_add_grob(full, title_grob, t = 1, l = 1, r = n_cols, name = "title")
-  }
-  for (i in seq_along(col_grobs)) {
-    full <- gtable::gtable_add_grob(full, col_grobs[[i]], t = body_row, l = i, name = names(columns)[[i]] %||% paste0("col", i))
+    layout <- spec$layout %||% list(left = names(spec$sections), right = character(0))
+    align_rows <- isTRUE(layout$align_rows)
+    columns <- layout[setdiff(names(layout), c("columns", "align_rows"))]
+    columns <- columns[lengths(columns) > 0]
+    col_width_mm <- size_mm[["width"]] / max(length(columns), 1)
+
+    col_grobs <- lapply(columns, function(section_names) {
+      build_column(section_names, spec$sections, theme, objects, base_dir, col_width_mm, col_height_mm,
+                   show_plot_area = show_plot_area)
+    })
+
+    # layout$align_rows = TRUE lines up each row position across columns to
+    # the tallest "auto"-height card at that position, instead of letting
+    # every column stack its cards at their own independent heights. The
+    # first build_column() pass above only *measures* each card's natural
+    # height; once the per-row target is known from that measurement, affected
+    # columns are rebuilt so the shorter cards at that row stretch to match.
+    if (align_rows && length(col_grobs) > 1) {
+      n_rows <- max(vapply(col_grobs, function(cg) length(attr(cg, "is_auto")), integer(1)))
+      target_row_mm <- vapply(seq_len(n_rows), function(i) {
+        vals <- vapply(col_grobs, function(cg) {
+          is_auto <- attr(cg, "is_auto")
+          auto_mm <- attr(cg, "auto_mm")
+          if (i <= length(is_auto) && isTRUE(is_auto[[i]])) auto_mm[[i]] else NA_real_
+        }, numeric(1))
+        vals <- vals[!is.na(vals)]
+        if (length(vals)) max(vals) else NA_real_
+      }, numeric(1))
+
+      col_grobs <- lapply(columns, function(section_names) {
+        build_column(section_names, spec$sections, theme, objects, base_dir, col_width_mm, col_height_mm,
+                     show_plot_area = show_plot_area, target_row_mm = target_row_mm)
+      })
+    }
+
+    n_cols <- max(length(columns), 1)
+    full <- new_full_gtable(n_cols, col_width_mm, title_grob, title_h, col_height_mm)
+    body_row <- if (!is.null(title_grob)) 2 else 1
+    for (i in seq_along(col_grobs)) {
+      full <- gtable::gtable_add_grob(full, col_grobs[[i]], t = body_row, l = i, name = names(columns)[[i]] %||% paste0("col", i))
+    }
   }
 
   structure(
@@ -175,6 +194,163 @@ build_poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL,
         objects = objects, base_dir = base_dir),
     class = "ggposter"
   )
+}
+
+#' Start the poster's outer gtable (equal-width columns, optional title row)
+#' @param n_cols Number of equal-width columns.
+#' @param col_width_mm Width of one column, in millimetres.
+#' @param title_grob The title band grob, or `NULL` for no title.
+#' @param title_h Title band height in millimetres (ignored if `title_grob`
+#'   is `NULL`).
+#' @param col_height_mm Height available to the body row, in millimetres.
+#' @return A [gtable::gtable()] with the title already placed (if any); the
+#'   caller still needs to add the body content at the body row.
+#' @keywords internal
+#' @noRd
+new_full_gtable <- function(n_cols, col_width_mm, title_grob, title_h, col_height_mm) {
+  row_heights <- if (!is.null(title_grob)) {
+    grid::unit(c(title_h, col_height_mm), "mm")
+  } else {
+    grid::unit(col_height_mm, "mm")
+  }
+  full <- gtable::gtable(widths = grid::unit(rep(col_width_mm, n_cols), "mm"),
+                         heights = row_heights)
+  if (!is.null(title_grob)) {
+    full <- gtable::gtable_add_grob(full, title_grob, t = 1, l = 1, r = n_cols, name = "title")
+  }
+  full
+}
+
+#' Validate `spec$grid$columns` and return it
+#' @param grid_spec `spec$grid`.
+#' @return The number of columns, as a positive integer.
+#' @keywords internal
+#' @noRd
+validate_grid_columns <- function(grid_spec) {
+  n_cols <- grid_spec$columns
+  if (is.null(n_cols) || !is.numeric(n_cols) || length(n_cols) != 1 ||
+      n_cols < 1 || n_cols != round(n_cols)) {
+    cli::cli_abort("{.field grid$columns} must be a single positive integer.")
+  }
+  as.integer(n_cols)
+}
+
+#' Build the body of a `grid:`-laid-out poster: one gtable of boxes placed by
+#' `x`/`y`/`w`/`h`, CSS-Grid style
+#'
+#' Row heights follow the same two rules as [build_column()]'s section
+#' `height` (a number shares out leftover space; `"auto"` measures the
+#' card's own content), applied per *row* instead of per column, from
+#' whichever boxes in that row don't span multiple rows (`h == 1`). A
+#' spanning box (`w > 1` or `h > 1`) never drives row/column sizing -- it is
+#' always measured at its own natural size and pinned to the top-left of
+#' the cell union it spans (see [anchor_top_left()]), so it can leave blank
+#' space below it instead of stretching its neighbours. A row with no
+#' non-spanning box in it (fully covered by spanning boxes) falls back to
+#' an equal (weight `1`) share of the leftover space.
+#'
+#' @param grid_spec `spec$grid`: `list(columns =, boxes = list(list(name=,
+#'   x=, y=, w=, h=), ...))`. `x`/`y` are 0-based; `w`/`h` default to `1`.
+#' @param sections Named list of section specs (`spec$sections`).
+#' @param theme,objects,base_dir,show_plot_area As in [build_column()].
+#' @param col_width_mm Width of one grid column, in millimetres.
+#' @param col_height_mm Total height available to the grid body, in
+#'   millimetres.
+#' @return A [gtable::gtable()] with every box placed at its `t`/`l`/`b`/`r`
+#'   cell span.
+#' @keywords internal
+#' @noRd
+build_grid_body <- function(grid_spec, sections, theme, objects, base_dir,
+                            col_width_mm, col_height_mm, show_plot_area = FALSE) {
+  n_cols <- validate_grid_columns(grid_spec)
+  boxes <- lapply(grid_spec$boxes %||% list(), function(b) {
+    if (is.null(b$name) || is.null(b$x) || is.null(b$y)) {
+      cli::cli_abort("Every {.field grid$boxes} entry needs {.field name}, {.field x}, and {.field y}.")
+    }
+    list(name = b$name, x = as.integer(b$x), y = as.integer(b$y),
+        w = as.integer(b$w %||% 1), h = as.integer(b$h %||% 1))
+  })
+
+  box_names <- vapply(boxes, `[[`, character(1), "name")
+  undefined <- setdiff(box_names, names(sections))
+  if (length(undefined)) {
+    cli::cli_abort("{.field grid$boxes} references {cli::qty(length(undefined))} section{?s} not defined in {.field sections}: {.val {undefined}}.")
+  }
+  unplaced <- setdiff(names(sections), box_names)
+  if (length(unplaced)) {
+    cli::cli_abort("{cli::qty(length(unplaced))} Section{?s} defined in {.field sections} but not placed in {.field grid$boxes}: {.val {unplaced}}.")
+  }
+
+  overflow <- Filter(function(b) b$x < 0 || b$y < 0 || b$x + b$w > n_cols, boxes)
+  if (length(overflow)) {
+    overflow_names <- vapply(overflow, `[[`, character(1), "name")
+    cli::cli_abort("{cli::qty(length(overflow))} Box{?es} overflow the grid's {n_cols} {cli::qty(n_cols)} column{?s}: {.val {overflow_names}}.")
+  }
+
+  n_rows <- if (length(boxes)) max(vapply(boxes, function(b) b$y + b$h, integer(1))) else 0L
+  occupied <- matrix(NA_character_, nrow = n_rows, ncol = n_cols)
+  for (b in boxes) {
+    for (yy in b$y + seq_len(b$h)) {
+      for (xx in b$x + seq_len(b$w)) {
+        if (!is.na(occupied[yy, xx])) {
+          cli::cli_abort("Boxes {.val {occupied[yy, xx]}} and {.val {b$name}} overlap in the grid.")
+        }
+        occupied[yy, xx] <- b$name
+      }
+    }
+  }
+
+  boxes <- lapply(boxes, function(b) {
+    is_spanning <- b$w > 1 || b$h > 1
+    height_field <- sections[[b$name]]$height %||% 1
+    is_auto <- is_spanning || identical(height_field, "auto")
+    card <- build_section(b$name, sections[[b$name]], theme, objects, base_dir,
+                          col_width_mm * b$w, show_plot_area = show_plot_area,
+                          fit_content_override = if (is_spanning) TRUE else NULL)
+    c(b, list(card = card, is_auto = is_auto,
+             auto_mm = if (is_auto) grid::convertHeight(measure_height(card), "mm", valueOnly = TRUE) else NA_real_,
+             weight  = if (!is_auto) as.numeric(height_field) else NA_real_))
+  })
+
+  row_is_auto <- logical(n_rows)
+  row_auto_mm <- numeric(n_rows)
+  row_weight  <- numeric(n_rows)
+  for (r in seq_len(n_rows)) {
+    in_row <- Filter(function(b) b$h == 1 && b$y + 1 == r, boxes)
+    auto_in_row <- Filter(function(b) b$is_auto, in_row)
+    if (length(auto_in_row)) {
+      row_is_auto[[r]] <- TRUE
+      row_auto_mm[[r]] <- max(vapply(auto_in_row, `[[`, numeric(1), "auto_mm"))
+    } else {
+      weighted_in_row <- Filter(function(b) !b$is_auto, in_row)
+      row_weight[[r]] <- if (length(weighted_in_row)) max(vapply(weighted_in_row, `[[`, numeric(1), "weight")) else 1
+    }
+  }
+
+  sum_auto_mm <- sum(row_auto_mm[row_is_auto])
+  overflow_mm <- sum_auto_mm - col_height_mm
+  if (overflow_mm > 1e-6) {
+    cli::cli_warn("Poster grid content is {round(overflow_mm, 1)}mm taller than the page; some boxes may overlap.")
+  }
+  leftover_mm  <- max(col_height_mm - sum_auto_mm, 0)
+  weight_total <- sum(row_weight[!row_is_auto])
+  row_mm <- vapply(seq_len(n_rows), function(r) {
+    if (row_is_auto[[r]]) row_auto_mm[[r]]
+    else if (weight_total > 0) leftover_mm * row_weight[[r]] / weight_total
+    else 0
+  }, numeric(1))
+  if (weight_total == 0 && leftover_mm > 1e-6) {
+    row_mm <- c(row_mm, leftover_mm)
+  }
+
+  grid_gtable <- gtable::gtable(widths = grid::unit(rep(col_width_mm, n_cols), "mm"),
+                                heights = grid::unit(row_mm, "mm"))
+  for (b in boxes) {
+    card <- if (b$is_auto) anchor_top_left(b$card) else b$card
+    grid_gtable <- gtable::gtable_add_grob(grid_gtable, card, t = b$y + 1, l = b$x + 1,
+                                           b = b$y + b$h, r = b$x + b$w, name = b$name)
+  }
+  grid_gtable
 }
 
 #' Build one column of stacked section cards
