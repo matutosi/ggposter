@@ -8,8 +8,8 @@ theme:
 
 title:
   title: "The relationship between grassland species richness and the management in long-established golf courses in Japan"
-  authors: "*Toshikazu Matsumura (Konan Women's Univ.), Yoshinobu Hashimoto (Museum of Nature and Human activities, Hyogo), Yoshihiro Sawada (Awaji Landscape Planning & Horticulture Academy / Univ. of Hyogo)"
-  funding: "This study was supported by JSPS KAKENHI Grant Number 15K07833. We wish to thank the golf courses for field investigations."
+  authors: "*Toshikazu Matsumura (Konan Women's Univ.), Kenji Yamada (Example Museum of Nature and Culture), Aya Suzuki (Example Landscape Institute)"
+  funding: "This study was supported by a research grant. We wish to thank the golf courses for field investigations."
 
 layout:
   left:  [objectives, backgrounds, methods, course_summary, dominant_species]
