@@ -251,6 +251,45 @@ render_poster(p, "preview.png", scale = 0.25, dpi = 150)   # A4-ish preview
 See `vignette("ggposter")` for the full spec schema, theming, and a
 reproduction of a real conference poster.
 
+## A header the sibling tools can share
+
+ggposter has two siblings that build the same kind of poster by other
+routes: **acposter** (`build-poster-pdf`: Markdown -> pandoc -> headless
+Chrome) and **qtposter** (Quarto -> Typst). Those two write their metadata
+*flat*, at the top level of the header, while ggposter groups it into
+`title`/`poster`/`theme` blocks. Both forms are read here, and the names
+the three tools use for the same thing are folded into the right block, so
+one header serves all three unchanged:
+
+``` yaml
+title: "One header, three poster tools"
+author: ["*A. One", "B. Two"]     # authors, poster-authors
+institute: ["Example Univ."]      # institutes, affiliation(s)
+note: "Fictional sample."         # funding, footer
+paper: A1                         # -> poster$size
+orientation: portrait
+columns: 2                        # -> an equal-share layout
+font-size: 22                     # -> theme$base_size
+font: "Noto Sans"                 # -> theme$base_family
+type: "Academic poster"           # only acposter needs it; ignored here
+```
+
+A top-level `columns` count stands in for `layout` when neither `layout`
+nor `grid` is given: the sections flow down the leftmost column and on into
+the next, in the order written. A list of authors or institutes is joined
+into the single line the title band draws. Setting the same thing twice --
+a key and its alias, or the flat and the nested form -- keeps ggposter's
+own and warns. Nested specs are untouched, and the two forms can be mixed.
+
+A bare `size` is *not* accepted: qtposter means type size by it and a spec
+here means paper, so write `font-size` or `paper`.
+
+`inst/extdata/poster_sample_flat.yml` is a complete poster written this
+way, next to `poster_sample.yml` in the nested style. For layout, `grid:`
+is written identically in ggposter and acposter, so it carries across
+unchanged; `layout:` does not -- it names columns here and is a row-by-row
+matrix there.
+
 ## How to make an academic poster
 
 The poster below is a quick tour of ggposter's card types rather than a

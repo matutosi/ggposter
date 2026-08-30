@@ -241,6 +241,45 @@ render_poster(p, "preview.png", scale = 0.25, dpi = 150)   # A4程度のプレ�
 仕様のスキーマ全体・テーマ設定・実際の学会ポスターの再現例については，
 `vignette("ggposter")` を参照のこと．
 
+## 姉妹ツールと共通のヘッダー
+
+ggposter には，同じ種類のポスターを別の経路で作る姉妹ツールが2つある．
+**acposter** (`build-poster-pdf`．Markdown → pandoc → ヘッドレス Chrome)
+と **qtposter** (Quarto → Typst) である．
+この2つはメタデータを**平らに** (ヘッダーの top-level に) 書くのに対し，
+ggposter は `title`/`poster`/`theme` のブロックにまとめる． ggposter
+はどちらの形も読み，3つのツールが同じ意味に使っている名前を
+対応するブロックへ畳む．そのため**同じヘッダーを3つでそのまま使える**．
+
+``` yaml
+title: "One header, three poster tools"
+author: ["*A. One", "B. Two"]     # authors, poster-authors
+institute: ["Example Univ."]      # institutes, affiliation(s)
+note: "Fictional sample."         # funding, footer
+paper: A1                         # -> poster$size
+orientation: portrait
+columns: 2                        # -> 均等割りの layout になる
+font-size: 22                     # -> theme$base_size
+font: "Noto Sans"                 # -> theme$base_family
+type: "学術ポスター"               # acposter だけが要る．ここでは無視される
+```
+
+top-level の `columns` は，`layout` も `grid` も無いときに `layout`
+の代わりになる． 節を書いた順に，左の列を上から埋めて次の列へ流し込む．
+`author`・`institute` をリストで書くと，表題帯が描く1行に連結される．
+**同じものを二度書いたとき** (キーと別名，あるいは平らな形と入れ子の形)
+は， ggposter
+側を残して警告する．入れ子の書き方はそのまま動き，混ぜてもよい．
+
+**`size` は受け付けない**．qtposter では文字サイズを指すが，
+ここでは用紙を指すため．用紙は `paper`，文字は `font-size` と書く．
+
+`inst/extdata/poster_sample_flat.yml`
+が，この書き方で書いたポスター一式である (入れ子の書き方は
+`poster_sample.yml`)． 配置については，**`grid:` は ggposter と acposter
+で書式が同じ**なのでそのまま移せる． **`layout:` は移せない** —
+ここでは列の名前を並べるものだが，acposter では行ごとの行列である．
+
 ## 学術ポスターの作り方
 
 以下のポスターは，実際の研究例ではなく，ggposterのカードタイプを一通り紹介するものだ．
