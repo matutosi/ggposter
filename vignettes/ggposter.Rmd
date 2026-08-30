@@ -356,6 +356,17 @@ only:
   ggposter doesn't (`type`, `date`, `format`) are simply ignored, so a
   header can carry them along.
 
+`poster_sample_flat.yml` in `inst/extdata/` is a poster written that way,
+next to `poster_sample.yml` in the nested style:
+
+```{r flat_sample}
+flat <- read_poster_yaml(
+  system.file("extdata", "poster_sample_flat.yml", package = "ggposter")
+)
+names(flat)
+p_flat <- poster(flat)
+```
+
 ## Theming
 
 [poster_theme()] controls the accent colour, fonts, corner radius, and

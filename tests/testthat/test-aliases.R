@@ -130,3 +130,17 @@ test_that("nested specs keep working untouched", {
   )
   expect_equal(normalize_spec(nested), nested)
 })
+
+test_that("the bundled flat sample reads and builds", {
+  path <- system.file("extdata", "poster_sample_flat.yml", package = "ggposter")
+  skip_if(path == "", "flat sample not installed")
+  spec <- normalize_spec(read_poster_yaml(path))
+  expect_equal(spec$title$authors, "*A. One, B. Two")
+  expect_equal(spec$title$affiliations, "Example Univ., Example Museum")
+  expect_equal(spec$poster$size, "A1")
+  expect_equal(spec$theme$base_size, 22)
+  expect_equal(spec$layout, list(col1 = c("objectives", "methods"),
+                                 col2 = c("results", "conclusions")))
+  expect_no_warning(p <- poster(read_poster_yaml(path)))
+  expect_equal(unname(p$size_mm), c(594, 841))
+})

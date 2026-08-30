@@ -1,0 +1,58 @@
+# A flat header, written the way the sibling tools acposter
+# (build-poster-pdf) and qtposter write one: the metadata sits at the top
+# level rather than inside `title:`/`poster:`/`theme:`, the authors and
+# institutes are lists, and the layout is a plain column count. ggposter
+# folds each key into the block it belongs to, so this is the same spec as
+# the nested form -- see `poster_sample.yml` for that style.
+#
+# `type:` is what acposter uses to pick the file; ggposter ignores keys it
+# does not need, so a header can carry them along unchanged.
+
+title: "One header, three poster tools"
+author: ["*A. One", "B. Two"]
+institute: ["Example Univ.", "Example Museum"]
+note: "This sample is fictional; it does not describe real research."
+type: "学術ポスター"
+
+paper: A1
+orientation: portrait
+columns: 2
+font-size: 22
+
+sections:
+  objectives:
+    header: "OBJECTIVES"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "To show that one header can be written once and read by all three tools."
+        - "`author` and `institute` may be lists; they are joined into the title band."
+
+  methods:
+    header: "METHODS"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "`paper` sets the paper size (`poster$size` in the nested form)."
+        - "`font-size` sets the base type size (`theme$base_size`)."
+        - "`columns` stands in for `layout` when neither `layout` nor `grid` is given."
+
+  results:
+    header: "RESULTS"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "The sections flow down the first column and on into the next, in the order written."
+        - "Two columns and four sections put OBJECTIVES and METHODS on the left."
+
+  conclusions:
+    header: "CONCLUSIONS"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "Write `paper` for the paper and `font-size` for the type."
+        - "A bare `size` is not accepted: it means paper here and type size in qtposter."
