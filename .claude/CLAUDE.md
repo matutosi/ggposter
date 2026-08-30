@@ -16,7 +16,7 @@ R言語で学術ポスター(PDF、CJKフォント埋め込み対応)を作成�
 
 ## 進捗状況
 
-_最終更新: 2026-08-31 07:40 (x280-home)_
+_最終更新: 2026-08-31 08:30 (x280-home)_
 
 ### ブランチ運用
 
@@ -27,6 +27,21 @@ _最終更新: 2026-08-31 07:40 (x280-home)_
 公開したくない変更はブランチではなくローカルに置いておく。
 
 ### 現在の状態
+
+- 2026-08-31 08:30 (x280-home)
+  **統一作業の取りこぼしを塞いだ** (ユーザ指示の 2・3・7)．
+  - **README (英・日) に「姉妹ツールと共通のヘッダー」節を新設**．別名・平らなヘッダー・
+    `columns` は vignette と roxygen にしか書いていなかった．再 knit しても図は変わらず，
+    追加分だけの差分 (英 40行・日 39行) になった．
+  - **`inst/extdata/poster_sample_flat.yml` を同梱**．平らな書き方の実例が無く，
+    入れ子の `poster_sample.yml` しか無かった．vignette から参照し，回帰テストも追加．
+    既存の `poster_sample.yml` は**書き換えていない** (README との一致を purl で
+    検証している経緯があるため，別ファイルとして足した)．
+  - **`.Rbuildignore` に README の生成物を入れ，check の NOTE を消した**．
+    `README.html`・`READMEjp.Rmd`・`READMEjp.html`・`READMEjp.md` が top level の
+    非標準ファイルとして指摘されていた．**`R CMD check` は 0/0/0 になった**．
+  - テスト151件通過．**`^vignettes$` が `.Rbuildignore` にあるため check は vignette を
+    ビルドしない**ので，vignette は別途 `rmarkdown::render()` で knit を確認した．
 
 - 2026-08-31 07:40 (x280-home)
   **acposter・qtposter と「同じヘッダーをそのまま渡せる」ようにした** (ユーザの指摘)．
