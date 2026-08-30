@@ -6,6 +6,10 @@
 ^ggposter\.Rproj$
 ^tools$
 ^README\.Rmd$
+^README\.html$
+^READMEjp\.Rmd$
+^READMEjp\.html$
+^READMEjp\.md$
 ^vignettes$
 ^\.claude$
 ^poster\.pdf$
