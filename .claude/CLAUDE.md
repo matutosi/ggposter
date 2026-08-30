@@ -16,7 +16,7 @@ R言語で学術ポスター(PDF、CJKフォント埋め込み対応)を作成�
 
 ## 進捗状況
 
-_最終更新: 2026-08-31 05:47 (x280-home)_
+_最終更新: 2026-08-31 07:40 (x280-home)_
 
 ### ブランチ運用
 
@@ -27,6 +27,25 @@ _最終更新: 2026-08-31 05:47 (x280-home)_
 公開したくない変更はブランチではなくローカルに置いておく。
 
 ### 現在の状態
+
+- 2026-08-31 07:40 (x280-home)
+  **acposter・qtposter と「同じヘッダーをそのまま渡せる」ようにした** (ユーザの指摘)．
+  別名を受けるだけでは足りなかった．**最大の非対称は ggposter だけキーが入れ子**
+  (`title:`/`poster:`/`theme:` ブロックの中) で，他2つの平らなヘッダーが通らなかった．
+  - `promote_flat_keys()` を足し，**top-level に書いたキーを対応するブロックへ畳む**．
+    `title:` は文字列なら表題，リストなら従来の title ブロックとして見分ける．
+  - **`author`/`institute` をリストで書ける**ようにした (`collapse_title_row()` で
+    `", "` 連結)．`poster_title()` は1行1文字列の前提で，リストを渡すと
+    `gridtext::textbox_grob()` が落ちていた (実際に落ちて気づいた)．
+  - **top-level の `columns` (`cols`) を `layout` の代わりに使える**ようにした．
+    acposter・qtposter と同じ「左列を上から埋めて次の列へ」の流し込みで，
+    節を書いた順に均等割りする (余りは左の列が取る)．`layout`/`grid` と併記したら警告して無視．
+    `read_poster_yaml()` の検査も `columns` を認めるよう緩めた．
+  - `poster-authors`・`font` の別名も追加．`normalize_aliases()` に自己別名の番人を入れた
+    (`cjk_family = "cjk_family"` のような自己写像は値を消してしまう)．
+  - **検証**: acposter の `golf_course.md` のヘッダーをそのまま YAML にして
+    (`type:` も残したまま) 読み込み → A1・base_size 20・2列に正しく畳まれ，描画も通った．
+    テスト22件追加 (全144件通過)，`R CMD check` 0 errors/0 warnings．
 
 - 2026-08-31 05:47 (x280-home)
   **ggposter・acposter・qtposter の3系統を比較し，ヘッダーのキー名を別名で受けるようにした**．

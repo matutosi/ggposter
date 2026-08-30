@@ -329,11 +329,32 @@ only:
   interchangeable -- ggposter's names columns (`left:`/`right:`), acposter's
   is a row-by-row matrix -- so prefer `grid:` for any layout you expect to
   carry across.
-* **The header keys are aliased.** The names the three tools use for the
-  same metadata (`author`/`authors`/`poster-authors`,
-  `institute`/`institutes`/`affiliations`, `note`/`footer`/`funding`,
-  `paper`/`size`, `font-size`/`base_size`) are all accepted here and
-  rewritten to ggposter's own; see [poster()] for the full mapping.
+* **One header works in all three.** acposter and qtposter write their
+  metadata *flat*, at the top level; ggposter groups it into
+  `title`/`poster`/`theme`. Both forms are accepted here, and the names
+  the three tools use for the same thing
+  (`author`/`authors`/`poster-authors`,
+  `institute`/`institutes`/`affiliation(s)`, `note`/`footer`/`funding`,
+  `paper`, `font-size`, `font`) are folded into the right block and
+  renamed. A top-level `columns` count stands in for `layout` when neither
+  `layout` nor `grid` is given. So this is a complete spec:
+
+  ```yaml
+  title: "A poster"
+  author: ["A. One", "B. Two"]
+  institute: "Somewhere Univ."
+  note: "Funded by X"
+  paper: A1
+  columns: 2
+  font-size: 20
+  sections:
+    intro: {header: "INTRO", body: {type: text, md: ["- Hello"]}}
+    outro: {header: "OUTRO", body: {type: text, md: ["- Bye"]}}
+  ```
+
+  See [poster()] for the full mapping. Keys the other tools need and
+  ggposter doesn't (`type`, `date`, `format`) are simply ignored, so a
+  header can carry them along.
 
 ## Theming
 

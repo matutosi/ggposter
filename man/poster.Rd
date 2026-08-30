@@ -61,15 +61,41 @@ If both \code{layout} and \code{grid} are set, \code{grid} wins (with a warning)
 \code{"image"} plus that type's arguments.}
 }
 
-The key names shared with the sibling tools acposter (\code{build-poster-pdf})
-and qtposter are accepted as aliases and rewritten to ggposter's own
-keys, so the same header can be moved between the three: \code{author} ->
-\code{authors}, \code{institute}/\code{institutes}/\code{affiliation} -> \code{affiliations},
-\code{note}/\code{footer} -> \code{funding} (all in \code{title}); \code{paper} -> \code{size} (in
-\code{poster}); \code{font-size}/\code{font-family}/\code{cjk-family} ->
-\code{base_size}/\code{base_family}/\code{cjk_family} (in \code{theme}). Setting both a key
-and its alias keeps the ggposter one and warns. A bare \code{size} is \emph{not}
-accepted for type size: in a spec it already means the paper size.
+A spec may also be written the way the sibling tools acposter
+(\code{build-poster-pdf}) and qtposter write a header -- \strong{flat}, with the
+metadata at the top level rather than inside \code{title}/\code{poster}/\code{theme}
+-- so that one header serves all three unchanged:
+
+\if{html}{\out{<div class="sourceCode yaml">}}\preformatted{title: "A poster"
+author: ["A. One", "B. Two"]     # authors, poster-authors
+institute: "Somewhere Univ."     # institutes, affiliation(s)
+note: "Funded by X"              # funding, footer
+paper: A1                        # -> poster$size
+orientation: portrait
+columns: 2                       # -> an equal-share layout
+font-size: 20                    # -> theme$base_size
+font: "Noto Sans"                # -> theme$base_family
+}\if{html}{\out{</div>}}
+
+Each key is folded into the block it belongs to and renamed to
+ggposter's own: \code{author}/\code{authors}/\code{poster-authors} -> \code{title$authors},
+\code{institute}/\code{institutes}/\code{affiliation(s)} -> \code{title$affiliations},
+\code{note}/\code{funding}/\code{footer} -> \code{title$funding}, \code{paper} -> \code{poster$size},
+\code{font-size}/\code{font}/\code{cjk-family} ->
+\code{theme$base_size}/\code{base_family}/\code{cjk_family}. A list of authors or
+affiliations (as the other two tools write them) is joined into the one
+line \code{\link[=poster_title]{poster_title()}} draws. Setting the same thing twice -- a key and
+its alias, or the flat and the nested form -- keeps ggposter's own and
+warns. Nested specs are untouched, and the two forms can be mixed.
+
+A bare \code{size} is \emph{not} accepted: qtposter means type size by it and a
+spec here means paper, so write \code{font-size} or \code{paper}.
+
+A top-level \code{columns} count (as \code{cols} too) stands in for \code{layout} when
+neither \code{layout} nor \code{grid} is given: the sections flow down the
+leftmost column and on into the next, in spec order, split as evenly as
+they divide. Given alongside \code{layout}/\code{grid} it is ignored, with a
+warning.
 }
 \examples{
 spec <- list(

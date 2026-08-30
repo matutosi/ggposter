@@ -33,15 +33,42 @@
 #'     `"image"` plus that type's arguments.}
 #' }
 #'
-#' The key names shared with the sibling tools acposter (`build-poster-pdf`)
-#' and qtposter are accepted as aliases and rewritten to ggposter's own
-#' keys, so the same header can be moved between the three: `author` ->
-#' `authors`, `institute`/`institutes`/`affiliation` -> `affiliations`,
-#' `note`/`footer` -> `funding` (all in `title`); `paper` -> `size` (in
-#' `poster`); `font-size`/`font-family`/`cjk-family` ->
-#' `base_size`/`base_family`/`cjk_family` (in `theme`). Setting both a key
-#' and its alias keeps the ggposter one and warns. A bare `size` is *not*
-#' accepted for type size: in a spec it already means the paper size.
+#' A spec may also be written the way the sibling tools acposter
+#' (`build-poster-pdf`) and qtposter write a header -- **flat**, with the
+#' metadata at the top level rather than inside `title`/`poster`/`theme`
+#' -- so that one header serves all three unchanged:
+#'
+#' ```yaml
+#' title: "A poster"
+#' author: ["A. One", "B. Two"]     # authors, poster-authors
+#' institute: "Somewhere Univ."     # institutes, affiliation(s)
+#' note: "Funded by X"              # funding, footer
+#' paper: A1                        # -> poster$size
+#' orientation: portrait
+#' columns: 2                       # -> an equal-share layout
+#' font-size: 20                    # -> theme$base_size
+#' font: "Noto Sans"                # -> theme$base_family
+#' ```
+#'
+#' Each key is folded into the block it belongs to and renamed to
+#' ggposter's own: `author`/`authors`/`poster-authors` -> `title$authors`,
+#' `institute`/`institutes`/`affiliation(s)` -> `title$affiliations`,
+#' `note`/`funding`/`footer` -> `title$funding`, `paper` -> `poster$size`,
+#' `font-size`/`font`/`cjk-family` ->
+#' `theme$base_size`/`base_family`/`cjk_family`. A list of authors or
+#' affiliations (as the other two tools write them) is joined into the one
+#' line [poster_title()] draws. Setting the same thing twice -- a key and
+#' its alias, or the flat and the nested form -- keeps ggposter's own and
+#' warns. Nested specs are untouched, and the two forms can be mixed.
+#'
+#' A bare `size` is *not* accepted: qtposter means type size by it and a
+#' spec here means paper, so write `font-size` or `paper`.
+#'
+#' A top-level `columns` count (as `cols` too) stands in for `layout` when
+#' neither `layout` nor `grid` is given: the sections flow down the
+#' leftmost column and on into the next, in spec order, split as evenly as
+#' they divide. Given alongside `layout`/`grid` it is ignored, with a
+#' warning.
 #'
 #' @param spec An R list following the schema above, or a path to a YAML file.
 #' @param objects Named list of R objects (ggplots, data.frames, grobs)
