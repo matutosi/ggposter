@@ -16,7 +16,7 @@ R言語で学術ポスター(PDF、CJKフォント埋め込み対応)を作成�
 
 ## 進捗状況
 
-_最終更新: 2026-08-30 13:41 (x280-home)_
+_最終更新: 2026-08-31 05:47 (x280-home)_
 
 ### ブランチ運用
 
@@ -27,6 +27,20 @@ _最終更新: 2026-08-30 13:41 (x280-home)_
 公開したくない変更はブランチではなくローカルに置いておく。
 
 ### 現在の状態
+
+- 2026-08-31 05:47 (x280-home)
+  **ggposter・acposter・qtposter の3系統を比較し，ヘッダーのキー名を別名で受けるようにした**．
+  比較資料は `todo/.claude/notes/poster_tools.md` (横断の知見なので todo 側に置いた)．
+  根の違い (構造化データ vs 散文) は統一できないが，`grid:` は ggposter と acposter で
+  すでに完全に同一なので，**`grid:` を「移し替えるときの共通形」と位置づけた**
+  (`layout:` は同名で別構造のまま触らない．ユーザ確定の c 案)．
+  `R/aliases.R` を新設し，`author`→`authors`・`institute`/`institutes`/`affiliation`→
+  `affiliations`・`note`/`footer`→`funding`・`paper`→`size`・`font-size`→`base_size` 等を
+  `build_poster()` の入口で書き換える．**`size` は用紙 (ggposter) と文字サイズ (qtposter) の
+  両方の意味で使われているため，どちらの別名にもしない**のが要点．
+  キーと別名を両方書いたら ggposter 側を残して警告．テスト12件追加 (全122件通過)，
+  `R CMD check` は 0 errors/0 warnings (NOTE 1件は `README.html` 等の既存の指摘で無関係)．
+  vignette に「Moving a poster between the sibling tools」節を追加．
 
 - 2026-08-30 13:41 (x280-home)
   **`grid:` (行またぎ `h>1` の箱) が長文だとほぼ描画されない実バグを発見・修正した**．

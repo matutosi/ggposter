@@ -33,6 +33,16 @@
 #'     `"image"` plus that type's arguments.}
 #' }
 #'
+#' The key names shared with the sibling tools acposter (`build-poster-pdf`)
+#' and qtposter are accepted as aliases and rewritten to ggposter's own
+#' keys, so the same header can be moved between the three: `author` ->
+#' `authors`, `institute`/`institutes`/`affiliation` -> `affiliations`,
+#' `note`/`footer` -> `funding` (all in `title`); `paper` -> `size` (in
+#' `poster`); `font-size`/`font-family`/`cjk-family` ->
+#' `base_size`/`base_family`/`cjk_family` (in `theme`). Setting both a key
+#' and its alias keeps the ggposter one and warns. A bare `size` is *not*
+#' accepted for type size: in a spec it already means the paper size.
+#'
 #' @param spec An R list following the schema above, or a path to a YAML file.
 #' @param objects Named list of R objects (ggplots, data.frames, grobs)
 #'   referenced from `sections[[.]]$body$object` in the spec.
@@ -106,6 +116,7 @@ build_poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL,
     spec <- read_poster_yaml(spec)
   }
   if (is.null(base_dir)) base_dir <- "."
+  spec <- normalize_spec(spec)
   if (is.null(theme)) theme <- do.call(poster_theme, spec$theme %||% list())
 
   size_mm <- poster_size(spec$poster$size %||% "A1", spec$poster$orientation %||% "portrait")

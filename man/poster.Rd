@@ -60,6 +60,16 @@ If both \code{layout} and \code{grid} are set, \code{grid} wins (with a warning)
 \code{height}, and a \code{body} of \code{type} \code{"text"}, \code{"table"}, \code{"figure"}, or
 \code{"image"} plus that type's arguments.}
 }
+
+The key names shared with the sibling tools acposter (\code{build-poster-pdf})
+and qtposter are accepted as aliases and rewritten to ggposter's own
+keys, so the same header can be moved between the three: \code{author} ->
+\code{authors}, \code{institute}/\code{institutes}/\code{affiliation} -> \code{affiliations},
+\code{note}/\code{footer} -> \code{funding} (all in \code{title}); \code{paper} -> \code{size} (in
+\code{poster}); \code{font-size}/\code{font-family}/\code{cjk-family} ->
+\code{base_size}/\code{base_family}/\code{cjk_family} (in \code{theme}). Setting both a key
+and its alias keeps the ggposter one and warns. A bare \code{size} is \emph{not}
+accepted for type size: in a spec it already means the paper size.
 }
 \examples{
 spec <- list(

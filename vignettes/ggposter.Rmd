@@ -312,6 +312,29 @@ A few rules to keep in mind:
 * If a spec sets both `layout:` and `grid:`, `grid:` wins and a warning is
   raised -- keep only one of the two in a spec you intend to reuse.
 
+## Moving a poster between the sibling tools
+
+ggposter has two siblings that build the same kind of poster by other
+routes: **acposter** (`build-poster-pdf`: Markdown -> pandoc -> headless
+Chrome) and **qtposter** (Quarto -> Typst). The body of a poster is written
+very differently in each -- ggposter takes structured `sections`, the other
+two take prose under `# ` headings -- but two things are deliberately kept
+identical, so that moving a poster between them is a rewrite of the body
+only:
+
+* **`grid:` is the shared interchange form for layout.** ggposter and
+  acposter accept exactly the same `grid:` block: `columns` plus `boxes`
+  of `name`/`x`/`y`/`w`/`h`, 0-based, `w`/`h` defaulting to `1`, with the
+  same overlap/out-of-bounds/unplaced-section errors. `layout:` is *not*
+  interchangeable -- ggposter's names columns (`left:`/`right:`), acposter's
+  is a row-by-row matrix -- so prefer `grid:` for any layout you expect to
+  carry across.
+* **The header keys are aliased.** The names the three tools use for the
+  same metadata (`author`/`authors`/`poster-authors`,
+  `institute`/`institutes`/`affiliations`, `note`/`footer`/`funding`,
+  `paper`/`size`, `font-size`/`base_size`) are all accepted here and
+  rewritten to ggposter's own; see [poster()] for the full mapping.
+
 ## Theming
 
 [poster_theme()] controls the accent colour, fonts, corner radius, and
