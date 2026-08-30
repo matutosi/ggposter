@@ -41,6 +41,25 @@ test_that("poster() places a column-spanning and row-spanning grid: box correctl
   expect_no_error(render_poster(p, out, scale = 0.1, dpi = 50))
 })
 
+test_that("grid: a row-spanning box with many lines keeps its full column width", {
+  # Regression test: build_grid_body() used to pin a row-spanning ("h > 1")
+  # box to its cell with anchor_top_left(), which sizes its viewport from
+  # measure_width()/measure_height(). A poster_card's *width* is a "null"
+  # unit (it normally just fills whatever column it's given), and
+  # gtable::gtable_width() resolves a lone "null" width, measured outside
+  # any parent layout, to some small, meaningless value -- collapsing the
+  # box to a sliver a few mm wide and clipping almost all of its content.
+  spec <- grid_spec()
+  spec$sections$tall$body$md <- paste0("- line ", 1:9)  # enough lines to
+                                                          # make the bug visible
+  p <- poster(spec)
+  body <- p$patchwork$grobs[[which(p$patchwork$layout$name == "grid_body")]]
+  tall_grob <- body$grobs[[which(body$layout$name == "tall")]]
+  w_mm <- grid::convertWidth(tall_grob$vp$width, "mm", valueOnly = TRUE)
+  # one grid column is 594/3 = 198mm; a collapsed box measured well under 100mm
+  expect_gt(w_mm, 150)
+})
+
 test_that("grid: two same-row boxes are resolved to the same row height", {
   p <- poster(grid_spec())
   body <- p$patchwork$grobs[[which(p$patchwork$layout$name == "grid_body")]]

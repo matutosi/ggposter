@@ -346,7 +346,31 @@ build_grid_body <- function(grid_spec, sections, theme, objects, base_dir,
   grid_gtable <- gtable::gtable(widths = grid::unit(rep(col_width_mm, n_cols), "mm"),
                                 heights = grid::unit(row_mm, "mm"))
   for (b in boxes) {
-    card <- if (b$is_auto) anchor_top_left(b$card) else b$card
+    # Only a *row*-spanning box's cell height can exceed its own content's
+    # (row height is set purely by the h == 1 boxes in that row, so a
+    # non-spanning box's cell, and a column-only-spanning box's cell, are
+    # already sized to match its content exactly -- same as
+    # build_column()'s cards, which don't need this either). Only h > 1
+    # needs pinning to the top-left of its cell instead of stretching.
+    #
+    # anchor_top_left() itself isn't used here: it sizes its viewport from
+    # measure_width()/measure_height(), but a poster_card's *width* is a
+    # "null" unit (it normally fills whatever column it's given) -- outside
+    # that context, gtable::gtable_width() resolves a lone "null" width to
+    # some small, meaningless value, giving the card an near-zero-width
+    # viewport that clips almost all of its content. The width this card
+    # was actually built for is already known (col_width_mm * b$w), so use
+    # that directly and only measure the height (which auto_mm already
+    # holds, in the same units).
+    card <- if (b$h > 1) {
+      vp <- grid::viewport(x = grid::unit(0, "npc"), y = grid::unit(1, "npc"),
+                           just = c("left", "top"), clip = "off",
+                           width = grid::unit(col_width_mm * b$w, "mm"),
+                           height = grid::unit(b$auto_mm, "mm"))
+      grid::grobTree(b$card, vp = vp)
+    } else {
+      b$card
+    }
     grid_gtable <- gtable::gtable_add_grob(grid_gtable, card, t = b$y + 1, l = b$x + 1,
                                            b = b$y + b$h, r = b$x + b$w, name = b$name)
   }

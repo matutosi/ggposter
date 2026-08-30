@@ -251,18 +251,40 @@ grid_spec <- list(
   ),
   sections = list(
     intro = list(header = "INTRO", height = "auto", body = list(type = "text", md = c(
-      "- `intro` spans both left columns (`w = 2`) on row 0."
+      "- `intro` spans both left columns (`w = 2`) on row 0.",
+      "- A column-spanning box is placed like any other box, just with",
+      "  `w` greater than `1`; its width is `w` times the grid column width.",
+      "- Use it for anything that reads better at full measure: an",
+      "  introduction, an abstract, or a transition between sections."
     ))),
     tall = list(header = "TALL", height = "auto", body = list(type = "text", md = c(
       "- `tall` spans all three rows (`h = 3`) in the right column.",
       "- A spanning box never stretches its neighbours: `a`/`b`/`wide`",
       "  keep whatever height their own content needs.",
       "- If `tall`'s content is shorter than the rows it spans, it just",
-      "  leaves blank space below instead of growing them."
+      "  leaves blank space below instead of growing them -- so a very",
+      "  short `tall` box won't force `a`/`b`/`wide` to spread out to fill",
+      "  the page.",
+      "- This is the natural home for the one element that needs the most",
+      "  room on the page: a large results table, an ordination plot, or",
+      "  a long species list, sitting beside several shorter cards."
     ))),
-    a = list(header = "A", height = "auto", body = list(type = "text", md = "- One of two side-by-side cards.")),
-    b = list(header = "B", height = "auto", body = list(type = "text", md = "- The other side-by-side card.")),
-    wide = list(header = "WIDE", height = "auto", body = list(type = "text", md = "- `wide` spans both left columns again, on row 2."))
+    a = list(header = "A", height = "auto", body = list(type = "text", md = c(
+      "- One of two side-by-side cards sharing row 1.",
+      "- Both are plain `x`/`y` boxes with the default `w = 1`, `h = 1`.",
+      "- Row 1's height is set by whichever of `a`/`b` needs more room."
+    ))),
+    b = list(header = "B", height = "auto", body = list(type = "text", md = c(
+      "- The other side-by-side card in row 1.",
+      "- `a` and `b` don't have to hold the same amount of text -- the",
+      "  shorter one just leaves blank space below, top-anchored."
+    ))),
+    wide = list(header = "WIDE", height = "auto", body = list(type = "text", md = c(
+      "- `wide` spans both left columns again, on row 2, closing out the",
+      "  left side of the page under `a` and `b`.",
+      "- A section can span columns on some rows and not others -- there's",
+      "  no requirement that spans line up from row to row."
+    )))
   )
 )
 
