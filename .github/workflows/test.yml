@@ -1,0 +1,97 @@
+# ggposter の CI (3系統で揃えた構成．acposter の test.yml と同じ考え方)
+#
+#   1. パッケージとして壊れていないか  … R CMD check (Ubuntu と macOS)
+#   2. 見本が実際に組めるか            … 4本を PDF にして，中身の文字列まで確かめる
+#
+# **「組めた」だけでは足りない**．PDF ができていても中身が別物ということがあるので
+# (acposter で実例)，`pdftotext` でテキストを抜き出し，見本ごとの既知の文字列が
+# 入っているかを機械的に確かめる．
+
+name: ggposter test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
+          # vignette は .Rbuildignore で外してあるので，ビルドも走らせない．
+          args: 'c("--no-manual", "--no-build-vignettes", "--no-vignettes")'
+          build_args: 'c("--no-build-vignettes")'
+
+  samples:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          needs: check
+
+      - name: Install poppler (pdftotext) and a CJK font
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y poppler-utils fonts-noto-cjk
+
+      - name: Render the four samples
+        run: |
+          Rscript -e 'pkgload::load_all(".", quiet = TRUE);
+                      source("inst/extdata/render_samples.R");
+                      render_ggposter_samples(out_dir = Sys.getenv("RUNNER_TEMP"))'
+
+      - name: Verify PDF content (not just that a file appeared)
+        run: |
+          set -e
+          check() {
+            local pdf="$1" needle="$2"
+            if ! pdftotext "$pdf" - | grep -qF "$needle"; then
+              echo "::error::$pdf に期待した文字列が無い: $needle"
+              exit 1
+            fi
+            echo "OK: $pdf に '$needle' を確認"
+          }
+          check "$RUNNER_TEMP/poster_sample_howto.pdf"  "How to Make an Academic Poster"
+          check "$RUNNER_TEMP/poster_sample_howto2.pdf" "input to output"
+          check "$RUNNER_TEMP/poster_sample_howto3.pdf" "irregular layouts"
+          check "$RUNNER_TEMP/poster_sample.pdf"        "grassland"
+
+      - name: Upload generated PDFs
+        uses: actions/upload-artifact@v4
+        with:
+          name: posters-ubuntu-latest
+          path: ${{ runner.temp }}/*.pdf

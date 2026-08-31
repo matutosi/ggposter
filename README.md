@@ -693,3 +693,8 @@ fits depends on the job. ggposter is the one that takes R objects
 directly, so it suits a poster whose figures and tables come out of an
 analysis. The three share header key names and the `grid:` notation, and
 ship the same four samples.
+
+## License
+
+**MIT** ([`LICENSE`](LICENSE)). All three tools (ggposter, acposter,
+qtposter) are MIT.
