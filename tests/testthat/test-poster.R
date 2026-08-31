@@ -108,6 +108,7 @@ test_that("render_poster() writes a PNG at the requested scale", {
 })
 
 test_that("render_poster() writes a true-size PDF", {
+  skip_if_no_cairo()
   p <- poster(simple_spec())
   out <- tempfile(fileext = ".pdf")
   render_poster(p, out)
