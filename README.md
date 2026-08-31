@@ -310,8 +310,7 @@ row-by-row matrix in acposter).
 
 ## Samples
 
-Four samples ship with the package, matching acposter’s and qtposter’s
-one for one, so the same poster can be compared across the three tools.
+Four samples ship with the package.
 
 |  | Sample | What it shows |
 |----|----|----|
@@ -325,9 +324,8 @@ source(system.file("extdata", "render_samples.R", package = "ggposter"))
 render_ggposter_samples(out_dir = ".")
 ```
 
-`inst/extdata/README.md` lists them next to the matching acposter and
-qtposter files. `poster_sample_flat.yml` (a flat header) and
-`poster_readme_example.yml` are there too.
+`poster_sample_flat.yml` (a flat header) and `poster_readme_example.yml`
+are in the same directory.
 
 ### A tour of the card types
 
@@ -687,14 +685,11 @@ row-by-row matrix there.
 
 ## Status and background
 
-ggposter is one of three tools that build the same kind of poster by
-different routes; they are alternatives, not replacements, and which one
-fits depends on the job. ggposter is the one that takes R objects
-directly, so it suits a poster whose figures and tables come out of an
-analysis. The three share header key names and the `grid:` notation, and
-ship the same four samples.
+ggposter draws the poster in R itself, so it suits a poster whose
+figures and tables come straight out of an analysis: the spec stays
+declarative while the data work stays in R. Sizes are controlled in mm,
+and the output is a true-size PDF or PNG with the fonts embedded.
 
 ## License
 
-**MIT** ([`LICENSE`](LICENSE)). All three tools (ggposter, acposter,
-qtposter) are MIT.
+**MIT** ([`LICENSE`](LICENSE)).
