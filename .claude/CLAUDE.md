@@ -36,6 +36,17 @@ _最終更新: 2026-08-31 08:30 (x280-home)_
   - ローカルの `R CMD check` は **0 errors / 0 warnings / 1 note**．
     note は「隠しファイル `.git`」で，**worktree で検査したため** (worktree では
     `.git` がファイルとして残る)．CI の checkout では出ない．
+  - **macOS の CI が3回落ちて，原因は cairo だった**．
+    `capabilities("cairo")` は **TRUE を返すのに `cairo_pdf()` が実行時に
+    "failed to load cairo DLL" で落ち**，基本の pdf デバイスに落ちていた．
+    そこで text grob ごとに「フォント名が PostScript のデータベースに無い」，
+    箇条書きの記号で `mbcsToSbcs` の警告が出て，`R CMD check` が失敗していた
+    (この action の既定は **警告も失敗扱い**)．
+    直した内容は `tests/testthat/setup.R`:
+    **実際に開いてデバイス名を見て cairo の可否を決め**，駄目なら **ragg** で測る
+    (ragg は PNG 出力で使っており，システムフォントも Unicode も扱える)．
+    `render_poster()` の PDF 出力そのものは cairo に依るので，**そのテストは skip** する．
+  - **CI は3ジョブとも成功** (check の Ubuntu・macOS，見本のビルド)．
   - ライセンスは元から MIT．README (英・日) の末尾に節を足して3系統で揃えた．
 
 - 2026-08-31 10:05 (このセッション，MATUTOSI_DP) その1
