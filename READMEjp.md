@@ -680,3 +680,8 @@ top-level の `columns` は，`layout` も `grid` も無いときに `layout`
 ggposter は **R オブジェクトをそのまま載せられる**のが持ち味で，
 解析から出てきた図や表を並べるポスターに向く． 3つはヘッダーのキー名と
 `grid:` の書式を共有し，同じ4本の見本を持つ．
+
+## ライセンス
+
+**MIT** ([`LICENSE`](LICENSE))．3系統 (ggposter・acposter・qtposter)
+とも MIT で揃えてある．

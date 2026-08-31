@@ -28,7 +28,17 @@ _最終更新: 2026-08-31 08:30 (x280-home)_
 
 ### 現在の状態
 
-- 2026-08-31 10:05 (このセッション，MATUTOSI_DP)
+- 2026-08-31 11:35 (このセッション，MATUTOSI_DP) その2
+  **CI を足し，README にライセンス節を置いた** (ユーザ指示)．
+  - `.github/workflows/test.yml`: **`R CMD check` (Ubuntu・macOS)** と，
+    **見本4本のビルド**の2ジョブ．見本は `pdftotext` で中身の文字列まで確かめ，
+    PDF を成果物として上げる (acposter・qtposter と同じ考え方)．
+  - ローカルの `R CMD check` は **0 errors / 0 warnings / 1 note**．
+    note は「隠しファイル `.git`」で，**worktree で検査したため** (worktree では
+    `.git` がファイルとして残る)．CI の checkout では出ない．
+  - ライセンスは元から MIT．README (英・日) の末尾に節を足して3系統で揃えた．
+
+- 2026-08-31 10:05 (このセッション，MATUTOSI_DP) その1
   **見本を4本に揃えた** (ユーザ指示の1)．acposter の4本を基準に，
   `inst/extdata/poster_sample_howto2.yml` (入力と出力の早見表) と
   `poster_sample_howto3.yml` (`grid:` の非対称な配置) を新設し，
