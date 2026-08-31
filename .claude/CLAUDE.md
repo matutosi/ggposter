@@ -28,6 +28,22 @@ _最終更新: 2026-08-31 08:30 (x280-home)_
 
 ### 現在の状態
 
+- 2026-08-31 10:05 (このセッション，MATUTOSI_DP)
+  **見本を4本に揃えた** (ユーザ指示の1)．acposter の4本を基準に，
+  `inst/extdata/poster_sample_howto2.yml` (入力と出力の早見表) と
+  `poster_sample_howto3.yml` (`grid:` の非対称な配置) を新設し，
+  4本まとめて組む `inst/extdata/render_samples.R` と `inst/extdata/README.md` を添えた．
+  - **`grid:` の `y` が R の yaml (YAML 1.1) で真偽値になっていた**ことが分かった
+    (キーが `"TRUE"` になり `Every grid$boxes entry needs name, x, and y.` で止まる)．
+    `x` は無事なので気づきにくく，**姉妹ツールと「同じ書式」のはずの `grid:` が
+    ここでだけ通らなかった**．`read_poster_yaml()` が読んだ直後にキー名を戻す
+    (`restore_y_key()`)．引用符付きの `'y'` でも通る．回帰テストを追加．
+  - 表・図のカードは R オブジェクトが要るので，`render_samples.R` が見本4本ぶんの
+    オブジェクト (図・表・配置の模式図) を作ってから渡す．
+  - **検証**: 4本とも PDF に組め，新しい2本は PNG に起こして目視確認．テスト全通過．
+  - **README.Rmd と vignette は触っていない** (再 knit すると 1.2MB の html まで
+    作り直しになるため)．見本の一覧は `inst/extdata/README.md` に置いた．
+
 - 2026-08-31 08:30 (x280-home)
   **統一作業の取りこぼしを塞いだ** (ユーザ指示の 2・3・7)．
   - **README (英・日) に「姉妹ツールと共通のヘッダー」節を新設**．別名・平らなヘッダー・

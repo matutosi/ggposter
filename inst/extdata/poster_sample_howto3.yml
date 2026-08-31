@@ -1,0 +1,123 @@
+# Sample 3: irregular layouts (`grid:`)
+#
+# The sibling tools ship the same sample: acposter's
+# `examples/poster_howto3.md` and qtposter's `poster_howto3.qmd`. The three
+# use the same `grid:` notation, so this page can be moved between them by
+# copying the header.
+#
+# This spec is text only -- it needs no `objects =`, so it renders on its own:
+#
+#   render_poster(poster(system.file("extdata", "poster_sample_howto3.yml",
+#                                    package = "ggposter")),
+#                 "poster_sample_howto3.pdf")
+
+title: "ggposter: irregular layouts"
+author: ["*Row spans, column spans, and the two ways to write them"]
+institute: ["ggposter"]
+note: "This page is itself an irregular layout. The grid: header below places every card by coordinate, including the tall card on the right and the wide cards at the bottom."
+
+paper: A1
+orientation: portrait
+font-size: 21
+accent: "#2E7D32"
+
+grid:
+  columns: 3
+  boxes:
+    - {name: two_notations, x: 0, y: 0, w: 2}
+    - {name: tall_card,     x: 2, y: 0, h: 3}
+    - {name: layout_matrix, x: 0, y: 1}
+    - {name: grid_coords,   x: 1, y: 1}
+    - {name: which_one,     x: 0, y: 2, w: 2}
+    - {name: checks,        x: 0, y: 3, w: 3}
+    - {name: this_page,     x: 0, y: 4, w: 3}
+
+sections:
+  two_notations:
+    header: "The two notations"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "Both `layout:` and `grid:` place cards on the page. They differ only in **how you write the same arrangement**."
+        - "- `layout:` -- **named columns**, each listing its cards from top to bottom."
+        - "- `grid:` -- an **`x`/`y`/`w`/`h` coordinate per card**, like a dashboard library."
+        - "`grid:` wins if you write both (with a warning)."
+
+  tall_card:
+    header: "A tall card"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "This card is `h: 3`, so it spans **three rows** -- it stays beside the three cards on its left instead of being cut into pieces."
+        - "A tall card is the usual home for the one thing that needs the most room: a large results table, an ordination plot, or a long species list."
+        - "A spanning card is **top-left anchored at its own natural size**: it never stretches the rows or columns it spans. Row heights come from the cards in that row that do not span."
+        - "- `h: 2` -- spans two rows"
+        - "- `h: 3` -- spans three rows (this card)"
+        - "- `w: 2` -- spans two columns (see the cards below)"
+
+  layout_matrix:
+    header: "The layout columns"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "Name each column and list its cards, top to bottom."
+        - "layout:"
+        - "  align_rows: true"
+        - "  left:  [intro, a, wide]"
+        - "  right: [tall]"
+        - "Every section must appear exactly once. `align_rows: true` lines up each row position across the columns."
+        - "**A column is a stack**, which is why this notation cannot place a card beside a card of a different height."
+
+  grid_coords:
+    header: "The grid coordinates"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "Give each card a position and a size."
+        - "grid:"
+        - "  columns: 3"
+        - "  boxes:"
+        - "    - {name: intro, x: 0, y: 0, w: 2}"
+        - "    - {name: tall,  x: 2, y: 0, h: 3}"
+        - "    - {name: a,     x: 0, y: 1}"
+        - "    - {name: b,     x: 1, y: 1}"
+        - "    - {name: wide,  x: 0, y: 2, w: 2}"
+        - "`x`/`y` count from **0** at the top left. `w`/`h` default to `1`."
+
+  which_one:
+    header: "Which one to use"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "Neither is better; they trade off against each other."
+        - "- **Reads like the page** -- `layout:` (a column is a stack you can see)."
+        - "- **Spanning card** -- `grid:` only; `layout:` cannot span rows or columns."
+        - "- **Editing one card** -- `grid:` changes that card's numbers; `layout:` may move several names."
+        - "- **Many irregular cards** -- `grid:` stays compact."
+        - "A rule of thumb: **start with `layout:`**, and switch to `grid:` when a card needs to span."
+
+  checks:
+    header: "What gets checked"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "A wrong arrangement is caught before the file is written, so a broken poster never reaches the printer quietly."
+        - "- **Overlap** -- two cards on the same cell are named in the error."
+        - "- **Overflow** -- a card whose `x + w` passes `columns` is named."
+        - "- **Missing** -- a section not placed in exactly one box (or a box naming a section that does not exist) stops the build."
+        - "- **Too tall** -- content taller than the page raises a warning; the file is still written so you can see *what* overflowed."
+
+  this_page:
+    header: "This very page"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "The header of this file uses `grid:` with `columns: 3`. The card you are reading is `w: 3` (full width), the tall card on the right is `h: 3`, and the two notation cards sit side by side in the middle row."
+        - "The same sample exists for the sibling tools: acposter's `examples/poster_howto3.md` and qtposter's `poster_howto3.qmd`. Compare with `poster_sample_howto.yml` (a tour of the card types), `poster_sample_howto2.yml` (input and output side by side), and `poster_sample.yml` (a realistic poster)."
