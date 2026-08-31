@@ -41,3 +41,21 @@ render_poster(
 **R の yaml は YAML 1.1 なので，引用符の無い `y` を真偽値として読む**が，
 `read_poster_yaml()` が読み込んだ直後に戻すので，
 `- {name: a, x: 0, y: 0}` のまま移してよい (`'y'` と書いても通る)．
+
+## 縮小画像
+
+README (英・日) に載せる縮小画像は，組んだ PDF から作る．
+
+```
+pdftoppm -r 26 -png -f 1 -l 1 -singlefile poster_sample_howto.pdf man/figures/README-sample1
+```
+
+`-r 26` は A1 のポスターが 600 px 幅ほどになる解像度で，A0 を `-r 18` で起こす
+acposter・qtposter の縮小画像とほぼ同じ大きさになる．
+置き場所が `previews/` ではなく `man/figures/` なのは，**pkgdown が参照サイトへ
+複写するのがこのディレクトリだけ**のため (ここだけ姉妹ツールと違う)．
+
+## README が使う例
+
+`poster_readme_example.yml` と対になる R のリストは `readme_example.R` にある．
+README にコードを直接置かず，ファイルへ切り出してリンクする形にした (2026-08-31)．

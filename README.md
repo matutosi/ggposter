@@ -17,6 +17,12 @@ embedded fonts, including CJK (Japanese). Content and layout can be
 written as an R list or a YAML file; figures, tables, and photos are
 supplied separately as R objects.
 
+Three tools build this kind of poster (ggposter,
+[acposter](https://github.com/matutosi/acposter), and
+[qtposter](https://github.com/matutosi/qtposter)). **They do not replace
+one another – pick the one that fits the job.** The three READMEs carry
+the same sections in the same order.
+
 ## What you can make
 
 - **A true-size poster** – A0/A1/A2 (portrait or landscape), written out
@@ -62,146 +68,17 @@ description beside a table or figure.
 
 ``` r
 library(ggposter)
-library(ggplot2)
 
-tbl_class <- aggregate(cbind(hwy, cty) ~ class, data = mpg, FUN = function(x) round(mean(x), 1))
-names(tbl_class) <- c("Class", "Mean hwy", "Mean cty")
-class_best  <- tbl_class$Class[which.max(tbl_class$`Mean hwy`)]
-class_worst <- tbl_class$Class[which.min(tbl_class$`Mean hwy`)]
-
-tbl_drv <- aggregate(cbind(hwy, cty) ~ drv, data = mpg, FUN = function(x) round(mean(x), 1))
-names(tbl_drv) <- c("Drivetrain", "Mean hwy", "Mean cty")
-drv_best  <- tbl_drv$Drivetrain[which.max(tbl_drv$`Mean hwy`)]
-drv_worst <- tbl_drv$Drivetrain[which.min(tbl_drv$`Mean hwy`)]
-
-fig_facet <- ggplot(mpg, aes(displ, hwy, colour = class)) +
-  geom_point() +
-  labs(caption = paste(
-    "• Highway mileage falls as engine displacement rises.",
-    "• Compact and subcompact classes reach the highest mileage.",
-    sep = "\n")) +
-  theme_bw() +
-  theme(legend.position = "inside", legend.position.inside = c(0.85, 0.72),
-        legend.background = element_rect(fill = scales::alpha("white", 0.7), colour = NA),
-        legend.key.size = unit(0.9, "lines"),
-        plot.caption = element_text(hjust = 0, size = rel(1.3), colour = "black"))
-
-fig_scatter <- ggplot(mpg, aes(cty, hwy, colour = drv)) +
-  geom_point(alpha = 0.7) +
-  theme_bw() +
-  theme(legend.position = "inside", legend.position.inside = c(0.75, 0.32),
-        legend.background = element_rect(fill = scales::alpha("white", 0.7), colour = NA))
-
-fig_box <- ggplot(mpg, aes(drv, hwy, fill = drv)) +
-  geom_boxplot(show.legend = FALSE) +
-  labs(x = "Drivetrain", y = "Highway mpg") +
-  theme_bw()
-drv_med <- aggregate(hwy ~ drv, data = mpg, FUN = median)
-drv_box_best <- as.character(drv_med$drv[which.max(drv_med$hwy)])
-
-mpg_heat <- aggregate(hwy ~ class + drv, data = mpg, FUN = function(x) round(mean(x), 1))
-fig_heat <- ggplot(mpg_heat, aes(drv, class, fill = hwy)) +
-  geom_tile(colour = "white") +
-  geom_text(aes(label = hwy), size = 2.6) +
-  scale_fill_gradient(low = "#E8F5E9", high = "#2E7D32") +
-  labs(x = "Drivetrain", y = "Class", fill = "Mean hwy") +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-
-img_dir <- system.file("extdata", package = "ggposter")
-stock_photos <- c("small.JPG", "tall.jpg", "wide.jpg", "large.JPG")
-stock_labels <- c("Photo A", "Photo B", "Photo C", "Photo D")
-
-spec <- list(
-  title = list(
-    title = "Example Poster: Fuel Economy Patterns in the mpg Dataset",
-    authors = "*Jane Doe (Example University), John Smith (Example Institute)",
-    funding = "This is a demonstration poster for the ggposter package; it does not describe real research."
-  ),
-  layout = list(
-    left  = c("objectives", "background", "methods", "summary_table", "fig_box", "fig_heat"),
-    right = c("conclusions", "results_table", "fig_facet", "fig_scatter", "photos_2")
-  ),
-  sections = list(
-    objectives = list(header = "OBJECTIVES", height = "auto", body = list(type = "text", md = c(
-      "- Demonstrate the ggposter package.",
-      "- Use the mpg fuel-economy dataset as example content.",
-      "- Combine text, tables, figures, and photos in one poster."
-    ))),
-    background = list(header = "BACKGROUND", height = "auto", body = list(type = "text", md = c(
-      "- Conference posters often mix text, tables, and figures.",
-      "- ggposter arranges these as rounded, tab-headed cards.",
-      "- Layout and content can be declared as an R list or a YAML file."
-    ))),
-    methods = list(header = "METHODS", height = "auto", body = list(type = "text", md = c(
-      "- Data: the mpg dataset (234 vehicles, model years 1999-2008).",
-      "- Figures: highway/city mileage by class and drivetrain.",
-      "- Photos: generic stock images bundled with ggposter."
-    ))),
-    summary_table = list(header = "SUMMARY by class", height = "auto", body = list(
-      type = "table", object = "tbl_class", title = "Mean mileage by vehicle class",
-      notes = c(
-        sprintf("- **%s** has the best highway mileage of all vehicle classes in this dataset.", class_best),
-        sprintf("- **%s** has the worst, largely due to its greater size and weight.", class_worst),
-        "- Compact and subcompact classes have nearly identical mean highway mileage.",
-        "- Midsize vehicles average close to the compact/subcompact classes.",
-        "- Pickup and SUV classes have the two lowest highway mileages, both under 19 mpg.",
-        "- City mileage tracks highway mileage closely across all seven classes."
-      )
-    )),
-    fig_box = list(header = "Mileage spread by drivetrain", height = "auto", body = list(
-      type = "figure", object = "fig_box", notes_width = 0.4, height = 117,
-      notes = c(
-        "- Boxes show the full spread of highway mileage, not just the mean.",
-        sprintf("- **%s**-wheel drive has the highest median highway mileage.", drv_box_best)
-      )
-    )),
-    fig_heat = list(header = "Mean mileage: class x drivetrain", height = "auto", body = list(
-      type = "figure", object = "fig_heat", notes_width = 0.4, height = 137,
-      notes = c(
-        "- Colour shows mean highway mpg for each class/drivetrain combination.",
-        "- Blank cells are combinations that don't occur in the data."
-      )
-    )),
-    conclusions = list(header = "CONCLUSIONS", height = "auto", body = list(type = "text", md = c(
-      "- Compact and subcompact cars get the best highway mileage.",
-      "- SUVs and pickups get the lowest.",
-      "- ggposter can lay out this kind of summary automatically."
-    ))),
-    results_table = list(header = "SUMMARY by drivetrain", height = "auto", body = list(
-      type = "table", object = "tbl_drv", title = "Mean mileage by drivetrain",
-      notes = c(
-        sprintf("- **%s**-wheel drive has the best highway mileage among the three drivetrain types.", drv_best),
-        sprintf("- **%s**-wheel drive has the worst, mainly due to the added weight of the drivetrain.", drv_worst),
-        "- The gap between front- and four-wheel drive is nearly 9 mpg highway."
-      )
-    )),
-    fig_facet = list(header = "Mileage by class", height = "auto",
-      body = list(type = "figure", object = "fig_facet", height = 280)),
-    fig_scatter = list(header = "Highway vs. city mileage", height = "auto", body = list(
-      type = "figure", object = "fig_scatter", notes_width = 0.45, height = 102,
-      notes = c(
-        "- Highway and city mileage are closely correlated.",
-        "- 4-wheel drive vehicles cluster at the low-mileage end.",
-        "- Front-wheel drive vehicles cluster at the high-mileage end."
-      )
-    )),
-    photos_2 = list(header = "More sample photos", height = "auto", body = list(
-      type = "image", files = stock_photos, labels = stock_labels,
-      width = 230
-    ))
-  )
-)
-
-p <- poster(
-  spec,
-  objects = list(tbl_class = tbl_class, tbl_drv = tbl_drv,
-                 fig_facet = fig_facet, fig_scatter = fig_scatter,
-                 fig_box = fig_box, fig_heat = fig_heat),
-  theme = theme_green(base_size = 24),
-  base_dir = img_dir
-)
+source(system.file("extdata", "readme_example.R", package = "ggposter"))
+p <- readme_example_poster()
 ```
+
+The spec behind it runs to about 140 lines, so it lives in
+[`inst/extdata/readme_example.R`](inst/extdata/readme_example.R) rather
+than in this README – the sibling tools keep their samples in files too.
+`readme_example_spec()` returns the R list, `readme_example_objects()`
+builds the figures and tables it refers to, and
+`readme_example_poster()` combines them.
 
 The same layout, theme, title, and section text can live in a YAML file
 instead of an inline R list, keeping the declarative content separate
@@ -213,12 +90,7 @@ identical to `p` above:
 ``` r
 yml_path <- system.file("extdata", "poster_readme_example.yml", package = "ggposter")
 
-p_yml <- poster(
-  yml_path,
-  objects = list(tbl_class = tbl_class, tbl_drv = tbl_drv,
-                 fig_facet = fig_facet, fig_scatter = fig_scatter,
-                 fig_box = fig_box, fig_heat = fig_heat)
-)
+p_yml <- poster(yml_path, objects = readme_example_objects())
 ```
 
 Rendering a poster at true size makes font sizes and spacing come out
@@ -314,325 +186,34 @@ Four samples ship with the package.
 
 |  | Sample | What it shows |
 |----|----|----|
-| 1 | `inst/extdata/poster_sample_howto.yml` | a tour of the card types |
-| 2 | `inst/extdata/poster_sample_howto2.yml` | input and output side by side |
-| 3 | `inst/extdata/poster_sample_howto3.yml` | irregular layouts (`grid:`) |
-| 4 | `inst/extdata/poster_sample.yml` | a realistic poster (fictional data) |
+| 1 | [`inst/extdata/poster_sample_howto.yml`](inst/extdata/poster_sample_howto.yml) | a tour of the card types |
+| 2 | [`inst/extdata/poster_sample_howto2.yml`](inst/extdata/poster_sample_howto2.yml) | input and output side by side |
+| 3 | [`inst/extdata/poster_sample_howto3.yml`](inst/extdata/poster_sample_howto3.yml) | irregular layouts (`grid:`) |
+| 4 | [`inst/extdata/poster_sample.yml`](inst/extdata/poster_sample.yml) | a realistic poster (fictional data) |
 
 ``` r
 source(system.file("extdata", "render_samples.R", package = "ggposter"))
 render_ggposter_samples(out_dir = ".")
 ```
 
+Scaled-down previews (click an image for its spec).
+
+| 1\. A tour of the card types | 2\. Input and output side by side |
+|----|----|
+| [<img src="man/figures/README-sample1.png" width="320">](inst/extdata/poster_sample_howto.yml) | [<img src="man/figures/README-sample2.png" width="320">](inst/extdata/poster_sample_howto2.yml) |
+
+| 3\. Irregular layouts (`grid:`) | 4\. A realistic poster |
+|----|----|
+| [<img src="man/figures/README-sample3.png" width="320">](inst/extdata/poster_sample_howto3.yml) | [<img src="man/figures/README-sample4.png" width="320">](inst/extdata/poster_sample.yml) |
+
+The images are made from the rendered PDFs with
+`pdftoppm -r 26 -png <file>.pdf man/figures/README-sampleN`, the way
+acposter and qtposter make theirs. They sit under `man/figures/` rather
+than `previews/` because that is the directory pkgdown copies to the
+reference site.
+
 `poster_sample_flat.yml` (a flat header) and `poster_readme_example.yml`
 are in the same directory.
-
-### A tour of the card types
-
-The poster below is a quick tour of ggposter’s card types rather than a
-real research example: the left column has one card of each kind – first
-how the `title` band and the `layout` parts of the spec themselves are
-written, then a bullet list, a table with `notes` beside it, a figure, a
-figure with a `caption` below it, and a photo strip – the center column
-shows the YAML spec for the matching card on the left, and the right
-column shows the equivalent R code.
-
-``` r
-howto_fig <- ggplot(mpg, aes(displ, hwy)) +
-  geom_point(colour = "#2E7D32") +
-  theme_bw()
-
-howto_fig_notes <- ggplot(mpg, aes(class, hwy)) +
-  geom_boxplot(fill = "#A5D6A7") +
-  labs(x = "Class", y = "Highway mpg") +
-  theme_bw()
-
-howto_tbl_notes <- data.frame(Drivetrain = c("f", "4", "r"),
-                               `Mean highway mpg` = c(28.2, 19.2, 21.0),
-                               check.names = FALSE)
-
-howto_spec <- list(
-  title = list(
-    title = "How to Make an Academic Poster",
-    authors = "*A guide to the ggposter card types",
-    funding = "Each left-column card demonstrates one card type; the matching center-column card shows the YAML spec for it; the matching right-column card shows the equivalent R code."
-  ),
-  layout = list(
-    align_rows = TRUE,
-    left   = c(
-               "howto_title", "howto_layout",
-               "howto_bullets", "howto_table_notes", 
-               "howto_figure", "howto_figure_notes",
-               "howto_photo"),
-    center = c(
-               "yml_title", "yml_layout",
-               "yml_bullets", "yml_table_notes",
-               "yml_figure", "yml_figure_notes", 
-               "yml_photo"),
-    right  = c(
-               "code_title", "code_layout",
-               "code_bullets", "code_table_notes",
-               "code_figure", "code_figure_notes",
-               "code_photo")
-  ),
-  sections = list(
-    howto_title = list(header = "The title band", height = "auto", body = list(
-      type = "text", md = c(
-        "- `title` is written once, not per column.",
-        "- `title`, `authors`, `funding` stack top to bottom.",
-        "- It spans the full poster width, above every column."
-      )
-    )),
-    howto_layout = list(header = "The layout", height = "auto", body = list(
-      type = "text", md = c(
-        "- `layout` assigns section names to columns.",
-        "- Column names are free-form -- not just left/right.",
-        "- `align_rows: true` lines up each row to the tallest card at that row."
-      )
-    )),
-    howto_bullets = list(header = "Bullet list only", height = "auto", body = list(
-      type = "text", md = c(
-        "- Bullet points summarize key facts.",
-        "- Each line starts with a dash.",
-        "- Long lines wrap to fit the card."
-      )
-    )),
-    howto_figure = list(header = "Figure only", height = "auto", body = list(
-      type = "figure", object = "howto_fig", height = 100
-    )),
-    howto_figure_notes = list(header = "Figure + bullets (below)", height = "auto", body = list(
-      type = "figure", object = "howto_fig_notes", height = 110,
-      caption = paste(
-        "- A figure's caption= adds bullets below it.",
-        "- Great for calling out key takeaways.",
-        sep = "\n"
-      )
-    )),
-    howto_table_notes = list(header = "Table + bullets (right)", height = "auto", body = list(
-      type = "table", object = "howto_tbl_notes", notes_width = 0.4,
-      notes = c(
-        "- A table's notes= sits beside it.",
-        "- Good for a short note."
-      )
-    )),
-    howto_photo = list(header = "Photo strip", height = "auto", body = list(
-      type = "image", files = c("small.JPG", "tall.jpg", "wide.jpg"),
-      labels = c("Photo 1", "Photo 2", "Photo 3"), width = 200
-    )),
-
-    yml_title = list(header = "YAML: title", height = "auto", body = list(
-      type = "text", md = c(
-        "title:",
-        "  title: \"How to Make an Academic Poster\"",
-        "  authors: \"*A guide to the ggposter card types\"",
-        "  funding: \"...\""
-      )
-    )),
-    yml_layout = list(header = "YAML: layout", height = "auto", body = list(
-      type = "text", md = c(
-        "layout:",
-        "  align_rows: true",
-        "  left: howto_bullets, ...",
-        "  center: yml_bullets, ...",
-        "  right: code_bullets, ..."
-      )
-    )),
-    yml_bullets = list(header = "YAML: bullet list", height = "auto", body = list(
-      type = "text", md = c(
-        "howto_bullets:",
-        "  header: \"Bullet list only\"",
-        "  height: \"auto\"",
-        "  body:",
-        "    type: text",
-        "    md:",
-        "      \\- \"- Bullet points summarize key facts.\"",
-        "      \\- \"- Each line starts with a dash.\"",
-        "      \\- \"- Long lines wrap to fit the card.\""
-      )
-    )),
-    yml_figure = list(header = "YAML: figure only", height = "auto", body = list(
-      type = "text", md = c(
-        "howto_figure:",
-        "  header: \"Figure only\"",
-        "  height: \"auto\"",
-        "  body:",
-        "    type: figure",
-        "    object: howto_fig",
-        "    height: 100"
-      )
-    )),
-    yml_figure_notes = list(header = "YAML: figure + bullets", height = "auto", body = list(
-      type = "text", md = c(
-        "howto_figure_notes:",
-        "  header: \"Figure + bullets (below)\"",
-        "  height: \"auto\"",
-        "  body:",
-        "    type: figure",
-        "    object: howto_fig_notes",
-        "    height: 110",
-        "    caption: |-",
-        "      \\- A figure's caption= adds bullets below it.",
-        "      \\- Great for calling out key takeaways."
-      )
-    )),
-    yml_table_notes = list(header = "YAML: table + bullets", height = "auto", body = list(
-      type = "text", md = c(
-        "howto_table_notes:",
-        "  header: \"Table + bullets (right)\"",
-        "  height: \"auto\"",
-        "  body:",
-        "    type: table",
-        "    object: howto_tbl_notes",
-        "    notes_width: 0.4",
-        "    notes:",
-        "      \\- \"- A table's notes= sits beside it.\"",
-        "      \\- \"- Good for a short note.\""
-      )
-    )),
-    yml_photo = list(header = "YAML: photo strip", height = "auto", body = list(
-      type = "text", md = c(
-        "howto_photo:",
-        "  header: \"Photo strip\"",
-        "  height: \"auto\"",
-        "  body:",
-        "    type: image",
-        "    files:",
-        "      \\- small.JPG",
-        "      \\- tall.jpg",
-        "      \\- wide.jpg",
-        "    labels:",
-        "      \\- \"Photo 1\"",
-        "      \\- \"Photo 2\"",
-        "      \\- \"Photo 3\"",
-        "    width: 200"
-      )
-    )),
-
-    code_title = list(header = "Code: title", height = "auto", body = list(
-      type = "text", md = c(
-        "title = list(",
-        "  title = \"How to Make an Academic Poster\",",
-        "  authors = \"*A guide to the ggposter card types\",",
-        "  funding = \"...\"",
-        ")"
-      )
-    )),
-    code_layout = list(header = "Code: layout", height = "auto", body = list(
-      type = "text", md = c(
-        "layout = list(",
-        "  align_rows = TRUE,",
-        "  left   = c(\"howto_bullets\", ...),",
-        "  center = c(\"yml_bullets\", ...),",
-        "  right  = c(\"code_bullets\", ...)",
-        ")"
-      )
-    )),
-    code_bullets = list(header = "Code: bullet list", height = "auto", body = list(
-      type = "text", md = c(
-        "list(",
-        "  header = \"Bullet list only\",",
-        "  body = list(",
-        "    type = \"text\",",
-        "    md = c(",
-        "      \"- Bullet points summarize key facts.\",",
-        "      \"- Each line starts with a dash.\",",
-        "      \"- Long lines wrap to fit the card.\"",
-        "    )",
-        "  )",
-        ")"
-      )
-    )),
-    code_figure = list(header = "Code: figure only", height = "auto", body = list(
-      type = "text", md = c(
-        "list(",
-        "  header = \"Figure only\",",
-        "  body = list(",
-        "    type = \"figure\",",
-        "    object = \"howto_fig\",",
-        "    height = 100",
-        "  )",
-        ")"
-      )
-    )),
-    code_figure_notes = list(header = "Code: figure + bullets", height = "auto", body = list(
-      type = "text", md = c(
-        "list(",
-        "  header = \"Figure + bullets (below)\",",
-        "  body = list(",
-        "    type = \"figure\",",
-        "    object = \"howto_fig_notes\",",
-        "    height = 110,",
-        "    caption = paste(",
-        "      \"- A figure's caption= adds bullets below it.\",",
-        "      \"- Great for calling out key takeaways.\",",
-        "      sep = \"\\n\"",
-        "    )",
-        "  )",
-        ")"
-      )
-    )),
-    code_table_notes = list(header = "Code: table + bullets", height = "auto", body = list(
-      type = "text", md = c(
-        "list(",
-        "  header = \"Table + bullets (right)\",",
-        "  body = list(",
-        "    type = \"table\",",
-        "    object = \"howto_tbl_notes\",",
-        "    notes_width = 0.4,",
-        "    notes = c(",
-        "      \"- A table's notes= sits beside it.\",",
-        "      \"- Good for a short note.\"",
-        "    )",
-        "  )",
-        ")"
-      )
-    )),
-    code_photo = list(header = "Code: photo strip", height = "auto", body = list(
-      type = "text", md = c(
-        "list(",
-        "  header = \"Photo strip\",",
-        "  body = list(",
-        "    type = \"image\",",
-        "    files = c(\"small.JPG\", \"tall.jpg\", \"wide.jpg\"),",
-        "    labels = c(\"Photo 1\", \"Photo 2\", \"Photo 3\"),",
-        "    width = 200",
-        "  )",
-        ")"
-      )
-    ))
-  )
-)
-
-p_howto <- poster(
-  howto_spec,
-  objects = list(howto_fig = howto_fig, howto_fig_notes = howto_fig_notes,
-                 howto_tbl_notes = howto_tbl_notes),
-  theme = theme_green(base_size = 18),
-  base_dir = img_dir
-)
-```
-
-The same layout, theme, title, and section text can live in a YAML file
-instead of an inline R list; only the figures and tables stay in R,
-passed in via `objects`. `p_howto_yml` below is identical to `p_howto`
-above:
-
-``` r
-howto_yml_path <- system.file("extdata", "poster_sample_howto.yml", package = "ggposter")
-
-p_howto_yml <- poster(
-  howto_yml_path,
-  objects = list(howto_fig = howto_fig, howto_fig_notes = howto_fig_notes,
-                 howto_tbl_notes = howto_tbl_notes)
-)
-```
-
-``` r
-render_poster(p_howto, "man/figures/README-howto-poster.png", scale = 0.3, dpi = 150)
-knitr::include_graphics("man/figures/README-howto-poster.png")
-```
-
-<img src="man/figures/README-howto-poster.png" alt="A tutorial poster titled 'How to Make an Academic Poster', with a left column showing one example of each ggposter card type (bullet list, figure, figure with bullets below, table with bullets to the right, a photo strip, and explanations of the title band and layout config), a center column showing the YAML spec for each matching card, and a right column showing the R code that built each matching card." width="100%" />
 
 ## Sharing with the sibling tools
 
@@ -657,6 +238,21 @@ font: "Noto Sans"                 # -> theme$base_family
 type: "Academic poster"           # only acposter needs it; ignored here
 ```
 
+| Meaning | ggposter’s own key | Also accepted |
+|----|----|----|
+| subtitle | `title$subtitle` | `subtitle` (flat) |
+| authors | `title$authors` | `author`, `authors`, `poster-authors` |
+| affiliations | `title$affiliations` | `institute`, `institutes`, `affiliation` |
+| note | `title$funding` | `note`, `funding`, `footer` |
+| logo | `title$logo` | `logo` (flat) |
+| paper | `poster$size` | `paper` |
+| orientation | `poster$orientation` | `orientation` (flat) |
+| columns | `columns` (top level) | `cols` |
+| type size | `theme$base_size` | `font-size`, `font_size` |
+| font | `theme$base_family` | `font`, `font-family`, `font_family` |
+| CJK font | `theme$cjk_family` | `cjk-family` |
+| accent colour | `theme$accent` | `accent` (flat) |
+
 A top-level `columns` count stands in for `layout` when neither `layout`
 nor `grid` is given: the sections flow down the leftmost column and on
 into the next, in the order written. A list of authors or institutes is
@@ -668,20 +264,23 @@ can be mixed.
 A bare `size` is *not* accepted: qtposter means type size by it and a
 spec here means paper, so write `font-size` or `paper`.
 
-`inst/extdata/poster_sample_flat.yml` is a complete poster written this
-way, next to `poster_sample.yml` in the nested style. For layout,
-`grid:` is written identically in ggposter and acposter, so it carries
-across unchanged; `layout:` does not – it names columns here and is a
-row-by-row matrix there.
+[`inst/extdata/poster_sample_flat.yml`](inst/extdata/poster_sample_flat.yml)
+is a complete poster written this way, next to `poster_sample.yml` in
+the nested style. For layout, `grid:` is written identically in ggposter
+and acposter, so it carries across unchanged; `layout:` does not – it
+names columns here and is a row-by-row matrix there.
 
 ## Files
 
 | Path | What is in it |
 |----|----|
 | `R/` | the package: `poster()`, `render_poster()`, cards, theme, YAML reader |
-| `inst/extdata/` | the samples, and `render_samples.R` to build them |
+| `inst/extdata/` | the four samples, and `render_samples.R` to build them |
+| `inst/extdata/readme_example.R` | the spec and objects behind this README’s example poster |
+| `man/figures/` | the images this README shows, including the four sample previews |
 | `vignettes/ggposter.Rmd` | the full spec schema, theming, a real poster |
 | `tests/testthat/` | the test suite |
+| `.github/workflows/` | CI: `R CMD check` (Ubuntu, macOS) and a build of the four samples |
 
 ## Status and background
 
@@ -689,6 +288,10 @@ ggposter draws the poster in R itself, so it suits a poster whose
 figures and tables come straight out of an analysis: the spec stays
 declarative while the data work stays in R. Sizes are controlled in mm,
 and the output is a true-size PDF or PNG with the fonts embedded.
+
+CI runs `R CMD check` on Ubuntu and macOS and builds the four samples on
+every push (`.github/workflows/test.yml`); the pkgdown site is deployed
+from `main`.
 
 ## License
 
