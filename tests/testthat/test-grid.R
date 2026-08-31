@@ -114,3 +114,26 @@ test_that("read_poster_yaml() accepts a grid: spec without layout:", {
   yaml::write_yaml(list(sections = grid_spec()$sections, grid = grid_spec()$grid), tmp)
   expect_no_error(read_poster_yaml(tmp))
 })
+
+test_that("read_poster_yaml() reads an unquoted y: in grid boxes", {
+  # R の yaml は YAML 1.1 なので，引用符の無い `y` を真偽値として読む
+  # (キーが "TRUE" になる)．姉妹ツール (acposter・qtposter) からヘッダーを
+  # そのまま移せるよう，読み込んだ直後にキー名を戻している．
+  tmp <- tempfile(fileext = ".yml")
+  writeLines(c(
+    "grid:",
+    "  columns: 2",
+    "  boxes:",
+    "    - {name: a, x: 0, y: 0, w: 2}",
+    "    - {name: b, x: 0, y: 1}",
+    "    - {name: c, x: 1, y: 1}",
+    "sections:",
+    "  a: {header: A, body: {type: text, md: [\"a\"]}}",
+    "  b: {header: B, body: {type: text, md: [\"b\"]}}",
+    "  c: {header: C, body: {type: text, md: [\"c\"]}}"
+  ), tmp)
+  spec <- read_poster_yaml(tmp)
+  ys <- vapply(spec$grid$boxes, function(b) b$y, numeric(1))
+  expect_equal(ys, c(0, 1, 1))
+  expect_no_error(poster(spec))
+})

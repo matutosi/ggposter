@@ -1,0 +1,155 @@
+# Sample 2: input to output
+#
+# The left column is what you write in the spec; the right column is what
+# comes out. The sibling tools ship the same sample: acposter's
+# `examples/poster_howto2.md` and qtposter's `poster_howto2.qmd`.
+#
+# Four cards need R objects (a table, a figure, and two schematic figures),
+# so render it with `objects =`:
+#
+#   source(system.file("extdata", "render_samples.R", package = "ggposter"))
+#
+# `render_samples.R` builds those objects and writes every sample to PDF.
+
+title: "ggposter: input to output"
+author: ["*A cheat sheet of the ggposter spec"]
+institute: ["ggposter"]
+note: "Left column: what you write in the spec. Right column: what comes out. See poster_sample_howto.yml for a feature tour instead."
+
+paper: A1
+orientation: portrait
+font-size: 24
+accent: "#2E7D32"
+
+layout:
+  align_rows: true
+  left:  [in_header, in_bullets, in_table, in_figure, in_layout, in_grid]
+  right: [out_header, out_bullets, out_table, out_figure, out_layout, out_grid]
+
+sections:
+  in_header:
+    header: "Header input"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "title: \"My Poster\""
+        - "author: [\"Jane Doe\"]"
+        - "institute: [\"Example Univ.\"]"
+        - "note: \"A short note\""
+        - "paper: A1"
+        - "The same keys are read by all three tools; the nested form (`title:`/`poster:`/`theme:`) works too."
+
+  out_header:
+    header: "Header output"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "The title band spans the full width, above every card:"
+        - "**My Poster**"
+        - "Jane Doe (Example Univ.)"
+        - "A short note"
+        - "An author prefixed with `*` is marked as the presenting author."
+
+  in_bullets:
+    header: "Bullet list input"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "body:"
+        - "  type: text"
+        - "  md:"
+        - "    - \"- First point\""
+        - "    - \"- Second point\""
+        - "    - \"  - Nested point\""
+
+  out_bullets:
+    header: "Bullet list output"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "- First point"
+        - "- Second point"
+        - "  - Nested point"
+
+  in_table:
+    header: "Table input"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "body:"
+        - "  type: table"
+        - "  object: howto2_tbl"
+        - "The table itself stays in R (`objects = list(howto2_tbl = ...)`), so the analysis is not copied into the spec."
+
+  out_table:
+    header: "Table output"
+    height: "auto"
+    body:
+      type: table
+      object: howto2_tbl
+
+  in_figure:
+    header: "Figure input"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "body:"
+        - "  type: figure"
+        - "  object: howto2_fig"
+        - "  height: 70"
+        - "`height` is the drawing height in mm; the width follows the card."
+
+  out_figure:
+    header: "Figure output"
+    height: "auto"
+    body:
+      type: figure
+      object: howto2_fig
+      height: 70
+
+  in_layout:
+    header: "Layout input"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "layout:"
+        - "  left:  [a, b]"
+        - "  right: [c]"
+        - "Each column is a stack of cards, top to bottom. Every section is named exactly once."
+
+  out_layout:
+    header: "Layout output"
+    height: "auto"
+    body:
+      type: figure
+      object: howto2_cols
+      height: 55
+
+  in_grid:
+    header: "Grid input"
+    height: "auto"
+    body:
+      type: text
+      md:
+        - "grid:"
+        - "  columns: 2"
+        - "  boxes:"
+        - "    - {name: a, x: 0, y: 0, w: 2}"
+        - "    - {name: b, x: 0, y: 1}"
+        - "    - {name: c, x: 1, y: 1}"
+        - "Use `grid:` when a card must span rows or columns -- `layout:` cannot."
+
+  out_grid:
+    header: "Grid output"
+    height: "auto"
+    body:
+      type: figure
+      object: howto2_grid
+      height: 55
