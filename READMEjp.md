@@ -302,8 +302,7 @@ grid:                          # 座標．0 起点，w/h の既定は 1
 
 ## 見本
 
-見本を4本同梱している．acposter・qtposter の4本と1対1で対応しており，
-**同じポスターを3つの書き方で書くとこうなる**を見比べられる．
+見本を4本同梱している．
 
 |  | 見本 | 内容 |
 |----|----|----|
@@ -317,9 +316,8 @@ source(system.file("extdata", "render_samples.R", package = "ggposter"))
 render_ggposter_samples(out_dir = ".")
 ```
 
-`inst/extdata/README.md` に，対応する acposter・qtposter
-のファイルを並べた表がある． `poster_sample_flat.yml` (平らなヘッダー)
-と `poster_readme_example.yml` も同じ場所にある．
+`poster_sample_flat.yml` (平らなヘッダー) と `poster_readme_example.yml`
+も同じ場所にある．
 
 ### カードの種類の一巡り
 
@@ -676,12 +674,10 @@ top-level の `columns` は，`layout` も `grid` も無いときに `layout`
 
 ## 現状と経緯
 
-ポスターを作るツールは3系統あり，**互いに置き換えるものではなく案件ごとに選ぶ**．
-ggposter は **R オブジェクトをそのまま載せられる**のが持ち味で，
-解析から出てきた図や表を並べるポスターに向く． 3つはヘッダーのキー名と
-`grid:` の書式を共有し，同じ4本の見本を持つ．
+ggposter は **R 自身が描く**ので，解析から出てきた図や表をそのまま載せる
+ポスターに向く (spec は宣言的なまま，データの処理は R に残る)． 寸法は
+mm で指定でき，出力はフォントを埋め込んだ実寸の PDF・PNG になる．
 
 ## ライセンス
 
-**MIT** ([`LICENSE`](LICENSE))．3系統 (ggposter・acposter・qtposter)
-とも MIT で揃えてある．
+**MIT** ([`LICENSE`](LICENSE))．
