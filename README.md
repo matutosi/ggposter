@@ -17,11 +17,24 @@ embedded fonts, including CJK (Japanese). Content and layout can be
 written as an R list or a YAML file; figures, tables, and photos are
 supplied separately as R objects.
 
-## Introduction
+## What you can make
 
-<https://matutosi.github.io/ggposter/>
+- **A true-size poster** – A0/A1/A2 (portrait or landscape), written out
+  as PDF or PNG with the fonts embedded, including CJK (Japanese).
+- **A title band plus cards** – each section becomes one rounded,
+  tab-headed card; a card holds text, a table, a ggplot2 figure, or a
+  photo strip, and can pair a table/figure with a bullet-list
+  description.
+- **Two ways to place the cards** – `layout:` (named columns) for the
+  usual poster, `grid:` (`x`/`y`/`w`/`h` per card) when a card must span
+  rows or columns.
+- **A spec that stays declarative** – content and layout as an R list or
+  a YAML file; figures, tables, and photos are passed in separately as R
+  objects, so the analysis stays in R.
 
-## Installation
+Reference documentation: <https://matutosi.github.io/ggposter/>
+
+## Requirements and installation
 
 You can install the development version of ggposter from
 [GitHub](https://github.com/) with:
@@ -31,7 +44,11 @@ You can install the development version of ggposter from
 remotes::install_github("matutosi/ggposter")
 ```
 
-## Example
+ggposter needs R and draws with grid/gtable, ggplot2, and gridtext; a
+CJK font is needed only for Japanese text. No LaTeX and no browser are
+involved – the poster is drawn by R itself.
+
+## Usage
 
 The layout below follows a typical conference poster – a full-width
 title band and a two-column body of rounded, tab-headed cards for
@@ -245,47 +262,74 @@ render_poster(p, "preview.png", scale = 0.25, dpi = 150)   # A4-ish preview
 See `vignette("ggposter")` for the full spec schema, theming, and a
 reproduction of a real conference poster.
 
-## A header the sibling tools can share
+## Writing the spec
 
-ggposter has two siblings that build the same kind of poster by other
-routes: **acposter** (`build-poster-pdf`: Markdown -\> pandoc -\>
-headless Chrome) and **qtposter** (Quarto -\> Typst). Those two write
-their metadata *flat*, at the top level of the header, while ggposter
-groups it into `title`/`poster`/`theme` blocks. Both forms are read
-here, and the names the three tools use for the same thing are folded
-into the right block, so one header serves all three unchanged:
+A spec has four parts: `title` (the band), `poster` (paper size and
+orientation), `theme` (type size, family, accent colour), and `sections`
+(the cards). Each section has a `header`, an optional relative `height`
+(or `"auto"` to fit its own content), and a `body` of one of four types:
+
+| `body$type` | What it draws | Where the content comes from |
+|----|----|----|
+| `text` | paragraphs and bullet lists | `md`, a character vector |
+| `table` | a table, optionally with `notes` beside it | `object`, a data frame |
+| `figure` | a ggplot2 figure, optionally with a `caption` below | `object`, a ggplot |
+| `image` | a labelled photo strip | `files`, image paths |
+
+The metadata may also be written *flat*, the way the sibling tools write
+a header (see “Sharing with the sibling tools” below). See
+`vignette("ggposter")` for the full schema.
+
+## Layout
+
+Without `layout` or `grid`, a top-level `columns` count flows the
+sections down the leftmost column and on into the next, in the order
+written.
 
 ``` yaml
-title: "One header, three poster tools"
-author: ["*A. One", "B. Two"]     # authors, poster-authors
-institute: ["Example Univ."]      # institutes, affiliation(s)
-note: "Fictional sample."         # funding, footer
-paper: A1                         # -> poster$size
-orientation: portrait
-columns: 2                        # -> an equal-share layout
-font-size: 22                     # -> theme$base_size
-font: "Noto Sans"                 # -> theme$base_family
-type: "Academic poster"           # only acposter needs it; ignored here
+layout:                        # named columns; each is a stack, top to bottom
+  align_rows: true
+  left:  [objectives, methods]
+  right: [results, summary]
 ```
 
-A top-level `columns` count stands in for `layout` when neither `layout`
-nor `grid` is given: the sections flow down the leftmost column and on
-into the next, in the order written. A list of authors or institutes is
-joined into the single line the title band draws. Setting the same thing
-twice – a key and its alias, or the flat and the nested form – keeps
-ggposter’s own and warns. Nested specs are untouched, and the two forms
-can be mixed.
+``` yaml
+grid:                          # coordinates; 0-based, w/h default to 1
+  columns: 3
+  boxes:
+    - {name: objectives, x: 0, y: 0, w: 2}
+    - {name: results,    x: 2, y: 0, h: 3}
+```
 
-A bare `size` is *not* accepted: qtposter means type size by it and a
-spec here means paper, so write `font-size` or `paper`.
+`grid` wins if both are given (with a warning). Overlapping boxes, boxes
+running past `columns`, and any section not placed exactly once raise an
+error; content taller than the page raises a warning. **`grid:` is
+written identically in all three tools**, so an arrangement carries
+across unchanged; `layout:` does not (it names columns here and is a
+row-by-row matrix in acposter).
 
-`inst/extdata/poster_sample_flat.yml` is a complete poster written this
-way, next to `poster_sample.yml` in the nested style. For layout,
-`grid:` is written identically in ggposter and acposter, so it carries
-across unchanged; `layout:` does not – it names columns here and is a
-row-by-row matrix there.
+## Samples
 
-## How to make an academic poster
+Four samples ship with the package, matching acposter’s and qtposter’s
+one for one, so the same poster can be compared across the three tools.
+
+|  | Sample | What it shows |
+|----|----|----|
+| 1 | `inst/extdata/poster_sample_howto.yml` | a tour of the card types |
+| 2 | `inst/extdata/poster_sample_howto2.yml` | input and output side by side |
+| 3 | `inst/extdata/poster_sample_howto3.yml` | irregular layouts (`grid:`) |
+| 4 | `inst/extdata/poster_sample.yml` | a realistic poster (fictional data) |
+
+``` r
+source(system.file("extdata", "render_samples.R", package = "ggposter"))
+render_ggposter_samples(out_dir = ".")
+```
+
+`inst/extdata/README.md` lists them next to the matching acposter and
+qtposter files. `poster_sample_flat.yml` (a flat header) and
+`poster_readme_example.yml` are there too.
+
+### A tour of the card types
 
 The poster below is a quick tour of ggposter’s card types rather than a
 real research example: the left column has one card of each kind – first
@@ -591,3 +635,61 @@ knitr::include_graphics("man/figures/README-howto-poster.png")
 ```
 
 <img src="man/figures/README-howto-poster.png" alt="A tutorial poster titled 'How to Make an Academic Poster', with a left column showing one example of each ggposter card type (bullet list, figure, figure with bullets below, table with bullets to the right, a photo strip, and explanations of the title band and layout config), a center column showing the YAML spec for each matching card, and a right column showing the R code that built each matching card." width="100%" />
+
+## Sharing with the sibling tools
+
+ggposter has two siblings that build the same kind of poster by other
+routes: **acposter** (`build-poster-pdf`: Markdown -\> pandoc -\>
+headless Chrome) and **qtposter** (Quarto -\> Typst). Those two write
+their metadata *flat*, at the top level of the header, while ggposter
+groups it into `title`/`poster`/`theme` blocks. Both forms are read
+here, and the names the three tools use for the same thing are folded
+into the right block, so one header serves all three unchanged:
+
+``` yaml
+title: "One header, three poster tools"
+author: ["*A. One", "B. Two"]     # authors, poster-authors
+institute: ["Example Univ."]      # institutes, affiliation(s)
+note: "Fictional sample."         # funding, footer
+paper: A1                         # -> poster$size
+orientation: portrait
+columns: 2                        # -> an equal-share layout
+font-size: 22                     # -> theme$base_size
+font: "Noto Sans"                 # -> theme$base_family
+type: "Academic poster"           # only acposter needs it; ignored here
+```
+
+A top-level `columns` count stands in for `layout` when neither `layout`
+nor `grid` is given: the sections flow down the leftmost column and on
+into the next, in the order written. A list of authors or institutes is
+joined into the single line the title band draws. Setting the same thing
+twice – a key and its alias, or the flat and the nested form – keeps
+ggposter’s own and warns. Nested specs are untouched, and the two forms
+can be mixed.
+
+A bare `size` is *not* accepted: qtposter means type size by it and a
+spec here means paper, so write `font-size` or `paper`.
+
+`inst/extdata/poster_sample_flat.yml` is a complete poster written this
+way, next to `poster_sample.yml` in the nested style. For layout,
+`grid:` is written identically in ggposter and acposter, so it carries
+across unchanged; `layout:` does not – it names columns here and is a
+row-by-row matrix there.
+
+## Files
+
+| Path | What is in it |
+|----|----|
+| `R/` | the package: `poster()`, `render_poster()`, cards, theme, YAML reader |
+| `inst/extdata/` | the samples, and `render_samples.R` to build them |
+| `vignettes/ggposter.Rmd` | the full spec schema, theming, a real poster |
+| `tests/testthat/` | the test suite |
+
+## Status and background
+
+ggposter is one of three tools that build the same kind of poster by
+different routes; they are alternatives, not replacements, and which one
+fits depends on the job. ggposter is the one that takes R objects
+directly, so it suits a poster whose figures and tables come out of an
+analysis. The three share header key names and the `grid:` notation, and
+ship the same four samples.

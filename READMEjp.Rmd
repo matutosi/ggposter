@@ -26,11 +26,21 @@ ggplot2の図，または写真ストリップ)の列として宣言し，
 CJK(日本語を含む)フォントを埋め込んだ実寸で描画される．内容とレイアウトは，
 Rのリストまたは YAML ファイルとして記述でき，図・表・写真は別途 R オブジェクトとして渡す．
 
-## はじめに
+## つくれるもの
 
-https://matutosi.github.io/ggposter/
+* **実寸のポスター** — A0/A1/A2 (縦・横)．PDF か PNG で書き出し，
+  CJK (日本語) を含めてフォントを埋め込む．
+* **表題帯とカード** — 節が1つの角丸・タブ見出しのカードになる．
+  カードの中身はテキスト・表・ggplot2 の図・写真の帯で，
+  表や図には説明の箇条書きを横 (`notes`) や下 (`caption`) に添えられる．
+* **配置の決め方が2通り** — ふつうのポスターは `layout:` (名前付きの列)，
+  行や列をまたぐカードが要るときは `grid:` (カードごとの `x`/`y`/`w`/`h`)．
+* **宣言的な spec** — 内容と配置は R のリストか YAML．
+  図・表・写真は別途 R オブジェクトとして渡すので，**解析は R に残る**．
 
-## インストール
+参考ドキュメント: <https://matutosi.github.io/ggposter/>
+
+## 前提とインストール
 
 開発版の ggposter は，[GitHub](https://github.com/) から次のようにインストールできる．
 
@@ -39,7 +49,11 @@ https://matutosi.github.io/ggposter/
 remotes::install_github("matutosi/ggposter")
 ```
 
-## 使用例
+ggposter は R で動き，描画に grid/gtable・ggplot2・gridtext を使う．
+和文フォントは日本語を組むときだけ要る．
+**LaTeX もブラウザも要らない** (R 自身が描く)．
+
+## 使い方
 
 以下のレイアウトは，一般的な学会ポスター(全幅のタイトルバンドと，
 左側に紹介・方法・要約，右側に結果・結論を配置した2列構成のカード群)にならい，
@@ -244,44 +258,70 @@ render_poster(p, "preview.png", scale = 0.25, dpi = 150)   # A4程度のプレ�
 仕様のスキーマ全体・テーマ設定・実際の学会ポスターの再現例については，
 `vignette("ggposter")` を参照のこと．
 
-## 姉妹ツールと共通のヘッダー
+## 書き方の約束
 
-ggposter には，同じ種類のポスターを別の経路で作る姉妹ツールが2つある．
-**acposter** (`build-poster-pdf`．Markdown → pandoc → ヘッドレス Chrome) と
-**qtposter** (Quarto → Typst) である．
-この2つはメタデータを**平らに** (ヘッダーの top-level に) 書くのに対し，
-ggposter は `title`/`poster`/`theme` のブロックにまとめる．
-ggposter はどちらの形も読み，3つのツールが同じ意味に使っている名前を
-対応するブロックへ畳む．そのため**同じヘッダーを3つでそのまま使える**．
+spec は4つの部分からなる．`title` (帯)・`poster` (用紙と向き)・
+`theme` (文字サイズ・書体・差し色)・`sections` (カード)．
+各節は `header`，任意の相対 `height` (`"auto"` なら中身に合わせる)，
+そして4種類のいずれかの `body` を持つ．
+
+| `body$type` | 描くもの | 中身の出どころ |
+|---|---|---|
+| `text` | 段落と箇条書き | `md` (文字列ベクトル) |
+| `table` | 表 (横に `notes` を添えられる) | `object` (データフレーム) |
+| `figure` | ggplot2 の図 (下に `caption` を添えられる) | `object` (ggplot) |
+| `image` | 写真の帯 | `files` (画像のパス) |
+
+メタデータは**平ら**にも書ける (姉妹ツールと同じ書き方．下の
+「姉妹ツールとの行き来」を見る)．全体の仕様は `vignette("ggposter")` にある．
+
+## 配置の決め方
+
+`layout` も `grid` も書かなければ，top-level の `columns` の数で等分し，
+節を書いた順に左の列から上へ下へ流し込む．
 
 ``` yaml
-title: "One header, three poster tools"
-author: ["*A. One", "B. Two"]     # authors, poster-authors
-institute: ["Example Univ."]      # institutes, affiliation(s)
-note: "Fictional sample."         # funding, footer
-paper: A1                         # -> poster$size
-orientation: portrait
-columns: 2                        # -> 均等割りの layout になる
-font-size: 22                     # -> theme$base_size
-font: "Noto Sans"                 # -> theme$base_family
-type: "学術ポスター"               # acposter だけが要る．ここでは無視される
+layout:                        # 名前付きの列．各列は上から下への積み重ね
+  align_rows: true
+  left:  [objectives, methods]
+  right: [results, summary]
 ```
 
-top-level の `columns` は，`layout` も `grid` も無いときに `layout` の代わりになる．
-節を書いた順に，左の列を上から埋めて次の列へ流し込む．
-`author`・`institute` をリストで書くと，表題帯が描く1行に連結される．
-**同じものを二度書いたとき** (キーと別名，あるいは平らな形と入れ子の形) は，
-ggposter 側を残して警告する．入れ子の書き方はそのまま動き，混ぜてもよい．
+``` yaml
+grid:                          # 座標．0 起点，w/h の既定は 1
+  columns: 3
+  boxes:
+    - {name: objectives, x: 0, y: 0, w: 2}
+    - {name: results,    x: 2, y: 0, h: 3}
+```
 
-**`size` は受け付けない**．qtposter では文字サイズを指すが，
-ここでは用紙を指すため．用紙は `paper`，文字は `font-size` と書く．
+両方書くと `grid` が優先される (警告が出る)．
+重なり・`columns` を超えるはみ出し・1回だけ置かれていない節はエラー，
+紙面より高い中身は警告になる．
+**`grid:` は3系統とも同じ書式**なので配置ごと移し替えられる．
+`layout:` は移せない (ここでは列の名前，acposter では行ごとの行列)．
 
-`inst/extdata/poster_sample_flat.yml` が，この書き方で書いたポスター一式である
-(入れ子の書き方は `poster_sample.yml`)．
-配置については，**`grid:` は ggposter と acposter で書式が同じ**なのでそのまま移せる．
-**`layout:` は移せない** — ここでは列の名前を並べるものだが，acposter では行ごとの行列である．
+## 見本
 
-## 学術ポスターの作り方
+見本を4本同梱している．acposter・qtposter の4本と1対1で対応しており，
+**同じポスターを3つの書き方で書くとこうなる**を見比べられる．
+
+| | 見本 | 内容 |
+|---|---|---|
+| 1 | `inst/extdata/poster_sample_howto.yml` | カードの種類の一巡り |
+| 2 | `inst/extdata/poster_sample_howto2.yml` | 入力と出力の早見表 |
+| 3 | `inst/extdata/poster_sample_howto3.yml` | 非対称な配置 (`grid:`) |
+| 4 | `inst/extdata/poster_sample.yml` | 実際のポスターに近い例 (架空のデータ) |
+
+``` r
+source(system.file("extdata", "render_samples.R", package = "ggposter"))
+render_ggposter_samples(out_dir = ".")
+```
+
+`inst/extdata/README.md` に，対応する acposter・qtposter のファイルを並べた表がある．
+`poster_sample_flat.yml` (平らなヘッダー) と `poster_readme_example.yml` も同じ場所にある．
+
+### カードの種類の一巡り
 
 以下のポスターは，実際の研究例ではなく，ggposterのカードタイプを一通り紹介するものだ．
 左列には各カードタイプ(はじめに仕様自体の`title`部分と`layout`部分の書き方，
@@ -583,3 +623,57 @@ p_howto_yml <- poster(
 render_poster(p_howto, "man/figures/README-howto-poster.png", scale = 0.3, dpi = 150)
 knitr::include_graphics("man/figures/README-howto-poster.png")
 ```
+
+## 姉妹ツールとの行き来
+
+ggposter には，同じ種類のポスターを別の経路で作る姉妹ツールが2つある．
+**acposter** (`build-poster-pdf`．Markdown → pandoc → ヘッドレス Chrome) と
+**qtposter** (Quarto → Typst) である．
+この2つはメタデータを**平らに** (ヘッダーの top-level に) 書くのに対し，
+ggposter は `title`/`poster`/`theme` のブロックにまとめる．
+ggposter はどちらの形も読み，3つのツールが同じ意味に使っている名前を
+対応するブロックへ畳む．そのため**同じヘッダーを3つでそのまま使える**．
+
+``` yaml
+title: "One header, three poster tools"
+author: ["*A. One", "B. Two"]     # authors, poster-authors
+institute: ["Example Univ."]      # institutes, affiliation(s)
+note: "Fictional sample."         # funding, footer
+paper: A1                         # -> poster$size
+orientation: portrait
+columns: 2                        # -> 均等割りの layout になる
+font-size: 22                     # -> theme$base_size
+font: "Noto Sans"                 # -> theme$base_family
+type: "学術ポスター"               # acposter だけが要る．ここでは無視される
+```
+
+top-level の `columns` は，`layout` も `grid` も無いときに `layout` の代わりになる．
+節を書いた順に，左の列を上から埋めて次の列へ流し込む．
+`author`・`institute` をリストで書くと，表題帯が描く1行に連結される．
+**同じものを二度書いたとき** (キーと別名，あるいは平らな形と入れ子の形) は，
+ggposter 側を残して警告する．入れ子の書き方はそのまま動き，混ぜてもよい．
+
+**`size` は受け付けない**．qtposter では文字サイズを指すが，
+ここでは用紙を指すため．用紙は `paper`，文字は `font-size` と書く．
+
+`inst/extdata/poster_sample_flat.yml` が，この書き方で書いたポスター一式である
+(入れ子の書き方は `poster_sample.yml`)．
+配置については，**`grid:` は ggposter と acposter で書式が同じ**なのでそのまま移せる．
+**`layout:` は移せない** — ここでは列の名前を並べるものだが，acposter では行ごとの行列である．
+
+
+## 構成
+
+| パス | 中身 |
+|---|---|
+| `R/` | パッケージ本体 (`poster()`・`render_poster()`・カード・テーマ・YAML の読み込み) |
+| `inst/extdata/` | 見本と，まとめて組む `render_samples.R` |
+| `vignettes/ggposter.Rmd` | 仕様の全体・テーマ・実際のポスターの再現 |
+| `tests/testthat/` | テスト |
+
+## 現状と経緯
+
+ポスターを作るツールは3系統あり，**互いに置き換えるものではなく案件ごとに選ぶ**．
+ggposter は **R オブジェクトをそのまま載せられる**のが持ち味で，
+解析から出てきた図や表を並べるポスターに向く．
+3つはヘッダーのキー名と `grid:` の書式を共有し，同じ4本の見本を持つ．
