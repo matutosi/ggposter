@@ -156,11 +156,8 @@ with_notes <- function(main, notes_md, theme, total_width_mm, notes_width = 0.35
     # column, it never stretches a narrower one to fill it, so a border
     # drawn at the column's full width would show a misleadingly large
     # "empty" margin that was never really part of the table's own area.
-    plot_area_gp <- grid::gpar(fill = NA, col = "#FF00FF", lty = "dashed", lwd = 1.2)
     plot_area_for <- function(g) {
-      grid::rectGrob(x = 0, y = 1, just = c("left", "top"),
-                     width = measure_width(g), height = measure_height(g),
-                     gp = plot_area_gp)
+      plot_area_grob(width = measure_width(g), height = measure_height(g))
     }
     row <- gtable::gtable_add_grob(row, plot_area_for(main), t = 1, l = 1, z = Inf, name = "plot_area_main")
     row <- gtable::gtable_add_grob(row, plot_area_for(notes_grob), t = 1, l = 3, z = Inf, name = "plot_area_notes")

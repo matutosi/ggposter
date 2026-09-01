@@ -97,10 +97,7 @@ poster_card <- function(body, header = NULL, theme = poster_theme(),
   # itself; adding another one around the whole combined body here would
   # just nest a third, redundant border around both of them.
   if (show_plot_area && !isTRUE(attr(body, "plot_area_drawn"))) {
-    plot_area <- grid::rectGrob(
-      gp = grid::gpar(fill = NA, col = "#FF00FF", lty = "dashed", lwd = 1.2)
-    )
-    content <- gtable::gtable_add_grob(content, plot_area, t = body_t, l = 1,
+    content <- gtable::gtable_add_grob(content, plot_area_grob(), t = body_t, l = 1,
                                        z = Inf, name = "plot_area")
   }
 
@@ -116,6 +113,26 @@ poster_card <- function(body, header = NULL, theme = poster_theme(),
   )
   class(card) <- c("poster_card", class(card))
   card
+}
+
+#' The dashed magenta outline drawn by every `show_plot_area = TRUE` path
+#'
+#' One definition rather than three copies of the same `gpar()`: the outline
+#' is a single visual convention (it marks what a poster element actually
+#' fills), and it was drifting apart across [poster_card()], [header_tab()]
+#' and `with_notes()` in `R/content.R`.
+#'
+#' @param width,height Size of the outline. Both `NULL` (the default) fills
+#'   the whole cell the grob is placed in; giving them draws the outline at
+#'   the content's own measured size, top-left anchored inside a wider cell.
+#' @return A [grid::rectGrob()].
+#' @keywords internal
+#' @noRd
+plot_area_grob <- function(width = NULL, height = NULL) {
+  gp <- grid::gpar(fill = NA, col = "#FF00FF", lty = "dashed", lwd = 1.2)
+  if (is.null(width) && is.null(height)) return(grid::rectGrob(gp = gp))
+  grid::rectGrob(x = 0, y = 1, just = c("left", "top"),
+                 width = width, height = height, gp = gp)
 }
 
 #' Header tab grob: accent-filled rounded rectangle sized to the label text
@@ -156,10 +173,7 @@ header_tab <- function(label, theme, header_size, show_plot_area = FALSE) {
   tab <- gtable::gtable(widths = grid::unit.c(tw, grid::unit(1, "null")), heights = th)
   tab <- gtable::gtable_add_grob(tab, grid::grobTree(rect, txt), t = 1, l = 1, name = "tab")
   if (show_plot_area) {
-    plot_area <- grid::rectGrob(
-      gp = grid::gpar(fill = NA, col = "#FF00FF", lty = "dashed", lwd = 1.2)
-    )
-    tab <- gtable::gtable_add_grob(tab, plot_area, t = 1, l = 1, z = Inf, name = "plot_area")
+    tab <- gtable::gtable_add_grob(tab, plot_area_grob(), t = 1, l = 1, z = Inf, name = "plot_area")
   }
   tab$height <- th
   tab$width <- tw

@@ -306,6 +306,59 @@ grid_box_int <- function(value, field, box_name, min_value) {
   as.integer(value)
 }
 
+#' Resolve a stack of tracks to absolute millimetre sizes
+#'
+#' The one sizing rule a poster body follows, in both of its layouts: a
+#' track (a card row in [build_column()], a grid row in [build_grid_body()])
+#' either measures its own content (`"auto"`) or takes a relative share of
+#' whatever the measured tracks leave behind. Resolving everything to plain
+#' absolute millimetres -- rather than mixing in a `"null"` unit -- is
+#' deliberate: a gtable carrying a `"null"` row made patchwork's
+#' `wrap_elements(full=)` draw the whole gtable a second time, as a faint
+#' duplicate further down the page.
+#'
+#' The two callers had near-identical copies of this, which is how the
+#' figure-height bug fixed on 2026-09-02 could be present in one sizing
+#' path and not the other.
+#'
+#' @param is_auto Logical, one entry per track: `TRUE` if the track is
+#'   sized by its own measured content.
+#' @param auto_mm Numeric, one per track: the measured size of an `is_auto`
+#'   track (`0` for the others).
+#' @param weight Numeric, one per track: the relative share of a non-auto
+#'   track (`0` for the others).
+#' @param total_mm Space available to the whole stack, in millimetres.
+#' @param overflow_message A cli message to warn with when the measured
+#'   tracks alone are taller than `total_mm`, or `NULL` to stay silent. The
+#'   string may use `{overflow_mm}`.
+#' @return Numeric vector of track sizes in millimetres. When no track has
+#'   a weight to absorb the leftover space, one extra trailing entry (a
+#'   spacer) is appended, so the stack still totals `total_mm` and its
+#'   content stays top-anchored instead of centred.
+#' @keywords internal
+#' @noRd
+resolve_track_mm <- function(is_auto, auto_mm, weight, total_mm,
+                             overflow_message = NULL) {
+  auto_total  <- sum(auto_mm[is_auto])
+  overflow_mm <- round(auto_total - total_mm, 1)
+  if (!is.null(overflow_message) && auto_total - total_mm > 1e-6) {
+    cli::cli_warn(overflow_message, .envir = environment())
+  }
+  leftover_mm  <- max(total_mm - auto_total, 0)
+  weight_total <- sum(weight[!is_auto])
+  out <- vapply(seq_along(is_auto), function(i) {
+    if (is_auto[[i]]) {
+      auto_mm[[i]]
+    } else if (weight_total > 0) {
+      leftover_mm * weight[[i]] / weight_total
+    } else {
+      0
+    }
+  }, numeric(1))
+  if (weight_total == 0 && leftover_mm > 1e-6) out <- c(out, leftover_mm)
+  out
+}
+
 #' Build the body of a `grid:`-laid-out poster: one gtable of boxes placed by
 #' `x`/`y`/`w`/`h`, CSS-Grid style
 #'
@@ -331,9 +384,24 @@ grid_box_int <- function(value, field, box_name, min_value) {
 #'   cell span.
 #' @keywords internal
 #' @noRd
-build_grid_body <- function(grid_spec, sections, theme, objects, base_dir,
-                            col_width_mm, col_height_mm, show_plot_area = FALSE) {
-  n_cols <- validate_grid_columns(grid_spec)
+#' Read and check a `grid:` spec's boxes
+#'
+#' Everything that can be settled before a single card is built: the fields
+#' each box must carry and their types, that boxes and sections name each
+#' other exactly once, that no box runs off the right edge, and that no two
+#' boxes claim the same cell. Split out of [build_grid_body()] so that the
+#' rules live in one readable place rather than as a preamble to the
+#' measuring and assembly it has nothing to do with.
+#'
+#' @param grid_spec `spec$grid`.
+#' @param sections Named list of section specs (`spec$sections`).
+#' @param n_cols The grid's column count, from [validate_grid_columns()].
+#' @return A list with `boxes` (each `list(name=, x=, y=, w=, h=)`, all
+#'   integers, `x`/`y` 0-based) and `n_rows`, the number of rows the boxes
+#'   between them occupy.
+#' @keywords internal
+#' @noRd
+validate_grid_boxes <- function(grid_spec, sections, n_cols) {
   boxes <- lapply(grid_spec$boxes %||% list(), function(b) {
     if (is.null(b$name) || is.null(b$x) || is.null(b$y)) {
       cli::cli_abort("Every {.field grid$boxes} entry needs {.field name}, {.field x}, and {.field y}.")
@@ -377,6 +445,16 @@ build_grid_body <- function(grid_spec, sections, theme, objects, base_dir,
     }
   }
 
+  list(boxes = boxes, n_rows = n_rows)
+}
+
+build_grid_body <- function(grid_spec, sections, theme, objects, base_dir,
+                            col_width_mm, col_height_mm, show_plot_area = FALSE) {
+  n_cols   <- validate_grid_columns(grid_spec)
+  placed   <- validate_grid_boxes(grid_spec, sections, n_cols)
+  boxes    <- placed$boxes
+  n_rows   <- placed$n_rows
+
   boxes <- lapply(boxes, function(b) {
     is_spanning <- b$w > 1 || b$h > 1
     height_field <- sections[[b$name]]$height %||% 1
@@ -404,21 +482,9 @@ build_grid_body <- function(grid_spec, sections, theme, objects, base_dir,
     }
   }
 
-  sum_auto_mm <- sum(row_auto_mm[row_is_auto])
-  overflow_mm <- sum_auto_mm - col_height_mm
-  if (overflow_mm > 1e-6) {
-    cli::cli_warn("Poster grid content is {round(overflow_mm, 1)}mm taller than the page; some boxes may overlap.")
-  }
-  leftover_mm  <- max(col_height_mm - sum_auto_mm, 0)
-  weight_total <- sum(row_weight[!row_is_auto])
-  row_mm <- vapply(seq_len(n_rows), function(r) {
-    if (row_is_auto[[r]]) row_auto_mm[[r]]
-    else if (weight_total > 0) leftover_mm * row_weight[[r]] / weight_total
-    else 0
-  }, numeric(1))
-  if (weight_total == 0 && leftover_mm > 1e-6) {
-    row_mm <- c(row_mm, leftover_mm)
-  }
+  row_mm <- resolve_track_mm(
+    row_is_auto, row_auto_mm, row_weight, col_height_mm,
+    overflow_message = "Poster grid content is {overflow_mm}mm taller than the page; some boxes may overlap.")
 
   grid_gtable <- gtable::gtable(widths = grid::unit(rep(col_width_mm, n_cols), "mm"),
                                 heights = grid::unit(row_mm, "mm"))
@@ -515,32 +581,12 @@ build_column <- function(section_names, sections, theme, objects, base_dir,
     if (is_auto[[i]]) 0 else as.numeric(raw_heights[[i]])
   }, numeric(1))
 
-  # Resolving every row to a plain absolute mm value (rather than mixing in
-  # any "null" unit, whether from a numeric-weight section or a trailing
-  # spacer) is required here: handing patchwork's wrap_elements(full=) a
-  # gtable that contains a "null" row causes it to render that gtable's
-  # content a second time, as a faint duplicate further down the page, once
-  # the whole poster (title + body) is assembled. Absolute mm rows avoid
-  # that null-unit resolution path entirely.
-  leftover_mm  <- max(col_height_mm - sum(auto_mm), 0)
-  weight_total <- sum(weights)
-  row_mm <- vapply(seq_along(raw_heights), function(i) {
-    if (is_auto[[i]]) {
-      auto_mm[[i]]
-    } else if (weight_total > 0) {
-      leftover_mm * weights[[i]] / weight_total
-    } else {
-      0
-    }
-  }, numeric(1))
-  # If no section has a numeric weight to absorb the leftover space (every
-  # section is "auto"), append a blank spacer row sized to the leftover mm
-  # directly, so the column's total height still equals col_height_mm and
-  # the cards stay top-anchored instead of being centered within whatever
-  # (larger) space the page ultimately allots to this column.
-  if (weight_total == 0 && leftover_mm > 0) {
-    row_mm <- c(row_mm, leftover_mm)
-  }
+  # Sized by the same rule as a grid: row -- see resolve_track_mm(), which
+  # also appends the trailing spacer that keeps a column of nothing but
+  # "auto" cards top-anchored at its full height. No overflow warning here:
+  # a column that outgrows the page has always been left to overlap
+  # silently, and starting to warn is a behaviour change, not a refactor.
+  row_mm  <- resolve_track_mm(is_auto, auto_mm, weights, col_height_mm)
   heights <- grid::unit(row_mm, "mm")
 
   col <- gtable::gtable(widths = grid::unit(1, "null"), heights = heights)
