@@ -28,6 +28,27 @@ _最終更新: 2026-08-31 15:20 (MATUTOSI_DP)_
 
 ### 現在の状態
 
+- 2026-09-02 02:53 (このセッション，x280-home)
+  **バグ・リファクタリング・テストを点検し，バグ7件を直した** (ユーザ指示の 2)．
+  - **実害2件**: (1) `width` だけを与えた図が `height: "auto"` のカードで
+    **高さ0**になり，ヘッダと余白だけの箱に潰れていた (`poster_card()` が
+    `measured_size` の**有無**だけを見ており，`poster_fix_size()` は寸法を
+    **片方ずつ**しか入れないため)．(2) `columns: 4` と書いても空の列が
+    落とされ，**3列**で組まれていた (姉妹ツールと配置が食い違う)．
+  - **静かに間違う4件**: `grid:` の `w: 0`・`h: -1`・`x: 0.9` が素通り
+    (`w: 0` は重なり検査もすり抜け，`r < l` の不正な gtable になっていた)／
+    **`theme$cjk_family` がどこからも使われていなかった** (別名・promote・
+    print はあるのに `gpar()` に届かず，和文も `base_family` で描いていた)／
+    空入力の意味不明なエラー／YAML 1.1 で真偽値になるキー (`on:` など)．
+  - **7件目は `document()` で露見した既存のバグ**．`read_poster_yaml()` の
+    roxygen ブロックが `restore_y_key()` の上に取り残されており，
+    **次に `document()` を回すと `read_poster_yaml()` が export から外れる**
+    状態だった (`man/`・`NAMESPACE` が 2026-08-31 以降古いままだった)．
+  - `cjk_family` は**文字列ごとに切り替える** (CJK を含む行だけ `cjk_family`，
+    ほかは `base_family`)．grid は1つの `gpar()` の中で書体を切り替えられないため．
+  - **検証**: 回帰テスト31件を追加 (153 → 184件，全通過)．
+    `R CMD check` **0/0/0**．見本4本とも A1・1ページで変わらず組めた．
+
 - 2026-08-31 15:20 (このセッション，MATUTOSI_DP) その3
   **README (英・日) を acposter・qtposter に揃えた** (ユーザ指示)．
   - **長いコードを別ファイルへ出した**．`README.Rmd` は 696 → 約 290 行．
@@ -203,25 +224,24 @@ README.md と READMEjp.md を `rmarkdown::render()` で再生成した。
 - 検証: `knitr::purl()` で README/READMEjp の R 仕様を取り出し、`read_poster_yaml()`
   で読んだ同梱 YAML と `all.equal()` で比較して一致を確認。
 
-### 直近のコミット履歴(develop ブランチ)
-
-- ee79923 日本語版 README(READMEjp.Rmd)を追加
-- 488b6f6 図のキャプションを図の下に箇条書きとして表示できるように対応
-- c0d0360 howto レイアウト仕様のカンマ抜けを修正し README を再knit
-- 02db6e0 チュートリアルポスターでタイトルバンドとレイアウト設定を解説
-- cd1e42c テキストカードのインデント保持と列をまたいだ行揃えを追加
-- ecb0d76 「How to Make an Academic Poster」チュートリアルに YAML 仕様の中央列を追加
-- 0440ca7 README.md を再knitし、誤って評価されていたインストールチャンクを修正
-- bbedfd9 「How to Make an Academic Poster」チュートリアルポスターのレイアウトを改訂
-
-### 未コミットの変更
-
-- `README.Rmd` / `READMEjp.Rmd`: 表示上の高さの値・本文のカード順・生成元コメントを修正。
-- `README.md`(再生成)、`READMEjp.md`(新規)、`man/figures/README-howto-poster.png`(再生成)。
-- `inst/extdata/poster_sample_howto.yml`: README の仕様に合わせて更新。
-- `.gitignore`: `poster.pdf`・`*.html`(github_document のプレビュー)・`.claude/` を
-  追跡対象外に追加。`CLAUDE.md` は追跡する。
-
 ### 次にやること候補
 
-- 非対称レイアウトは `spec$grid` として実装済み(上の「現在の状態」参照)。特になし。
+**テストの穴** (2026-09-02 の点検で洗い出した．バグは直したが，ここは手つかず)．
+
+- **`layout$align_rows` のテストが1件も無い**．二段組み立て (測る → 建て直す) という
+  最も込み入った経路で，`poster_sample_howto.yml`・`howto2`・README が使っている．
+  2026-09-02 に実機で正しく動くことは確かめた (左右とも1行目が 85.4mm に揃う) が，
+  **回帰を守るものが無い**．優先度は最も高い．
+- **`poster_title()` のテストが1件も無い** (`logo`・`funding` の余白行・折り返し)．
+- `with_caption_below()` (図の `caption:`) のテストが無い．
+- `poster_register_font()` が未テスト．
+
+**リファクタリングの候補** (同じ点検より．どれも動作は変えない)．
+
+- `build_column()` と `build_grid_body()` で，**行の高さを決める約20行がほぼ完全な重複**
+  (auto/weight → leftover → `row_mm` → 余りのスペーサ行)．
+  `resolve_track_mm()` に括り出せば，「片方だけ直す」事故を防げる．
+- `gpar(fill=NA, col="#FF00FF", lty="dashed", lwd=1.2)` が `R/card.R` ×2・
+  `R/content.R` ×1 にコピーされている．`plot_area_grob()` 1つにまとめる．
+- `build_grid_body()` (150行) が検査・測定・組み立てを1関数でやっている．
+  検査部分を `validate_grid_boxes()` として切り出す．
