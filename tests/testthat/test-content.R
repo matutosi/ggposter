@@ -225,3 +225,47 @@ test_that("a card's main content is built to the same width with_notes() then gi
   expect_equal(widths_mm[2], ggposter:::NOTES_GAP_MM, tolerance = 1e-6)
   expect_equal(sum(widths_mm), total_mm, tolerance = 1e-6)
 })
+
+test_that("with_caption_below() stacks a bullet list under the figure at full width", {
+  skip_if_not_installed("ggplot2")
+  th <- poster_theme(base_family = "Arial")
+  gg <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+  fig <- card_figure(gg, th, width = 100, height = 70)
+  out <- ggposter:::with_caption_below(fig, c("- one", "- two"), th, 100)
+
+  inner <- out$children[[1]]
+  expect_setequal(inner$layout$name, c("main", "caption"))
+  expect_equal(inner$layout$t[inner$layout$name == "main"], 1)
+  expect_equal(inner$layout$t[inner$layout$name == "caption"], 3)   # row 2 is the gap
+
+  heights_mm <- grid::convertHeight(inner$heights, "mm", valueOnly = TRUE)
+  expect_equal(heights_mm[1], 70)                                   # the figure's own height
+  expect_equal(heights_mm[2], ggposter:::NOTES_GAP_MM)
+  expect_gt(heights_mm[3], 0)                                       # the caption has substance
+  expect_equal(grid::convertWidth(inner$widths, "mm", valueOnly = TRUE), 100)
+
+  # And the whole thing stays measurable, so a height = "auto" card can size
+  # itself to it rather than to the bare grobTree wrapper's 0.
+  expect_gt(grid::convertHeight(ggposter:::measure_height(out), "mm", valueOnly = TRUE), 70)
+})
+
+test_that("a figure body's caption: is placed below it, and notes: wins over caption:", {
+  skip_if_not_installed("ggplot2")
+  gg <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+  th <- poster_theme(base_family = "Arial")
+
+  # A caption string is split on "\n" into one bullet line per element.
+  captioned <- ggposter:::build_body(
+    list(type = "figure", object = "gg", caption = "- one\n- two"),
+    th, list(gg = gg), ".", col_width_mm = 200)
+  rows <- captioned$children[[1]]
+  expect_setequal(rows$layout$name, c("main", "caption"))
+
+  # notes: puts the list beside the figure instead, and takes precedence.
+  noted <- ggposter:::build_body(
+    list(type = "figure", object = "gg", notes = c("- one"), caption = "- ignored"),
+    th, list(gg = gg), ".", col_width_mm = 200)
+  side <- noted$children[[1]]
+  expect_setequal(side$layout$name, c("main", "notes"))
+  expect_equal(side$layout$l[side$layout$name == "notes"], 3)   # beside, not below
+})

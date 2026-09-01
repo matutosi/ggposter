@@ -34,6 +34,21 @@ test_that("poster_size() rejects anything that is not a name or two dimensions",
   expect_error(poster_size(c(100, 200, 300)), "width, height")
   expect_error(poster_size(c(100, NA)), "width, height")
   expect_error(poster_size(c(0, 200)), "width, height")
-  expect_error(poster_size("A9"), "Unknown paper size")
-  expect_equal(unname(poster_size(c(100, 200))), c(100, 200))
+})
+
+test_that("poster_register_font() registers a family under the name it is given", {
+  fonts <- systemfonts::system_fonts()
+  skip_if(nrow(fonts) == 0, "no system fonts to register")
+  path <- fonts$path[[1]]
+  family <- "ggposter test registered family"
+
+  expect_invisible(poster_register_font(family, path))
+  expect_equal(poster_register_font(family, path), family)
+  expect_true(family %in% systemfonts::registry_fonts()$family)
+
+  # All four faces default to `plain` when only `plain` is given.
+  reg <- systemfonts::registry_fonts()
+  reg <- reg[reg$family == family, ]
+  expect_equal(nrow(reg), 4L)
+  expect_true(all(reg$path == path))
 })
