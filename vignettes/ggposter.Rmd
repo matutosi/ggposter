@@ -381,9 +381,17 @@ th
 ```
 
 ```{r cjk, eval = FALSE}
-# For a Japanese poster, pick an installed CJK-capable family:
-th_jp <- poster_theme(base_family = poster_font(cjk = TRUE))
+# `cjk_family` already defaults to an installed CJK-capable family, and each
+# piece of text -- title row, card header, body line, table, photo caption --
+# is drawn in it when it actually contains CJK characters, and in
+# `base_family` otherwise. Name one explicitly only to override that choice:
+th_jp <- poster_theme(base_family = "Noto Sans", cjk_family = "Noto Sans JP")
 ```
+
+A mixed poster therefore needs no special handling: a Latin heading and a
+Japanese paragraph in the same card each get the family that can draw them
+(grid has no per-script fallback within a single `gpar()`, so the choice is
+made per grob).
 
 ## Reproducing a real poster
 

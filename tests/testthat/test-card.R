@@ -94,3 +94,12 @@ test_that("header_tab() sizes the tab to the label without clipping it", {
   expect_s3_class(tab, "header_tab")
   expect_true(grid::is.unit(tab$width))
 })
+
+test_that("header_tab() draws a CJK header in cjk_family", {
+  th <- poster_theme(base_family = "Arial", cjk_family = "Helvetica")
+  cjk <- ggposter:::header_tab("目的", th, 20)
+  latin <- ggposter:::header_tab("OBJECTIVES", th, 20)
+  family <- function(tab) tab$grobs[[1]]$children[[2]]$gp$fontfamily
+  expect_equal(family(cjk), "Helvetica")
+  expect_equal(family(latin), "Arial")
+})

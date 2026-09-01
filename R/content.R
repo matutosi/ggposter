@@ -24,8 +24,14 @@
 #' @examples
 #' g <- card_text(c("- point one", "- point two"), poster_theme())
 card_text <- function(md, theme = poster_theme(), width = NULL) {
-  gp <- grid::gpar(fontsize = theme$base_size, fontfamily = theme$base_family,
-                   col = theme$body_text, lineheight = theme$lineheight)
+  # Per line, not once for the whole block: a card can mix a Latin heading
+  # with Japanese body text, and grid has no per-script fallback inside a
+  # single gpar() (see text_family()).
+  gp_for <- function(text) {
+    grid::gpar(fontsize = theme$base_size, fontfamily = text_family(text, theme),
+               col = theme$body_text, lineheight = theme$lineheight)
+  }
+  gp <- gp_for(NULL)   # Latin metrics, for the bullet and indent columns
   width <- if (is.null(width)) grid::unit(1, "npc") else as_mm_unit(width)
   bullet <- paste0(intToUtf8(0x2022), " ")
   bullet_w <- grid::grobWidth(grid::textGrob(bullet, gp = gp))
@@ -34,7 +40,7 @@ card_text <- function(md, theme = poster_theme(), width = NULL) {
   box <- function(text, w) {
     text <- gsub("`", "", text)  # drop code spans (gridtext has no <code> support)
     gridtext::textbox_grob(text, x = 0, y = 1, hjust = 0, vjust = 1, halign = 0,
-                           gp = gp, box_gp = grid::gpar(col = NA),
+                           gp = gp_for(text), box_gp = grid::gpar(col = NA),
                            padding = grid::unit(c(0, 0, 0, 0), "mm"),
                            width = w)
   }
@@ -176,7 +182,9 @@ card_table <- function(x, theme = poster_theme(), title = NULL, caption = NULL,
   build <- function(size_mult) {
     tt <- gridExtra::ttheme_minimal(
       base_size = theme$base_size * 0.8 * size_mult,
-      base_family = theme$base_family,
+      # One family for the whole table: gridExtra takes a single base_family,
+      # so a table with any CJK anywhere in it is drawn in cjk_family.
+      base_family = text_family(c(colnames(x), unlist(lapply(x, as.character))), theme),
       core = list(fg_params = list(col = theme$body_text)),
       colhead = list(fg_params = list(col = theme$body_text, fontface = "bold"))
     )
@@ -249,14 +257,14 @@ poster_add_annotation <- function(g, title = NULL, caption = NULL, theme, size_m
   if (!is.null(title)) {
     tg <- grid::textGrob(title, x = 0, hjust = 0,
       gp = grid::gpar(fontsize = theme$base_size * 0.95 * size_mult, fontface = "bold",
-                      fontfamily = theme$base_family, col = theme$body_text))
+                      fontfamily = text_family(title, theme), col = theme$body_text))
     grobs <- c(list(tg), grobs)
     heights <- c(list(grid::grobHeight(tg) + grid::unit(3, "mm")), heights)
   }
   if (!is.null(caption)) {
     cg <- grid::textGrob(caption, x = 0, hjust = 0,
       gp = grid::gpar(fontsize = theme$base_size * 0.7 * size_mult, fontface = "italic",
-                      fontfamily = theme$base_family, col = theme$body_text))
+                      fontfamily = text_family(caption, theme), col = theme$body_text))
     grobs <- c(grobs, list(cg))
     heights <- c(heights, list(grid::grobHeight(cg) + grid::unit(3, "mm")))
   }
@@ -412,14 +420,14 @@ card_image <- function(files, labels = NULL, theme = poster_theme(),
       gridtext::textbox_grob(l, x = grid::unit(0.5, "npc"), y = grid::unit(2, "mm"),
                              hjust = 0.5, vjust = 0, halign = 0.5, width = w,
                              gp = grid::gpar(fontsize = theme$base_size * 0.6,
-                                             fontfamily = theme$base_family, col = "#FFFFFF"),
+                                             fontfamily = text_family(l, theme), col = "#FFFFFF"),
                              box_gp = grid::gpar(col = NA),
                              padding = grid::unit(c(0, 0, 0, 0), "mm"))
     } else {
       gridtext::textbox_grob(l, x = grid::unit(0.5, "npc"), y = grid::unit(1, "npc"),
                              hjust = 0.5, vjust = 1, halign = 0.5, width = w,
                              gp = grid::gpar(fontsize = theme$base_size * 0.6,
-                                             fontfamily = theme$base_family, col = theme$body_text),
+                                             fontfamily = text_family(l, theme), col = theme$body_text),
                              box_gp = grid::gpar(col = NA),
                              padding = grid::unit(c(0, 0, 0, 0), "mm"))
     }

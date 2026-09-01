@@ -165,3 +165,30 @@ test_that("with_notes(show_plot_area=TRUE) sizes the main border to its own cont
   area_main <- row$grobs[[which(row$layout$name == "plot_area_main")]]
   expect_equal(grid::convertWidth(area_main$width, "mm", valueOnly = TRUE), 20)
 })
+
+test_that("text is drawn in cjk_family only when it actually contains CJK", {
+  # Regression test: theme$cjk_family was stored, printed, and accepted as
+  # an alias, but never reached a single gpar() -- every text grob used
+  # base_family, so Japanese on a Latin-family poster fell back to whatever
+  # substitute the device picked. Both families here are ones setup.R maps
+  # to real metrics, so no font warning is raised.
+  th <- poster_theme(base_family = "Arial", cjk_family = "Helvetica")
+  expect_equal(ggposter:::text_family("survey plots", th), "Arial")
+  expect_equal(ggposter:::text_family("植生調査", th), "Helvetica")
+  # Fullwidth punctuation alone is enough to need the CJK face.
+  expect_equal(ggposter:::text_family("A，B", th), "Helvetica")
+  expect_equal(ggposter:::text_family(NULL, th), "Arial")
+  # An empty cjk_family falls back rather than handing "" to the device.
+  expect_equal(ggposter:::text_family("植生", poster_theme(base_family = "Arial", cjk_family = "")),
+               "Arial")
+})
+
+test_that("card_text() picks the family per line, not once per card", {
+  th <- poster_theme(base_family = "Arial", cjk_family = "Helvetica")
+  g <- card_text(c("latin only", "植生調査"), th)
+  families <- vapply(g$grobs, function(row) {
+    txt <- if (inherits(row, "gtable")) row$grobs[[length(row$grobs)]] else row
+    txt$gp$fontfamily
+  }, character(1))
+  expect_equal(families, c("Arial", "Helvetica"))
+})

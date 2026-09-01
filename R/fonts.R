@@ -59,3 +59,46 @@ poster_register_font <- function(family, plain, bold = plain,
   )
   invisible(family)
 }
+
+#' Does a string contain CJK characters?
+#'
+#' Covers the ranges a poster realistically carries: CJK symbols and
+#' punctuation, hiragana/katakana, the two main Han blocks, compatibility
+#' ideographs, and the fullwidth/halfwidth forms.
+#'
+#' @param x A character vector (or anything coercible to one).
+#' @return `TRUE` if any element contains a CJK character.
+#' @keywords internal
+#' @noRd
+has_cjk <- function(x) {
+  if (is.null(x) || !length(x)) return(FALSE)
+  x <- as.character(x)
+  x <- x[!is.na(x)]
+  if (!length(x)) return(FALSE)
+  # Written as ASCII \u escapes rather than the characters themselves:
+  # R CMD check requires a portable package to keep its R *code* ASCII.
+  pattern <- paste0("[\u3000-\u303F\u3040-\u309F\u30A0-\u30FF",
+                    "\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]")
+  any(grepl(pattern, x, perl = TRUE))
+}
+
+#' Pick the font family that can actually draw a string
+#'
+#' `theme$cjk_family` used to be stored, printed and accepted as an alias
+#' but never reached a single `gpar()`: every text grob was drawn in
+#' `base_family`, so Japanese text on a poster with a Latin `base_family`
+#' fell back to whatever substitute the device chose. Each piece of text is
+#' now drawn in `cjk_family` when it actually contains CJK characters, and
+#' in `base_family` otherwise -- grid has no per-script fallback within a
+#' single `gpar()`, so the choice has to be made per grob.
+#'
+#' @param x The text about to be drawn.
+#' @param theme A [poster_theme()] object.
+#' @return A font family name (character scalar).
+#' @keywords internal
+#' @noRd
+text_family <- function(x, theme) {
+  if (!has_cjk(x)) return(theme$base_family)
+  cjk <- theme$cjk_family
+  if (is.null(cjk) || !nzchar(cjk)) theme$base_family else cjk
+}

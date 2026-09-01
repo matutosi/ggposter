@@ -18,9 +18,9 @@
 poster_title <- function(title, subtitle = NULL, authors = NULL,
                          affiliations = NULL, funding = NULL, logo = NULL,
                          theme = poster_theme(), width = NULL) {
-  gp <- function(mult, face = "plain", col = theme$header_text) {
+  gp <- function(text, mult, face = "plain", col = theme$header_text) {
     grid::gpar(fontsize = theme$base_size * mult, fontface = face,
-              fontfamily = theme$base_family, col = col,
+              fontfamily = text_family(text, theme), col = col,
               lineheight = theme$lineheight)
   }
   wrap_width <- if (is.null(width)) NULL else as_mm_unit(width)
@@ -51,12 +51,12 @@ poster_title <- function(title, subtitle = NULL, authors = NULL,
   # Authors and affiliations are set at the same size as body text (1.0x);
   # only the title/subtitle are enlarged and funding is shrunk and
   # right-aligned, set apart from the author/affiliation block above it.
-  push("title", txt_grob(title, gp(1.9, "bold")))
-  if (!is.null(subtitle))     push("subtitle", txt_grob(subtitle, gp(1.2)))
-  if (!is.null(authors))      push("authors", txt_grob(authors, gp(1.0)))
-  if (!is.null(affiliations)) push("affiliations", txt_grob(affiliations, gp(1.0)))
+  push("title", txt_grob(title, gp(title, 1.9, "bold")))
+  if (!is.null(subtitle))     push("subtitle", txt_grob(subtitle, gp(subtitle, 1.2)))
+  if (!is.null(authors))      push("authors", txt_grob(authors, gp(authors, 1.0)))
+  if (!is.null(affiliations)) push("affiliations", txt_grob(affiliations, gp(affiliations, 1.0)))
   if (!is.null(funding)) {
-    funding_grob <- txt_grob(funding, gp(0.6), hjust = 1)
+    funding_grob <- txt_grob(funding, gp(funding, 0.6), hjust = 1)
     if (length(row_grobs) > 0) {
       # An extra spacer row, sized to duplicate the gap every other pair of
       # rows already gets from their own content_pad_factor padding, so the

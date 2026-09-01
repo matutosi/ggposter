@@ -120,7 +120,7 @@ poster_card <- function(body, header = NULL, theme = poster_theme(),
 #' @noRd
 header_tab <- function(label, theme, header_size, show_plot_area = FALSE) {
   gp_txt <- grid::gpar(col = theme$header_text, fontsize = header_size,
-                       fontfamily = theme$base_family, fontface = "bold")
+                       fontfamily = text_family(label, theme), fontface = "bold")
   measure <- grid::textGrob(label, gp = gp_txt)
   # Kept as lazy grobWidth()/grobHeight() units, resolved at draw time
   # against whatever device is actually current then: poster() typically

@@ -42,8 +42,12 @@ number interpreted as millimetres.}
 \item{base_family}{Font family for Latin text. \code{NULL} picks a sensible
 default via \code{\link[=poster_font]{poster_font()}}.}
 
-\item{cjk_family}{Font family for CJK (Japanese) text. \code{NULL} falls back to
-\code{base_family}.}
+\item{cjk_family}{Font family for CJK (Japanese) text. \code{NULL} picks an
+installed Japanese-capable family via \code{\link[=poster_font]{poster_font()}}, falling back to
+\code{base_family}. Used automatically, per piece of text: any title row,
+card header, body line, table, or photo caption that contains CJK
+characters is drawn in this family, everything else in \code{base_family}
+(grid has no per-script fallback within one \code{gpar()}).}
 
 \item{pad}{Inner padding of a card, as a \link[grid:unit]{grid::unit} or millimetres.
 \code{NULL} (default) uses one line's height of \code{base_size}/\code{lineheight} --

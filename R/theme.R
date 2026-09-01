@@ -16,8 +16,12 @@
 #' @param base_size Base font size in points (for A1 output).
 #' @param base_family Font family for Latin text. `NULL` picks a sensible
 #'   default via [poster_font()].
-#' @param cjk_family Font family for CJK (Japanese) text. `NULL` falls back to
-#'   `base_family`.
+#' @param cjk_family Font family for CJK (Japanese) text. `NULL` picks an
+#'   installed Japanese-capable family via [poster_font()], falling back to
+#'   `base_family`. Used automatically, per piece of text: any title row,
+#'   card header, body line, table, or photo caption that contains CJK
+#'   characters is drawn in this family, everything else in `base_family`
+#'   (grid has no per-script fallback within one `gpar()`).
 #' @param pad Inner padding of a card, as a [grid::unit] or millimetres.
 #'   `NULL` (default) uses one line's height of `base_size`/`lineheight` --
 #'   a physical-unit conversion of the font size, not a text measurement, so
