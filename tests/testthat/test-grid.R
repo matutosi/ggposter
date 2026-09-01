@@ -119,6 +119,9 @@ test_that("read_poster_yaml() reads an unquoted y: in grid boxes", {
   # R の yaml は YAML 1.1 なので，引用符の無い `y` を真偽値として読む
   # (キーが "TRUE" になる)．姉妹ツール (acposter・qtposter) からヘッダーを
   # そのまま移せるよう，読み込んだ直後にキー名を戻している．
+  # **これは yaml11_bad_keys() の見張りも兼ねる** (test-yaml.R)．あちらは
+  # 戻せないキーで止めるので，戻せるこの `y` を巻き込んでいないことを，
+  # 重複を作らずここで確かめている．
   tmp <- tempfile(fileext = ".yml")
   writeLines(c(
     "grid:",
