@@ -41,14 +41,20 @@ poster_card <- function(body, header = NULL, theme = poster_theme(),
   pad  <- theme$pad
   has_header <- !is.null(header) && !all(is.na(header)) && nzchar(header[[1]])
   body_h <- if (fit_content) {
-    # A body with a cached "measured_size" (see anchor_top_left()/
-    # poster_fix_size()) already has an explicit, deliberately-chosen size
-    # -- a table's actual rendered height, or a figure's explicit width/
+    # A body with a cached "measured_size" *height* (see anchor_top_left()/
+    # poster_fix_size()) already has an explicit, deliberately-chosen
+    # height -- a table's actual rendered height, or a figure's explicit
     # height -- not a tight text measurement that needs extra breathing
     # room, so content_pad_factor is skipped for it (applying it on top of
     # an already-fixed figure height, for example, was compounding into a
     # visibly oversized card).
-    if (!is.null(attr(body, "measured_size"))) {
+    #
+    # The *height* specifically, not the presence of the attribute:
+    # poster_fix_size() caches each dimension on its own, so a figure given
+    # only a width carries a "measured_size" whose height is NULL. Testing
+    # the attribute as a whole skipped the padding for that case too, on a
+    # height that was never fixed at all.
+    if (!is.null(attr(body, "measured_size")$height)) {
       measure_height(body)
     } else {
       measure_height(body) * theme$content_pad_factor

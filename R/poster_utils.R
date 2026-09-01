@@ -26,7 +26,15 @@ poster_size <- function(size = "A1", orientation = "portrait") {
     }
     known[[key]]
   } else {
-    as.numeric(size)
+    wh <- suppressWarnings(as.numeric(size))
+    if (length(wh) != 2 || anyNA(wh) || any(!is.finite(wh)) || any(wh <= 0)) {
+      cli::cli_abort(c(
+        "Paper size must be a name or {.code c(width, height)} in millimetres.",
+        "x" = "Got {.val {size}}.",
+        "i" = "Recognised names: {.val {names(known)}}."
+      ))
+    }
+    wh
   }
   if (identical(orientation, "landscape")) wh <- rev(wh)
   stats::setNames(wh, c("width", "height"))
@@ -80,6 +88,12 @@ anchor_top_left <- function(g, clip = "off") {
 #' a `"measured_size"` attribute, which is used in preference to either (a
 #' bare `grobTree()` wrapper has no measurable height/width of its own).
 #'
+#' [poster_fix_size()] fixes only one dimension at a time, so its
+#' `"measured_size"` can hold a width with a `NULL` height (or the reverse).
+#' For the missing half, measuring the `grobTree()` wrapper returns 0, so
+#' the grob it wraps is kept as a `"measured_source"` attribute and measured
+#' instead.
+#'
 #' @param g A grob or gtable.
 #' @return A [grid::unit] scalar.
 #' @keywords internal
@@ -87,6 +101,8 @@ anchor_top_left <- function(g, clip = "off") {
 measure_width <- function(g) {
   cached <- attr(g, "measured_size")
   if (!is.null(cached) && !is.null(cached$width)) return(cached$width)
+  src <- attr(g, "measured_source")
+  if (!is.null(src)) return(measure_width(src))
   if (inherits(g, "gtable")) gtable::gtable_width(g) else grid::grobWidth(g)
 }
 
@@ -96,5 +112,7 @@ measure_width <- function(g) {
 measure_height <- function(g) {
   cached <- attr(g, "measured_size")
   if (!is.null(cached) && !is.null(cached$height)) return(cached$height)
+  src <- attr(g, "measured_source")
+  if (!is.null(src)) return(measure_height(src))
   if (inherits(g, "gtable")) gtable::gtable_height(g) else grid::grobHeight(g)
 }

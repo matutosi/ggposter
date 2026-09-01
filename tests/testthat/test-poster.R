@@ -221,3 +221,84 @@ test_that("poster() reads a spec from a YAML file path", {
   ))
   expect_s3_class(p, "ggposter")
 })
+
+test_that("a height='auto' figure card with an explicit width (no height) is sized to that width", {
+  # Regression test for the mirror image of the case above. poster_card()
+  # skipped content_pad_factor whenever the body carried a "measured_size"
+  # attribute at all, but poster_fix_size() caches each dimension on its
+  # own: a width-only figure's cached height is NULL, so measure_height()
+  # fell through to the bare grobTree() wrapper and returned 0. The card
+  # collapsed to just its header and padding, and the figure was drawn into
+  # a zero-height cell.
+  skip_if_not_installed("ggplot2")
+  gg <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+  spec <- list(
+    layout = list(left = c("a", "b")),
+    sections = list(
+      a = list(header = "A", height = "auto",
+               body = list(type = "figure", object = "gg", width = 100)),
+      b = list(header = "B", height = "auto", body = list(type = "text", md = "- next card"))
+    )
+  )
+  p <- poster(spec, objects = list(gg = gg))
+  col <- p$patchwork$grobs[[which(p$patchwork$layout$name == "left")]]
+  heights_mm <- grid::convertHeight(col$heights, "mm", valueOnly = TRUE)
+  # 100mm wide at the default 4:3 gives a 75mm figure, plus header and padding.
+  expect_gt(heights_mm[1], 75)
+})
+
+test_that("a height='auto' figure card with neither width nor height is still measurable", {
+  skip_if_not_installed("ggplot2")
+  gg <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+  spec <- list(
+    layout = list(left = c("a", "b")),
+    sections = list(
+      a = list(header = "A", height = "auto", body = list(type = "figure", object = "gg")),
+      b = list(header = "B", height = "auto", body = list(type = "text", md = "- next card"))
+    )
+  )
+  p <- poster(spec, objects = list(gg = gg))
+  col <- p$patchwork$grobs[[which(p$patchwork$layout$name == "left")]]
+  heights_mm <- grid::convertHeight(col$heights, "mm", valueOnly = TRUE)
+  # A ggplotGrob on its own measures to its fixed axis/label rows (its panel
+  # is a "null" unit) -- around 18mm, whatever the poster's size. The card
+  # must instead follow from the column width it was given.
+  expect_gt(heights_mm[1], 100)
+})
+
+test_that("a figure in a card with a numeric height still fills its share of the column", {
+  # The 4:3 default above must not leak into the relative-height case, where
+  # the figure is meant to stretch to whatever share of the column it gets.
+  skip_if_not_installed("ggplot2")
+  gg <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+  spec <- list(
+    poster = list(size = "A1"),
+    layout = list(left = c("a", "b")),
+    sections = list(
+      a = list(header = "A", height = 3, body = list(type = "figure", object = "gg", width = 100)),
+      b = list(header = "B", height = 1, body = list(type = "text", md = "- next card"))
+    )
+  )
+  p <- poster(spec, objects = list(gg = gg))
+  col <- p$patchwork$grobs[[which(p$patchwork$layout$name == "left")]]
+  heights_mm <- grid::convertHeight(col$heights, "mm", valueOnly = TRUE)
+  expect_equal(heights_mm[1] / heights_mm[2], 3, tolerance = 1e-6)
+})
+
+test_that("a plain `columns` count keeps every column it asks for, even an empty one", {
+  # Regression test: build_poster() dropped columns with no sections in
+  # them, so `columns: 4` with three sections silently became three columns
+  # a quarter wider than the spec asked for -- the same header laid out
+  # differently here than in acposter/qtposter.
+  spec <- list(
+    poster = list(size = "A1"),
+    columns = 4,
+    sections = stats::setNames(
+      lapply(c("a", "b", "c"), function(n) list(body = list(type = "text", md = n))),
+      c("a", "b", "c"))
+  )
+  p <- poster(spec)
+  widths_mm <- grid::convertWidth(p$patchwork$widths, "mm", valueOnly = TRUE)
+  expect_length(widths_mm, 4)
+  expect_equal(widths_mm, rep(594 / 4, 4), tolerance = 1e-6)
+})

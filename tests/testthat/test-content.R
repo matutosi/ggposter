@@ -192,3 +192,36 @@ test_that("card_text() picks the family per line, not once per card", {
   }, character(1))
   expect_equal(families, c("Arial", "Helvetica"))
 })
+
+test_that("card_text() rejects empty content with a readable message", {
+  # It used to fail deep inside gtable with "attempt to set an attribute on
+  # NULL".
+  expect_error(card_text(character(0), poster_theme()), "is empty")
+})
+
+test_that("a card's main content is built to the same width with_notes() then gives it", {
+  # Regression test: build_body() subtracted a 5mm gap from the width
+  # budget while with_notes() subtracted 5/3mm, so the main content was
+  # built 3.3mm narrower than the column it was laid out in.
+  skip_if_not_installed("ggplot2")
+  gg <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+  th <- poster_theme()
+  spec <- list(
+    poster = list(size = "A1"),
+    layout = list(left = "a"),
+    sections = list(a = list(header = "A", height = "auto", body = list(
+      type = "figure", object = "gg", notes = c("- one", "- two"))))
+  )
+  p <- poster(spec, objects = list(gg = gg), theme = th)
+  pad_mm   <- grid::convertWidth(th$pad, "mm", valueOnly = TRUE)
+  total_mm <- 594 - 2 * pad_mm
+  expected_main <- total_mm * (1 - 0.35) - ggposter:::NOTES_GAP_MM
+
+  card  <- p$patchwork$grobs[[1]]$grobs[[1]]
+  body  <- card$grobs[[which(card$layout$name == "body")]]
+  row   <- body$children[[1]]
+  widths_mm <- grid::convertWidth(row$widths, "mm", valueOnly = TRUE)
+  expect_equal(widths_mm[1], expected_main, tolerance = 1e-6)
+  expect_equal(widths_mm[2], ggposter:::NOTES_GAP_MM, tolerance = 1e-6)
+  expect_equal(sum(widths_mm), total_mm, tolerance = 1e-6)
+})

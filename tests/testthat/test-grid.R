@@ -137,3 +137,42 @@ test_that("read_poster_yaml() reads an unquoted y: in grid boxes", {
   expect_equal(ys, c(0, 1, 1))
   expect_no_error(poster(spec))
 })
+
+test_that("grid: a zero or negative span is rejected instead of silently vanishing", {
+  # Regression test: w/h went through as.integer() with no check, so `w: 0`
+  # produced a box occupying no cells at all -- it slipped past the overlap
+  # check and then made a gtable entry with r < l. `h: -1` reached gtable
+  # and came back as "argument must be coercible to non-negative integer".
+  mk <- function(...) list(
+    poster = list(size = "A1"),
+    grid = list(columns = 2, boxes = list(
+      utils::modifyList(list(name = "a", x = 0, y = 0), list(...)),
+      list(name = "b", x = 1, y = 0))),
+    sections = list(a = list(body = list(type = "text", md = "a")),
+                    b = list(body = list(type = "text", md = "b")))
+  )
+  expect_error(poster(mk(w = 0)), "invalid.*w")
+  expect_error(poster(mk(h = 0)), "invalid.*h")
+  expect_error(poster(mk(h = -1)), "invalid.*h")
+})
+
+test_that("grid: a fractional coordinate is rejected instead of being truncated", {
+  # `x: 0.9` used to become column 0, not the column the spec named.
+  spec <- list(
+    poster = list(size = "A1"),
+    grid = list(columns = 2, boxes = list(
+      list(name = "a", x = 0.9, y = 0), list(name = "b", x = 1, y = 0))),
+    sections = list(a = list(body = list(type = "text", md = "a")),
+                    b = list(body = list(type = "text", md = "b")))
+  )
+  expect_error(poster(spec), "invalid.*x")
+})
+
+test_that("grid: a negative coordinate names the field it came from", {
+  spec <- list(
+    poster = list(size = "A1"),
+    grid = list(columns = 2, boxes = list(list(name = "a", x = -1, y = 0))),
+    sections = list(a = list(body = list(type = "text", md = "a")))
+  )
+  expect_error(poster(spec), "invalid.*x")
+})

@@ -184,10 +184,16 @@ build_poster <- function(spec, objects = list(), theme = NULL, base_dir = NULL,
     body_row <- if (!is.null(title_grob)) 2 else 1
     full <- gtable::gtable_add_grob(full, body_grob, t = body_row, l = 1, r = n_cols, name = "grid_body")
   } else {
-    layout <- spec$layout %||% list(left = names(spec$sections), right = character(0))
+    layout <- spec$layout %||% list(left = names(spec$sections))
     align_rows <- isTRUE(layout$align_rows)
     columns <- layout[setdiff(names(layout), c("columns", "align_rows"))]
-    columns <- columns[lengths(columns) > 0]
+    # Empty columns are kept, not dropped. A top-level `columns: 4` with
+    # only three sections expands (via flow_layout()) to three filled
+    # columns and one empty one, and dropping the empty one silently
+    # widened the other three to a quarter more than the spec asked for --
+    # the same header laid out differently here than in acposter/qtposter,
+    # which is exactly what the shared-key work was for. An explicitly
+    # written empty column is likewise taken at its word.
     col_width_mm <- size_mm[["width"]] / max(length(columns), 1)
 
     col_grobs <- lapply(columns, function(section_names) {
@@ -273,6 +279,33 @@ validate_grid_columns <- function(grid_spec) {
   as.integer(n_cols)
 }
 
+#' Coerce one `grid$boxes` coordinate/span to a whole number, or abort
+#'
+#' `as.integer()` alone was too permissive: it truncated a fractional `x`
+#' silently (`x: 0.9` became column 0, not the column the spec named), and
+#' let a zero or negative `w`/`h` through as an empty cell range. A
+#' zero-span box occupies no cells at all, so it slipped past the overlap
+#' check and then produced a gtable entry with `r < l`.
+#'
+#' @param value The value as written in the spec.
+#' @param field Field name (`"x"`, `"y"`, `"w"`, `"h"`), for the message.
+#' @param box_name The box's `name`, for the message.
+#' @param min_value Smallest value accepted: `0` for a coordinate, `1` for a
+#'   span.
+#' @return `value` as a length-1 integer.
+#' @keywords internal
+#' @noRd
+grid_box_int <- function(value, field, box_name, min_value) {
+  if (!is.numeric(value) || length(value) != 1 || !is.finite(value) ||
+      value != round(value) || value < min_value) {
+    cli::cli_abort(c(
+      "{.field grid$boxes} entry {.val {box_name}} has an invalid {.field {field}}: {.val {value}}.",
+      "i" = "{.field {field}} must be a single whole number, {min_value} or greater."
+    ))
+  }
+  as.integer(value)
+}
+
 #' Build the body of a `grid:`-laid-out poster: one gtable of boxes placed by
 #' `x`/`y`/`w`/`h`, CSS-Grid style
 #'
@@ -305,8 +338,14 @@ build_grid_body <- function(grid_spec, sections, theme, objects, base_dir,
     if (is.null(b$name) || is.null(b$x) || is.null(b$y)) {
       cli::cli_abort("Every {.field grid$boxes} entry needs {.field name}, {.field x}, and {.field y}.")
     }
-    list(name = b$name, x = as.integer(b$x), y = as.integer(b$y),
-        w = as.integer(b$w %||% 1), h = as.integer(b$h %||% 1))
+    if (!is.character(b$name) || length(b$name) != 1) {
+      cli::cli_abort("Every {.field grid$boxes} {.field name} must be a single section name.")
+    }
+    list(name = b$name,
+        x = grid_box_int(b$x, "x", b$name, 0),
+        y = grid_box_int(b$y, "y", b$name, 0),
+        w = grid_box_int(b$w %||% 1, "w", b$name, 1),
+        h = grid_box_int(b$h %||% 1, "h", b$name, 1))
   })
 
   box_names <- vapply(boxes, `[[`, character(1), "name")
@@ -319,7 +358,7 @@ build_grid_body <- function(grid_spec, sections, theme, objects, base_dir,
     cli::cli_abort("{cli::qty(length(unplaced))} Section{?s} defined in {.field sections} but not placed in {.field grid$boxes}: {.val {unplaced}}.")
   }
 
-  overflow <- Filter(function(b) b$x < 0 || b$y < 0 || b$x + b$w > n_cols, boxes)
+  overflow <- Filter(function(b) b$x + b$w > n_cols, boxes)
   if (length(overflow)) {
     overflow_names <- vapply(overflow, `[[`, character(1), "name")
     cli::cli_abort("{cli::qty(length(overflow))} Box{?es} overflow the grid's {n_cols} {cli::qty(n_cols)} column{?s}: {.val {overflow_names}}.")
@@ -528,13 +567,16 @@ build_section <- function(name, section, theme, objects, base_dir, col_width_mm,
   if (is.null(section)) {
     cli::cli_abort("Section {.val {name}} is referenced in {.field layout} but missing from {.field sections}.")
   }
-  body <- build_body(section$body, theme, objects, base_dir, col_width_mm,
-                     show_plot_area = show_plot_area)
+  # Resolved before the body is built, not after: a fit-to-content card
+  # needs its figure to carry a real height (see build_body()), which the
+  # body builder can only decide if it knows the card will be measured.
   fit_content <- if (!is.null(fit_content_override)) {
     fit_content_override
   } else {
     identical(section$height %||% 1, "auto")
   }
+  body <- build_body(section$body, theme, objects, base_dir, col_width_mm,
+                     show_plot_area = show_plot_area, fit_content = fit_content)
   poster_card(body, header = section$header, theme = theme, fit_content = fit_content,
              show_plot_area = show_plot_area)
 }
@@ -554,7 +596,8 @@ build_section <- function(name, section, theme, objects, base_dir, col_width_mm,
 #' @return A grob (or ggplot, for `"figure"`) ready for [poster_card()].
 #' @keywords internal
 #' @noRd
-build_body <- function(body, theme, objects, base_dir, col_width_mm, show_plot_area = FALSE) {
+build_body <- function(body, theme, objects, base_dir, col_width_mm, show_plot_area = FALSE,
+                       fit_content = FALSE) {
   type <- body$type %||% "text"
   has_notes   <- type %in% c("table", "figure") && !is.null(body$notes)
   has_caption <- type == "figure" && !has_notes && !is.null(body$caption)
@@ -563,7 +606,7 @@ build_body <- function(body, theme, objects, base_dir, col_width_mm, show_plot_a
   # `body$width`, if given, is the *combined* budget for main content + notes
   # (not the main content's own width): with_notes() splits it further below.
   total_width_mm <- (body$width %||% col_width_mm) - 2 * pad_mm
-  main_width_mm  <- if (has_notes) total_width_mm * (1 - notes_width) - 5 else total_width_mm
+  main_width_mm  <- if (has_notes) total_width_mm * (1 - notes_width) - NOTES_GAP_MM else total_width_mm
 
   content <- switch(type,
     # Text wraps relative to its card ("npc", the default in card_text())
@@ -577,15 +620,28 @@ build_body <- function(body, theme, objects, base_dir, col_width_mm, show_plot_a
     table = card_table(objects[[body$object]], theme,
                        title = body$title, caption = body$caption,
                        width = main_width_mm),
-    figure = card_figure(objects[[body$object]], theme,
-                        # A figure paired with notes or a caption needs an
-                        # explicit height too (not just width), so
-                        # with_notes()/with_caption_below() can measure it
-                        # (see poster_fix_size()'s caching, which only kicks
-                        # in when both dimensions are explicit). 4:3 is just
-                        # a reasonable default aspect ratio.
-                        width  = if (has_notes || has_caption) main_width_mm else body$width,
-                        height = if (has_notes || has_caption) (body$height %||% (main_width_mm * 0.75)) else body$height),
+    figure = {
+      fig_width <- if (has_notes || has_caption) main_width_mm else body$width
+      # A figure needs an explicit height, not just a width, whenever
+      # something has to *measure* it:
+      #   - paired with notes or a caption, so with_notes() /
+      #     with_caption_below() can size the row it sits in;
+      #   - in a `height: "auto"` card, so the card can size itself to the
+      #     figure (see poster_fix_size()'s caching, which is per
+      #     dimension).
+      # Left unset in either case, a ggplotGrob measures to its fixed
+      # axis/label rows alone -- its panel is a "null" unit -- so the card
+      # collapsed to a fraction of the intended figure height. 4:3 is just
+      # a reasonable default aspect ratio; a numeric `section$height` still
+      # lets the figure fill its share of the column as before.
+      needs_height <- has_notes || has_caption || isTRUE(fit_content)
+      fig_height <- body$height
+      if (is.null(fig_height) && needs_height) {
+        basis <- fig_width %||% total_width_mm
+        fig_height <- grid::convertWidth(as_mm_unit(basis), "mm", valueOnly = TRUE) * 0.75
+      }
+      card_figure(objects[[body$object]], theme, width = fig_width, height = fig_height)
+    },
     image = card_image(file.path(base_dir, body$files), labels = body$labels,
                        theme = theme, height = body$height, width = body$width,
                        label_position = body$label_position %||% "below"),

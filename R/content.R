@@ -31,6 +31,13 @@ card_text <- function(md, theme = poster_theme(), width = NULL) {
     grid::gpar(fontsize = theme$base_size, fontfamily = text_family(text, theme),
                col = theme$body_text, lineheight = theme$lineheight)
   }
+  if (!is.character(md)) md <- as.character(md)
+  if (!length(md)) {
+    cli::cli_abort(c(
+      "{.arg md} is empty, so there is nothing to put in the card.",
+      "i" = "Give at least one line of text, or drop the section."
+    ))
+  }
   gp <- gp_for(NULL)   # Latin metrics, for the bullet and indent columns
   width <- if (is.null(width)) grid::unit(1, "npc") else as_mm_unit(width)
   bullet <- paste0(intToUtf8(0x2022), " ")
@@ -80,6 +87,14 @@ card_text <- function(md, theme = poster_theme(), width = NULL) {
   out
 }
 
+# Gap between a card's main content and the notes column beside it (or the
+# caption below it), in millimetres. Shared deliberately: build_body()
+# subtracts it from the width budget it builds the main content to, and
+# with_notes()/with_caption_below() then lay that content out against the
+# same number. The two used to carry different values (5 and 5/3), so the
+# main content was built 3.3mm narrower than the space it was given.
+NOTES_GAP_MM <- 5 / 3
+
 #' Place a bullet-list description beside a table or figure
 #'
 #' Splits a card's body horizontally into the given content on the left and
@@ -117,7 +132,7 @@ card_text <- function(md, theme = poster_theme(), width = NULL) {
 #' @noRd
 with_notes <- function(main, notes_md, theme, total_width_mm, notes_width = 0.35,
                        show_plot_area = FALSE) {
-  gap_mm             <- 5 / 3
+  gap_mm             <- NOTES_GAP_MM
   max_notes_width_mm <- total_width_mm * notes_width
   max_main_width_mm  <- total_width_mm - max_notes_width_mm - gap_mm
   main_width_mm  <- min(grid::convertWidth(measure_width(main), "mm", valueOnly = TRUE),
@@ -292,7 +307,7 @@ poster_add_annotation <- function(g, title = NULL, caption = NULL, theme, size_m
 #' @keywords internal
 #' @noRd
 with_caption_below <- function(main, caption_md, theme, width_mm) {
-  gap_mm <- 5 / 3
+  gap_mm <- NOTES_GAP_MM
   caption_grob <- card_text(caption_md, theme, width = width_mm)
   tbl <- gtable::gtable(
     widths  = grid::unit(width_mm, "mm"),
@@ -342,7 +357,11 @@ card_figure <- function(gg, theme = poster_theme(), width = NULL, height = NULL)
 #'   an explicit height but no width can't be measured, and the next card
 #'   overlaps it. The unspecified dimension is stored as `NULL` (its
 #'   viewport uses `"npc"`, unmeasurable outside a layout) so its
-#'   `measure_*()` falls through to the generic.
+#'   `measure_*()` falls through -- to the wrapped grob itself, kept as a
+#'   `"measured_source"` attribute, rather than to the generic. Measuring
+#'   the bare `grobTree()` wrapper instead returns 0, which used to collapse
+#'   a `height = "auto"` card built around a width-only figure down to just
+#'   its header and padding.
 #' @keywords internal
 #' @noRd
 poster_fix_size <- function(g, width = NULL, height = NULL) {
@@ -354,6 +373,7 @@ poster_fix_size <- function(g, width = NULL, height = NULL) {
     width  = if (!is.null(width))  w else NULL,
     height = if (!is.null(height)) h else NULL
   )
+  attr(out, "measured_source") <- g
   out
 }
 

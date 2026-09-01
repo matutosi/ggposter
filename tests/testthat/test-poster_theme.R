@@ -26,3 +26,14 @@ test_that("poster_font() returns an installed family or the fallback", {
   expect_type(fam, "character")
   expect_length(fam, 1)
 })
+
+test_that("poster_size() rejects anything that is not a name or two dimensions", {
+  # These used to surface as "'names' attribute [2] must be the same length
+  # as the vector [0]", or to silently carry a third element along.
+  expect_error(poster_size(numeric(0)), "width, height")
+  expect_error(poster_size(c(100, 200, 300)), "width, height")
+  expect_error(poster_size(c(100, NA)), "width, height")
+  expect_error(poster_size(c(0, 200)), "width, height")
+  expect_error(poster_size("A9"), "Unknown paper size")
+  expect_equal(unname(poster_size(c(100, 200))), c(100, 200))
+})
